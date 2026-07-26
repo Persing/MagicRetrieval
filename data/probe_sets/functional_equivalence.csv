@@ -1,0 +1,26 @@
+card_a,card_b,role
+Dimir Signet,Izzet Signet,signet_cycle
+Azorius Signet,Golgari Signet,signet_cycle
+Boros Signet,Selesnya Signet,signet_cycle
+Talisman of Dominance,Talisman of Progress,talisman_cycle
+Talisman of Indulgence,Talisman of Unity,talisman_cycle
+Dimir Guildgate,Izzet Guildgate,guildgate_cycle
+Selesnya Guildgate,Rakdos Guildgate,guildgate_cycle
+Charcoal Diamond,Sky Diamond,diamond_cycle
+Fire Diamond,Marble Diamond,diamond_cycle
+Blossoming Sands,Dismal Backwater,gainland_cycle
+Jungle Hollow,Rugged Highlands,gainland_cycle
+Bant Panorama,Esper Panorama,panorama_cycle
+Dimir Cluestone,Izzet Cluestone,cluestone_cycle
+Boros Locket,Golgari Locket,locket_cycle
+Wrath of God,Damnation,wipe_recolour
+Path to Exile,Swords to Plowshares,white_exile
+Cultivate,Kodama's Reach,basic_ramp
+Nature's Lore,Three Visits,identical_effect
+Time Warp,Temporal Manipulation,extra_turn
+Doom Blade,Cast Down,conditional_kill
+Divination,Concentrate,draw_scaling
+Llanowar Elves,Fyndhorn Elves,identical_effect
+Elvish Mystic,Llanowar Elves,identical_effect
+Disenchant,Naturalize,recolour
+Negate,Dovin's Veto,counter_noncreature

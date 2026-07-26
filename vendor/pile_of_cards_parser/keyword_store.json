@@ -1,0 +1,544 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Keyword definition store for CDL parser. Each entry maps a keyword name to its CDL expansion template.",
+    "fields": {
+      "form": "simple | parameterized | block_parameterized | complex",
+      "pattern": "regex pattern to match the keyword in oracle text",
+      "cdl_template": "CDL output template; use {param} for captured groups",
+      "source": "builtin | llm | manual",
+      "reviewed": "boolean"
+    }
+  },
+  "Flying": {
+    "form": "simple",
+    "pattern": "^[Ff]lying$",
+    "cdl_template": "@FLYING",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Banding": {
+    "form": "simple",
+    "pattern": "^[Bb]anding$",
+    "cdl_template": "@BANDING",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Trample": {
+    "form": "simple",
+    "pattern": "^[Tt]rample$",
+    "cdl_template": "@TRAMPLE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Vigilance": {
+    "form": "simple",
+    "pattern": "^[Vv]igilance$",
+    "cdl_template": "@VIGILANCE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Haste": {
+    "form": "simple",
+    "pattern": "^[Hh]aste$",
+    "cdl_template": "@HASTE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Lifelink": {
+    "form": "simple",
+    "pattern": "^[Ll]ifelink$",
+    "cdl_template": "@LIFELINK",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Deathtouch": {
+    "form": "simple",
+    "pattern": "^[Dd]eathtouch$",
+    "cdl_template": "@DEATHTOUCH",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "First strike": {
+    "form": "simple",
+    "pattern": "^[Ff]irst strike$",
+    "cdl_template": "@FIRST_STRIKE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Double strike": {
+    "form": "simple",
+    "pattern": "^[Dd]ouble strike$",
+    "cdl_template": "@DOUBLE_STRIKE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Reach": {
+    "form": "simple",
+    "pattern": "^[Rr]each$",
+    "cdl_template": "@REACH",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Hexproof": {
+    "form": "simple",
+    "pattern": "^[Hh]exproof$",
+    "cdl_template": "@HEXPROOF",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Shroud": {
+    "form": "simple",
+    "pattern": "^[Ss]hroud$",
+    "cdl_template": "@SHROUD",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Indestructible": {
+    "form": "simple",
+    "pattern": "^[Ii]ndestructible$",
+    "cdl_template": "@INDESTRUCTIBLE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Menace": {
+    "form": "simple",
+    "pattern": "^[Mm]enace$",
+    "cdl_template": "@MENACE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Flash": {
+    "form": "simple",
+    "pattern": "^[Ff]lash$",
+    "cdl_template": "@FLASH",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Defender": {
+    "form": "simple",
+    "pattern": "^[Dd]efender$",
+    "cdl_template": "@DEFENDER",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Prowess": {
+    "form": "simple",
+    "pattern": "^[Pp]rowess$",
+    "cdl_template": "@PROWESS",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Horsemanship": {
+    "form": "simple",
+    "pattern": "^[Hh]orsemanship$",
+    "cdl_template": "@HORSEMANSHIP",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Cascade": {
+    "form": "simple",
+    "pattern": "^[Cc]ascade$",
+    "cdl_template": "@CASCADE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Exert": {
+    "form": "simple",
+    "pattern": "^[Ee]xert$",
+    "cdl_template": "@EXERT",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Exalted": {
+    "form": "simple",
+    "pattern": "^[Ee]xalted$",
+    "cdl_template": "@EXALTED",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Convoke": {
+    "form": "simple",
+    "pattern": "^[Cc]onvoke$",
+    "cdl_template": "@CONVOKE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Proliferate": {
+    "form": "simple",
+    "pattern": "^[Pp]roliferate$",
+    "cdl_template": "@PROLIFERATE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Ward": {
+    "form": "parameterized",
+    "pattern": "^[Ww]ard (\\{[^}]+\\})$",
+    "cdl_template": "@WARD(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Equip": {
+    "form": "parameterized",
+    "pattern": "^[Ee]quip (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@EQUIP(\"{cost}\") AS $equipped",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Crew": {
+    "form": "parameterized",
+    "pattern": "^[Cc]rew (\\d+)$",
+    "cdl_template": "@CREW({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Mobilize": {
+    "form": "parameterized",
+    "pattern": "^[Mm]obilize (\\d+)$",
+    "cdl_template": "@MOBILIZE({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Cycling": {
+    "form": "parameterized",
+    "pattern": "^[Cc]ycling (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@CYCLING(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Swampcycling": {
+    "form": "parameterized",
+    "pattern": "^[Ss]wampcycling (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@SWAMPCYCLING(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Flashback": {
+    "form": "parameterized",
+    "pattern": "^[Ff]lashback (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@FLASHBACK(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Overload": {
+    "form": "parameterized",
+    "pattern": "^[Oo]verload (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@OVERLOAD(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Kicker": {
+    "form": "parameterized",
+    "pattern": "^[Kk]icker (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@KICKER(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Offspring": {
+    "form": "parameterized",
+    "pattern": "^[Oo]ffspring (\\{[^}]+\\})$",
+    "cdl_template": "@OFFSPRING(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Freerunning": {
+    "form": "parameterized",
+    "pattern": "^[Ff]reerunning ((?:\\{[^}]+\\})+)$",
+    "cdl_template": "@FREERUNNING(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Surveil": {
+    "form": "parameterized",
+    "pattern": "^[Ss]urveil (\\d+)$",
+    "cdl_template": "@SURVEIL({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Toxic": {
+    "form": "parameterized",
+    "pattern": "^[Tt]oxic (\\d+)$",
+    "cdl_template": "@TOXIC({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Bushido": {
+    "form": "parameterized",
+    "pattern": "^[Bb]ushido (\\d+)$",
+    "cdl_template": "@BUSHIDO({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Harmonize": {
+    "form": "parameterized",
+    "pattern": "^[Hh]armonize (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@HARMONIZE(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Bestow": {
+    "form": "parameterized",
+    "pattern": "^[Bb]estow (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@BESTOW(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Station": {
+    "form": "simple",
+    "pattern": "^[Ss]tation$",
+    "cdl_template": "@STATION",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Disguise": {
+    "form": "parameterized",
+    "pattern": "^[Dd]isguise (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@DISGUISE(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Morph": {
+    "form": "parameterized",
+    "pattern": "^[Mm]orph (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@MORPH(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Megamorph": {
+    "form": "parameterized",
+    "pattern": "^[Mm]egamorph (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@MEGAMORPH(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Fear": {
+    "form": "simple",
+    "pattern": "^[Ff]ear$",
+    "cdl_template": "@FEAR",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Infect": {
+    "form": "simple",
+    "pattern": "^[Ii]nfect$",
+    "cdl_template": "@INFECT",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Shadow": {
+    "form": "simple",
+    "pattern": "^[Ss]hadow$",
+    "cdl_template": "@SHADOW",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Wither": {
+    "form": "simple",
+    "pattern": "^[Ww]ither$",
+    "cdl_template": "@WITHER",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Persist": {
+    "form": "simple",
+    "pattern": "^[Pp]ersist$",
+    "cdl_template": "@PERSIST",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Undying": {
+    "form": "simple",
+    "pattern": "^[Uu]ndying$",
+    "cdl_template": "@UNDYING",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Delve": {
+    "form": "simple",
+    "pattern": "^[Dd]elve$",
+    "cdl_template": "@DELVE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Intimidate": {
+    "form": "simple",
+    "pattern": "^[Ii]ntimidate$",
+    "cdl_template": "@INTIMIDATE",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Swampwalk": {
+    "form": "simple",
+    "pattern": "^[Ss]wampwalk$",
+    "cdl_template": "@SWAMPWALK",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Mountainwalk": {
+    "form": "simple",
+    "pattern": "^[Mm]ountainwalk$",
+    "cdl_template": "@MOUNTAINWALK",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Plainswalk": {
+    "form": "simple",
+    "pattern": "^[Pp]lainswalk$",
+    "cdl_template": "@PLAINSWALK",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Echo": {
+    "form": "parameterized",
+    "pattern": "^[Ee]cho (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@ECHO(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Evoke": {
+    "form": "parameterized",
+    "pattern": "^[Ee]voke (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@EVOKE(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Bloodthirst": {
+    "form": "parameterized",
+    "pattern": "^[Bb]loodthirst (\\d+|X)$",
+    "cdl_template": "@BLOODTHIRST({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Madness": {
+    "form": "parameterized",
+    "pattern": "^[Mm]adness (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@MADNESS(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Suspend": {
+    "form": "complex",
+    "pattern": "^[Ss]uspend (\\d+)[—-]+(\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@SUSPEND({n}, \"{cost2}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Dash": {
+    "form": "parameterized",
+    "pattern": "^[Dd]ash (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@DASH(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Buyback": {
+    "form": "parameterized",
+    "pattern": "^[Bb]uyback (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@BUYBACK(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Modular": {
+    "form": "parameterized",
+    "pattern": "^[Mm]odular (\\d+)$",
+    "cdl_template": "@MODULAR({n})",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Miracle": {
+    "form": "parameterized",
+    "pattern": "^[Mm]iracle (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@MIRACLE(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Replicate": {
+    "form": "parameterized",
+    "pattern": "^[Rr]eplicate (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@REPLICATE(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Blitz": {
+    "form": "parameterized",
+    "pattern": "^[Bb]litz (\\{[^}]+(?:\\}\\{[^}]+)*\\})$",
+    "cdl_template": "@BLITZ(\"{cost}\")",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Phasing": { "form": "simple", "pattern": "^[Pp]hasing$", "cdl_template": "@PHASING", "source": "builtin", "reviewed": true },
+  "Skulk": { "form": "simple", "pattern": "^[Ss]kulk$", "cdl_template": "@SKULK", "source": "builtin", "reviewed": true },
+  "Melee": { "form": "simple", "pattern": "^[Mm]elee$", "cdl_template": "@MELEE", "source": "builtin", "reviewed": true },
+  "Training": { "form": "simple", "pattern": "^[Tt]raining$", "cdl_template": "@TRAINING", "source": "builtin", "reviewed": true },
+  "Myriad": { "form": "simple", "pattern": "^[Mm]yriad$", "cdl_template": "@MYRIAD", "source": "builtin", "reviewed": true },
+  "Improvise": { "form": "simple", "pattern": "^[Ii]mprovise$", "cdl_template": "@IMPROVISE", "source": "builtin", "reviewed": true },
+  "Dethrone": { "form": "simple", "pattern": "^[Dd]ethrone$", "cdl_template": "@DETHRONE", "source": "builtin", "reviewed": true },
+  "Evolve": { "form": "simple", "pattern": "^[Ee]volve$", "cdl_template": "@EVOLVE", "source": "builtin", "reviewed": true },
+  "Demonstrate": { "form": "simple", "pattern": "^[Dd]emonstrate$", "cdl_template": "@DEMONSTRATE", "source": "builtin", "reviewed": true },
+  "Extort": { "form": "simple", "pattern": "^[Ee]xtort$", "cdl_template": "@EXTORT", "source": "builtin", "reviewed": true },
+  "Decayed": { "form": "simple", "pattern": "^[Dd]ecayed$", "cdl_template": "@DECAYED", "source": "builtin", "reviewed": true },
+  "Unleash": { "form": "simple", "pattern": "^[Uu]nleash$", "cdl_template": "@UNLEASH", "source": "builtin", "reviewed": true },
+  "Annihilator": { "form": "parameterized", "pattern": "^[Aa]nnihilator (\\d+)$", "cdl_template": "@ANNIHILATOR({n})", "source": "builtin", "reviewed": true },
+  "Dredge": { "form": "parameterized", "pattern": "^[Dd]redge (\\d+)$", "cdl_template": "@DREDGE({n})", "source": "builtin", "reviewed": true },
+  "Graft": { "form": "parameterized", "pattern": "^[Gg]raft (\\d+)$", "cdl_template": "@GRAFT({n})", "source": "builtin", "reviewed": true },
+  "Amplify": { "form": "parameterized", "pattern": "^[Aa]mplify (\\d+)$", "cdl_template": "@AMPLIFY({n})", "source": "builtin", "reviewed": true },
+  "Rampage": { "form": "parameterized", "pattern": "^[Rr]ampage (\\d+)$", "cdl_template": "@RAMPAGE({n})", "source": "builtin", "reviewed": true },
+  "Afflict": { "form": "parameterized", "pattern": "^[Aa]fflict (\\d+)$", "cdl_template": "@AFFLICT({n})", "source": "builtin", "reviewed": true },
+  "Devour": { "form": "parameterized", "pattern": "^[Dd]evour (\\d+)$", "cdl_template": "@DEVOUR({n})", "source": "builtin", "reviewed": true },
+  "Afterlife": { "form": "parameterized", "pattern": "^[Aa]fterlife (\\d+)$", "cdl_template": "@AFTERLIFE({n})", "source": "builtin", "reviewed": true },
+  "Emerge": { "form": "parameterized", "pattern": "^[Ee]merge (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@EMERGE(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Transmute": { "form": "parameterized", "pattern": "^[Tt]ransmute (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@TRANSMUTE(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Prowl": { "form": "parameterized", "pattern": "^[Pp]rowl (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@PROWL(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Plainscycling": { "form": "parameterized", "pattern": "^[Pp]lainscycling (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@PLAINSCYCLING(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Mountaincycling": { "form": "parameterized", "pattern": "^[Mm]ountaincycling (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@MOUNTAINCYCLING(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Forestcycling": { "form": "parameterized", "pattern": "^[Ff]orestcycling (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@FORESTCYCLING(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Islandcycling": { "form": "parameterized", "pattern": "^[Ii]slandcycling (\\{[^}]+(?:\\}\\{[^}]+)*\\})$", "cdl_template": "@ISLANDCYCLING(\"{cost}\")", "source": "builtin", "reviewed": true },
+  "Changeling": {
+    "form": "simple",
+    "pattern": "^[Cc]hangeling$",
+    "cdl_template": "@CHANGELING",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Islandwalk": {
+    "form": "simple",
+    "pattern": "^[Ii]slandwalk$",
+    "cdl_template": "@ISLANDWALK",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Forestwalk": {
+    "form": "simple",
+    "pattern": "^[Ff]orestwalk$",
+    "cdl_template": "@FORESTWALK",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Devoid": {
+    "form": "simple",
+    "pattern": "^[Dd]evoid$",
+    "cdl_template": "@DEVOID",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Affinity for artifact creatures": {
+    "form": "complex",
+    "pattern": "^[Aa]ffinity for artifact creatures$",
+    "cdl_template": "@AFFINITY(FILTER { AND { TYPE: \"Artifact\" TYPE: \"Creature\" } })",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Riot": {
+    "form": "simple",
+    "pattern": "^[Rr]iot$",
+    "cdl_template": "@RIOT",
+    "source": "builtin",
+    "reviewed": true
+  },
+  "Flanking": {
+    "form": "simple",
+    "pattern": "^[Ff]lanking$",
+    "cdl_template": "@FLANKING",
+    "source": "builtin",
+    "reviewed": true
+  }
+}

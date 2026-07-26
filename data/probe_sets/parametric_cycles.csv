@@ -1,0 +1,15 @@
+card_a,card_b,role
+Dimir Signet,Izzet Signet,signet_cycle
+Azorius Signet,Golgari Signet,signet_cycle
+Boros Signet,Selesnya Signet,signet_cycle
+Talisman of Dominance,Talisman of Progress,talisman_cycle
+Talisman of Indulgence,Talisman of Unity,talisman_cycle
+Dimir Guildgate,Izzet Guildgate,guildgate_cycle
+Selesnya Guildgate,Rakdos Guildgate,guildgate_cycle
+Charcoal Diamond,Sky Diamond,diamond_cycle
+Fire Diamond,Marble Diamond,diamond_cycle
+Blossoming Sands,Dismal Backwater,gainland_cycle
+Jungle Hollow,Rugged Highlands,gainland_cycle
+Bant Panorama,Esper Panorama,panorama_cycle
+Dimir Cluestone,Izzet Cluestone,cluestone_cycle
+Boros Locket,Golgari Locket,locket_cycle

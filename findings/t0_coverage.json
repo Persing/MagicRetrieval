@@ -1,0 +1,393 @@
+{
+  "git_dirty": true,
+  "git_rev": null,
+  "inputs": {
+    "/Users/nickpersing/PycharmProjects/MagicSpike/archidekt_census_popular.jsonl": {
+      "bytes": 28416697,
+      "exists": true,
+      "mtime": 1781370215,
+      "sha256": "267d9797ecb73c7f39b2ba704ba7c0583c3eb0a3a1b1f1d2374ad732f4e26766"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/backup_precon_only": {
+      "bytes": 85441549,
+      "exists": true,
+      "file_count": 13,
+      "is_dir": true
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1780248285,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/decks_combined.parquet": {
+      "bytes": 14636160,
+      "exists": true,
+      "mtime": 1780148806,
+      "sha256": "4bfec438d7ec52ea63469c3b08178aaa567215410a5f28133bee3d4f3d144164"
+    }
+  },
+  "results": {
+    "casual": {
+      "appearance_coverage": 0.4321853166676843,
+      "distinct_coverage_all_cards": 0.31819206855449245,
+      "distinct_coverage_in_corpus": 0.29934112646121147,
+      "encoded_coverage": 0.9574759915218017,
+      "exclusion_reasons": {
+        "digital": 5848,
+        "multi_faced": 13059,
+        "set_type": 594
+      },
+      "gap_categories": {
+        "ADDL_COST": 3084,
+        "ALT_COST": 1435,
+        "ETB replacement": 12145,
+        "UNKNOWN_KEYWORD": 4091,
+        "create token pattern unmatched": 2650,
+        "damage pattern unmatched": 2500,
+        "effect not matched": 119705,
+        "event not matched": 33996,
+        "mana side effect": 3635,
+        "replacement": 4543,
+        "replacement (instead)": 4783,
+        "static pattern unmatched": 44598
+      },
+      "guard_drop": 0.06332419005171153,
+      "guarded_coverage": 0.36886112661597276,
+      "n_cards_in_corpus": 24762,
+      "n_cards_parsed": 31041,
+      "n_decks": 4982,
+      "n_staples": 3,
+      "staple_names": [
+        "Arcane Signet",
+        "Command Tower",
+        "Sol Ring"
+      ],
+      "status_share": {
+        "clean": {
+          "appearances": 198195,
+          "n_cards": 7042,
+          "share": 0.4321853166676843
+        },
+        "crash": {
+          "appearances": 0,
+          "n_cards": 0,
+          "share": 0.0
+        },
+        "excluded": {
+          "appearances": 19501,
+          "n_cards": 1441,
+          "share": 0.042524008478198295
+        },
+        "gap": {
+          "appearances": 240892,
+          "n_cards": 15042,
+          "share": 0.5252906748541174
+        }
+      },
+      "strata": {
+        "all": {
+          "coverage": 0.4321853166676843,
+          "covered": 198195,
+          "total": 458588
+        },
+        "non_land": {
+          "coverage": 0.38096849449231346,
+          "covered": 138479,
+          "total": 363492
+        },
+        "non_land_non_staple": {
+          "coverage": 0.36886112661597276,
+          "covered": 131506,
+          "total": 356519
+        },
+        "non_staple": {
+          "coverage": 0.4188784767243861,
+          "covered": 187694,
+          "total": 448087
+        }
+      },
+      "top_breakouts": {
+        "top_100": {
+          "appearance_coverage": 0.8527281215644342,
+          "distinct_coverage": 0.8085106382978723,
+          "n_cards": 94
+        },
+        "top_2000": {
+          "appearance_coverage": 0.5520067739204064,
+          "distinct_coverage": 0.40948058497226425,
+          "n_cards": 1983
+        },
+        "top_500": {
+          "appearance_coverage": 0.6960946167256591,
+          "distinct_coverage": 0.5873983739837398,
+          "n_cards": 492
+        }
+      },
+      "verdict": "FAIL"
+    },
+    "cedh": {
+      "appearance_coverage": 0.48297018794456137,
+      "distinct_coverage_all_cards": 0.31819206855449245,
+      "distinct_coverage_in_corpus": 0.2960750853242321,
+      "encoded_coverage": 0.8937929418201593,
+      "exclusion_reasons": {
+        "digital": 408404,
+        "multi_faced": 68281,
+        "set_type": 5496
+      },
+      "gap_categories": {
+        "ADDL_COST": 27722,
+        "ALT_COST": 103181,
+        "ETB replacement": 113165,
+        "UNKNOWN_KEYWORD": 11965,
+        "create token pattern unmatched": 5412,
+        "damage pattern unmatched": 46094,
+        "effect not matched": 923096,
+        "event not matched": 153250,
+        "mana side effect": 9773,
+        "replacement": 50885,
+        "replacement (instead)": 21412,
+        "static pattern unmatched": 393998
+      },
+      "guard_drop": 0.06219545155224776,
+      "guarded_coverage": 0.4207747363923136,
+      "n_cards_in_corpus": 10569,
+      "n_cards_parsed": 31041,
+      "n_decks": 46798,
+      "n_staples": 39,
+      "staple_names": [
+        "Ancient Tomb",
+        "Arcane Signet",
+        "Arid Mesa",
+        "Bloodstained Mire",
+        "Chrome Mox",
+        "City of Brass",
+        "Command Tower",
+        "Deflecting Swat",
+        "Demonic Tutor",
+        "Fellwar Stone",
+        "Fierce Guardianship",
+        "Flooded Strand",
+        "Flusterstorm",
+        "Force of Negation",
+        "Force of Will",
+        "Gemstone Caverns",
+        "Lotus Petal",
+        "Mana Confluence",
+        "Mana Vault",
+        "Marsh Flats",
+        "Mental Misstep",
+        "Mindbreak Trap",
+        "Misty Rainforest",
+        "Mox Amber",
+        "Mox Diamond",
+        "Mox Opal",
+        "Mystic Remora",
+        "Otawara, Soaring City",
+        "Pact of Negation",
+        "Polluted Delta",
+        "Rhystic Study",
+        "Scalding Tarn",
+        "Sol Ring",
+        "Swan Song",
+        "The One Ring",
+        "Vampiric Tutor",
+        "Verdant Catacombs",
+        "Windswept Heath",
+        "Wooded Foothills"
+      ],
+      "status_share": {
+        "clean": {
+          "appearances": 2192689,
+          "n_cards": 3123,
+          "share": 0.48297018794456137
+        },
+        "crash": {
+          "appearances": 0,
+          "n_cards": 0,
+          "share": 0.0
+        },
+        "excluded": {
+          "appearances": 482181,
+          "n_cards": 597,
+          "share": 0.10620705817984061
+        },
+        "gap": {
+          "appearances": 1865139,
+          "n_cards": 6828,
+          "share": 0.410822753875598
+        }
+      },
+      "strata": {
+        "all": {
+          "coverage": 0.48297018794456137,
+          "covered": 2192689,
+          "total": 4540009
+        },
+        "non_land": {
+          "coverage": 0.4586283535397158,
+          "covered": 1523928,
+          "total": 3322795
+        },
+        "non_land_non_staple": {
+          "coverage": 0.4207747363923136,
+          "covered": 1071380,
+          "total": 2546208
+        },
+        "non_staple": {
+          "coverage": 0.40205524569624956,
+          "covered": 1282980,
+          "total": 3191054
+        }
+      },
+      "top_breakouts": {
+        "top_100": {
+          "appearance_coverage": 0.5789640053477908,
+          "distinct_coverage": 0.54,
+          "n_cards": 100
+        },
+        "top_2000": {
+          "appearance_coverage": 0.48588161720797735,
+          "distinct_coverage": 0.32814070351758795,
+          "n_cards": 1990
+        },
+        "top_500": {
+          "appearance_coverage": 0.507453995780393,
+          "distinct_coverage": 0.4166666666666667,
+          "n_cards": 492
+        }
+      },
+      "verdict": "FAIL"
+    },
+    "precon": {
+      "appearance_coverage": 0.46992176962503374,
+      "distinct_coverage_all_cards": 0.31819206855449245,
+      "distinct_coverage_in_corpus": 0.3228048010107391,
+      "encoded_coverage": 0.9900863231723765,
+      "exclusion_reasons": {
+        "digital": 58,
+        "multi_faced": 88,
+        "set_type": 1
+      },
+      "gap_categories": {
+        "ADDL_COST": 60,
+        "ALT_COST": 34,
+        "ETB replacement": 277,
+        "UNKNOWN_KEYWORD": 142,
+        "create token pattern unmatched": 94,
+        "damage pattern unmatched": 67,
+        "effect not matched": 4262,
+        "event not matched": 999,
+        "mana side effect": 160,
+        "replacement": 170,
+        "replacement (instead)": 75,
+        "static pattern unmatched": 1293
+      },
+      "guard_drop": 0.09242952328032839,
+      "guarded_coverage": 0.37749224634470535,
+      "n_cards_in_corpus": 6332,
+      "n_cards_parsed": 31041,
+      "n_decks": 224,
+      "n_staples": 3,
+      "staple_names": [
+        "Arcane Signet",
+        "Command Tower",
+        "Sol Ring"
+      ],
+      "status_share": {
+        "clean": {
+          "appearances": 6968,
+          "n_cards": 2044,
+          "share": 0.46992176962503374
+        },
+        "crash": {
+          "appearances": 0,
+          "n_cards": 0,
+          "share": 0.0
+        },
+        "excluded": {
+          "appearances": 147,
+          "n_cards": 111,
+          "share": 0.009913676827623416
+        },
+        "gap": {
+          "appearances": 7713,
+          "n_cards": 4177,
+          "share": 0.5201645535473428
+        }
+      },
+      "strata": {
+        "all": {
+          "coverage": 0.46992176962503374,
+          "covered": 6968,
+          "total": 14828
+        },
+        "non_land": {
+          "coverage": 0.3925637699956766,
+          "covered": 4540,
+          "total": 11565
+        },
+        "non_land_non_staple": {
+          "coverage": 0.37749224634470535,
+          "covered": 4260,
+          "total": 11285
+        },
+        "non_staple": {
+          "coverage": 0.4539012019731814,
+          "covered": 6533,
+          "total": 14393
+        }
+      },
+      "top_breakouts": {
+        "top_100": {
+          "appearance_coverage": 0.8153735632183908,
+          "distinct_coverage": 0.75,
+          "n_cards": 100
+        },
+        "top_2000": {
+          "appearance_coverage": 0.5656380486811284,
+          "distinct_coverage": 0.417,
+          "n_cards": 2000
+        },
+        "top_500": {
+          "appearance_coverage": 0.7017055342847198,
+          "distinct_coverage": 0.598,
+          "n_cards": 500
+        }
+      },
+      "verdict": "FAIL"
+    }
+  },
+  "run_args": {
+    "corpora": [
+      "casual",
+      "cedh",
+      "precon"
+    ],
+    "limit": null,
+    "parser": "PileOfCardsParser@/Users/nickpersing/PycharmProjects/PileOfCardsParser"
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "git_dirty": true,
+  "git_rev": null,
+  "harness": {
+    "corpus_caveat": "arm 2a was not run",
+    "expected_random": 0.748,
+    "expected_substitute": 0.717,
+    "matches_reference": null,
+    "observed_random": null,
+    "observed_substitute": null,
+    "tolerance": 0.02
+  },
+  "inputs": {
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/data/substitute_pairs_v2.csv": {
+      "bytes": 2411,
+      "exists": true,
+      "mtime": 1784987678,
+      "sha256": "6bd7702ed23d555efb44d6b1168756cbd4f6cdceba6b129cfae7ce4c6c378283"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/archidekt_census_popular.jsonl": {
+      "bytes": 28416697,
+      "exists": true,
+      "mtime": 1781370215,
+      "sha256": "267d9797ecb73c7f39b2ba704ba7c0583c3eb0a3a1b1f1d2374ad732f4e26766"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/backup_precon_only": {
+      "bytes": 85441549,
+      "exists": true,
+      "file_count": 13,
+      "is_dir": true
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1780248285,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/cluster_assignments.parquet": {
+      "bytes": 716141,
+      "exists": true,
+      "mtime": 1780182336,
+      "sha256": "9abf5ade9bbdbc7f731bc6435631396a96c6eaf16682492548a74a14af7276dd"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/decks_combined.parquet": {
+      "bytes": 14636160,
+      "exists": true,
+      "mtime": 1780148806,
+      "sha256": "4bfec438d7ec52ea63469c3b08178aaa567215410a5f28133bee3d4f3d144164"
+    }
+  },
+  "results": [
+    {
+      "arm": "2b",
+      "corpus": "cedh",
+      "curated": {
+        "lift_vs_cluster": 0.11708103120326996,
+        "lift_vs_cluster_ci": [
+          0.08414960412745486,
+          0.14887604230072024
+        ],
+        "lift_vs_stratum": 0.14676690497148182,
+        "lift_vs_stratum_ci": [
+          0.11398005179233023,
+          0.17955110624524542
+        ],
+        "mean_random_cluster_cosine": 0.7030160079399744,
+        "mean_random_stratum_cosine": 0.6733301341717626,
+        "mean_substitute_cosine": 0.8200970391432444,
+        "n_pairs_in_vocab": 54
+      },
+      "mined_holdout": {
+        "lift_vs_cluster": 0.01081121622365111,
+        "lift_vs_cluster_ci": [
+          0.00962361919987446,
+          0.012020918837823382
+        ],
+        "lift_vs_stratum": 0.07860977065155561,
+        "lift_vs_stratum_ci": [
+          0.07738874145750867,
+          0.07986993140045225
+        ],
+        "mean_random_cluster_cosine": 0.7243131032087006,
+        "mean_random_stratum_cosine": 0.6565145487807961,
+        "mean_substitute_cosine": 0.7351243194323517,
+        "n_pairs_in_vocab": 31341
+      },
+      "n_cards_vocab": 10569,
+      "n_decks": 46798,
+      "n_extra_negatives_2d": 0,
+      "n_extra_positives_2d": 0,
+      "n_holdout_positives": 31341,
+      "n_negatives": 0,
+      "n_positives_mined": 208946,
+      "n_positives_strict": 203901,
+      "n_positives_trained": 177605,
+      "verdict": "PASS",
+      "narrow_effect": true
+    }
+  ],
+  "run_args": {
+    "arms": [
+      "2b"
+    ],
+    "corpora": [
+      "cedh"
+    ],
+    "epochs": 2,
+    "max_decks": null,
+    "max_positives": null
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    }
+  }
+}

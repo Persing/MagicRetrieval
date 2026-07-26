@@ -1,0 +1,58 @@
+card_a,card_b,role
+Cultivate,Kodama's Reach,basic_ramp
+Rampant Growth,Three Visits,1cmc_ramp
+Nature's Lore,Three Visits,2cmc_ramp
+Farseek,Nature's Lore,2cmc_ramp
+Skyshroud Claim,Explosive Vegetation,4cmc_ramp
+Harrow,Explosive Vegetation,land_ramp
+Birds of Paradise,Llanowar Elves,1cmc_dork
+Elvish Mystic,Llanowar Elves,1cmc_dork
+Fyndhorn Elves,Llanowar Elves,1cmc_dork
+Sakura-Tribe Elder,Wood Elves,etb_ramp
+Solemn Simulacrum,Wood Elves,etb_ramp
+Sol Ring,Arcane Signet,early_mana
+Arcane Signet,Fellwar Stone,2cmc_rock
+Mind Stone,Fellwar Stone,2cmc_rock
+Thought Vessel,Mind Stone,2cmc_rock
+Commander's Sphere,Chromatic Lantern,3cmc_rock
+Coldsteel Heart,Fellwar Stone,2cmc_rock
+Path to Exile,Swords to Plowshares,white_removal
+Swords to Plowshares,Condemn,white_removal
+Generous Gift,Beast Within,permanent_removal
+Return to Dust,Crush Contraband,artifact_ench_removal
+Disenchant,Naturalize,artifact_ench_removal
+Krosan Grip,Nature's Claim,green_artifact_removal
+Go for the Throat,Doom Blade,black_removal
+Doom Blade,Cast Down,black_removal
+Infernal Grasp,Go for the Throat,black_removal
+Murder,Hero's Downfall,3cmc_black_removal
+Bake into a Pie,Murder,3cmc_black_removal
+Wrath of God,Damnation,4cmc_wipe
+Day of Judgment,Wrath of God,4cmc_wipe
+Toxic Deluge,Damnation,black_wipe
+Blasphemous Act,Chain Reaction,red_wipe
+Cyclonic Rift,Evacuation,bounce_wipe
+Counterspell,Arcane Denial,counterspell
+An Offer You Can't Refuse,Swan Song,cheap_counter
+Dovin's Veto,Negate,noncreature_counter
+Rhystic Study,Mystic Remora,draw_tax
+Phyrexian Arena,Underworld Connections,repeat_draw
+Night's Whisper,Sign in Blood,2cmc_draw
+Divination,Night's Whisper,2cmc_draw
+Fact or Fiction,Mulldrifter,draw_spell
+Harmonize,Concentrate,draw_three
+Demonic Tutor,Vampiric Tutor,tutor
+Diabolic Tutor,Demonic Tutor,tutor
+Diabolic Intent,Demonic Tutor,tutor
+Enlightened Tutor,Mystical Tutor,narrow_tutor
+Idyllic Tutor,Enlightened Tutor,enchantment_tutor
+Worldly Tutor,Sylvan Tutor,creature_tutor
+Eternal Witness,Regrowth,recursion
+Regrowth,Noxious Revival,recursion
+Time Warp,Temporal Manipulation,extra_turn
+Lightning Greaves,Swiftfoot Boots,protect_equip
+Deflecting Swat,Fierce Guardianship,free_protection
+Command Tower,Exotic Orchard,fixing_land
+Exotic Orchard,Reflecting Pool,fixing_land
+Bojuka Bog,Scavenger Grounds,graveyard_hate_land
+Reliquary Tower,Thought Vessel,no_max_hand

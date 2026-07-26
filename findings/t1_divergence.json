@@ -1,0 +1,147 @@
+{
+  "aggregate_divergence": 0.0,
+  "git_dirty": true,
+  "git_rev": null,
+  "inputs": {
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/data/probe_sets/identical_text.csv": {
+      "bytes": 38853,
+      "exists": true,
+      "mtime": 1784987678,
+      "sha256": "715803df9e7eb8f30a7b7bb42b94a026ccc87ee9f38fddbad159a19f2f7c6abd"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/data/probe_sets/parametric_cycles.csv": {
+      "bytes": 685,
+      "exists": true,
+      "mtime": 1784987678,
+      "sha256": "f9a8daf508595f88752ed5aab94468b68f3550864b862fd64406b46c5905b023"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/data/probe_sets/same_effect_diff_wording.csv": {
+      "bytes": 242,
+      "exists": true,
+      "mtime": 1784987678,
+      "sha256": "b2c6524c33bc69298cb73f1d3024938ec5b19fb062e11a2b53b98b8899893270"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/data/substitute_pairs_v2.csv": {
+      "bytes": 2411,
+      "exists": true,
+      "mtime": 1784987678,
+      "sha256": "6bd7702ed23d555efb44d6b1168756cbd4f6cdceba6b129cfae7ce4c6c378283"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1780248285,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/scryfall_oracle_cards.jsonl.gz": {
+      "bytes": 22627751,
+      "exists": true,
+      "mtime": 1781357505,
+      "sha256": "8db9e937a163529194833d46d4168621c8f1d9071b194fb7621d83638f57b774"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/scryfall_oracle_tags.jsonl.gz": {
+      "bytes": 5796896,
+      "exists": true,
+      "mtime": 1781357506,
+      "sha256": "654a36fdd6f241a85a3f1f082bbdbbc17d63b93c6d3f0026817abaa343bb3dc6"
+    }
+  },
+  "numeric_divergence": 0.0,
+  "run_args": {
+    "all_printings": null,
+    "parser": "PileOfCardsParser@/Users/nickpersing/PycharmProjects/PileOfCardsParser"
+  },
+  "sets": {
+    "identical_text": {
+      "divergence_all_rules_loose": 0.0,
+      "divergence_clean_full_loose": 0.9470468431771895,
+      "divergence_clean_rules_loose": 0.0,
+      "divergence_clean_rules_strict": 0.0,
+      "mask_numbers": false,
+      "mask_symbols": false,
+      "n_both_clean": 491,
+      "n_both_encoded": 641,
+      "n_pairs": 800,
+      "underpowered": false,
+      "upper_bound_95": 0.006109979633401222
+    },
+    "numeric": {
+      "divergence_all_rules_loose": 0.0,
+      "divergence_clean_full_loose": 0.8448275862068966,
+      "divergence_clean_rules_loose": 0.0,
+      "divergence_clean_rules_strict": 0.0,
+      "mask_numbers": true,
+      "mask_symbols": false,
+      "n_both_clean": 348,
+      "n_both_encoded": 465,
+      "n_pairs": 550,
+      "underpowered": false,
+      "upper_bound_95": 0.008620689655172414
+    },
+    "parametric_cycles": {
+      "divergence_all_rules_loose": 0.0,
+      "divergence_clean_full_loose": 0.0,
+      "divergence_clean_rules_loose": 0.0,
+      "divergence_clean_rules_strict": 0.0,
+      "mask_numbers": true,
+      "mask_symbols": true,
+      "n_both_clean": 14,
+      "n_both_encoded": 14,
+      "n_pairs": 14,
+      "underpowered": true,
+      "upper_bound_95": 0.21428571428571427
+    },
+    "same_effect_wording": {
+      "divergence_all_rules_loose": 0.0,
+      "divergence_clean_full_loose": 0.25,
+      "divergence_clean_rules_loose": 0.0,
+      "divergence_clean_rules_strict": 0.0,
+      "mask_numbers": false,
+      "mask_symbols": false,
+      "n_both_clean": 4,
+      "n_both_encoded": 5,
+      "n_pairs": 5,
+      "underpowered": true,
+      "upper_bound_95": 0.75
+    },
+    "substitutes_contrast": {
+      "divergence_all_rules_loose": 0.6785714285714286,
+      "divergence_clean_full_loose": 0.8717948717948718,
+      "divergence_clean_rules_loose": 0.6923076923076923,
+      "divergence_clean_rules_strict": 0.6923076923076923,
+      "mask_numbers": false,
+      "mask_symbols": false,
+      "n_both_clean": 39,
+      "n_both_encoded": 56,
+      "n_pairs": 57,
+      "underpowered": false,
+      "upper_bound_95": null
+    }
+  },
+  "skips": {
+    "reprints": "No all-printings bulk supplied. Scryfall's oracle snapshot carries one unified oracle_text per oracle_id, so era-wording pairs cannot be built from it. Pass --all-printings /path/to/all-cards.json to enable this set."
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    }
+  },
+  "verdict": "PASS (UNDERPOWERED)"
+}

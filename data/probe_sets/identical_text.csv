@@ -1,0 +1,801 @@
+card_a,card_b,role
+Haunted Mire,Woodland Chasm,identical_text
+Geothermal Bog,Sulfurous Mire,identical_text
+Rimewood Falls,Tangled Islet,identical_text
+Arctic Treeline,Radiant Grove,identical_text
+Highland Forest,Wooded Ridgeline,identical_text
+Alpine Meadow,Sacred Peaks,identical_text
+Contaminated Aquifer,Ice Tunnel,identical_text
+Molten Tributary,Volatile Fjord,identical_text
+Snowfield Sinkhole,Sunlit Marsh,identical_text
+Glacial Floodplain,Idyllic Beachfront,identical_text
+Collector Ouphe,Null Rod,identical_text
+Null Rod,Stony Silence,identical_text
+Frogmite,Myr Enforcer,identical_text
+Memory Guardian,Qumulox,identical_text
+Qumulox,Somber Hoverguard,identical_text
+Debtors' Transport,Ministrant of Obligation,identical_text
+Alluring Scent,Bloodscent,identical_text
+Bloodscent,Taunting Challenge,identical_text
+Breaker of Armies,Elvish Bard,identical_text
+Elvish Bard,Prized Unicorn,identical_text
+Prized Unicorn,Taunting Elf,identical_text
+Nausea,Shrivel,identical_text
+Infest,Rags // Riches,identical_text
+Magus of the Tabernacle,Pendrell Mists,identical_text
+Concordant Crossroads,Mass Hysteria,identical_text
+Kor Chant,Kor Dirge,identical_text
+Muscle Sliver,Sinew Sliver,identical_text
+Spitting Sliver,Talon Sliver,identical_text
+Heart Sliver,Reflex Sliver,identical_text
+Battering Sliver,Horned Sliver,identical_text
+Celebrity Fencer,EPF Point Squad,identical_text
+Etherium Sculptor,Foundry Inspector,identical_text
+Foundry Inspector,Voyager Quickwelder,identical_text
+Frozen Aether,Kismet,identical_text
+Kismet,Loxodon Gatekeeper,identical_text
+Big Score,Pirate's Pillage,identical_text
+Pirate's Pillage,Unexpected Windfall,identical_text
+Thrill of Possibility,Tormenting Voice,identical_text
+Tormenting Voice,Wild Guess,identical_text
+Electric Revelation,Laughing Mad,identical_text
+Blood Divination,Vivisection,identical_text
+Altar's Reap,Corrupted Conviction,identical_text
+Corrupted Conviction,Skulltap,identical_text
+Skulltap,Village Rites,identical_text
+Fling,Thud,identical_text
+Kitesail Apprentice,Skyhunter Cub,identical_text
+Dhund Operative,Gravblade Heavy,identical_text
+Eladamri's Vineyard,Magus of the Vineyard,identical_text
+Magus of the Abyss,The Abyss,identical_text
+Afflicted Deserter // Werewolf Ransacker,Breakneck Rider // Neck Breaker,identical_text
+Breakneck Rider // Neck Breaker,Convicted Killer // Branded Howler,identical_text
+Convicted Killer // Branded Howler,Gatstaf Arsonists // Gatstaf Ravagers,identical_text
+Gatstaf Arsonists // Gatstaf Ravagers,Gatstaf Shepherd // Gatstaf Howler,identical_text
+Gatstaf Shepherd // Gatstaf Howler,Grizzled Outcasts // Krallenhorde Wantons,identical_text
+Grizzled Outcasts // Krallenhorde Wantons,Hinterland Hermit // Hinterland Scourge,identical_text
+Hinterland Hermit // Hinterland Scourge,Hinterland Logger // Timber Shredder,identical_text
+Hinterland Logger // Timber Shredder,Lambholt Elder // Silverpelt Werewolf,identical_text
+Lambholt Elder // Silverpelt Werewolf,Mondronen Shaman // Tovolar's Magehunter,identical_text
+Mondronen Shaman // Tovolar's Magehunter,Reckless Waif // Merciless Predator,identical_text
+Reckless Waif // Merciless Predator,Solitary Hunter // One of the Pack,identical_text
+Solitary Hunter // One of the Pack,Tormented Pariah // Rampaging Werewolf,identical_text
+Tormented Pariah // Rampaging Werewolf,Ulvenwald Mystics // Ulvenwald Primordials,identical_text
+Ulvenwald Mystics // Ulvenwald Primordials,Villagers of Estwald // Howlpack of Estwald,identical_text
+Drop of Honey,Porphyry Nodes,identical_text
+Agent of Masks,Subversion,identical_text
+Elvish Farmer,Mycologist,identical_text
+Roaring Primadox,Species Gorger,identical_text
+Dark Confidant,Dark Tutelage,identical_text
+Darba,Hungry Mist,identical_text
+Juzám Djinn,Nettletooth Djinn,identical_text
+Nettletooth Djinn,Ravenous Giant,identical_text
+Army of Allah,Trumpet Blast,identical_text
+Goblin Oriflamme,Orcish Oriflamme,identical_text
+Orcish Oriflamme,War Horn,identical_text
+Berserkers' Onslaught,Blade Historian,identical_text
+Benalish Hero,Benalish Infantry,identical_text
+Benalish Infantry,Icatian Phalanx,identical_text
+Icatian Phalanx,Kjeldoran Escort,identical_text
+Kjeldoran Escort,Kjeldoran Warrior,identical_text
+Kjeldoran Warrior,Shield Bearer,identical_text
+Shield Bearer,Timber Wolves,identical_text
+Accorder Paladin,Goblin Wardriver,identical_text
+Goblin Wardriver,Loxodon Partisan,identical_text
+Bloodrage Vampire,Bloodscale Prowler,identical_text
+Battering Wurm,Skarrgan Pit-Skulk,identical_text
+Devoted Retainer,Nezumi Ronin,identical_text
+Inner-Chamber Guard,Jade Avenger,identical_text
+Jade Avenger,Ronin Cavekeeper,identical_text
+Ronin Cavekeeper,Samurai Enforcers,identical_text
+Enlisted Wurm,Maelstrom Colossus,identical_text
+Maelstrom Colossus,Shardless Agent,identical_text
+Eightfold Maze,Just Fate,identical_text
+Deep Wood,Heavy Fog,identical_text
+Champion's Victory,Remove,identical_text
+Illusory Angel,Skyshroud Condor,identical_text
+Deflection,Shunt,identical_text
+Shunt,Swerve,identical_text
+Impostor of the Sixth Pride,Universal Automaton,identical_text
+Universal Automaton,Woodland Changeling,identical_text
+Game-Trail Changeling,Gangly Stompling,identical_text
+Reviving Melody,Season of Renewal,identical_text
+Azula Always Lies,Subtle Strike,identical_text
+Raise the Draugr,Return from Extinction,identical_text
+Return from Extinction,Unbury,identical_text
+Healing Leaves,Healing Salve,identical_text
+Deglamer,Unravel the Aether,identical_text
+Halo Hopper,Ledev Guardian,identical_text
+Ledev Guardian,Will-Forged Golem,identical_text
+Mob,Vote Out,identical_text
+Astral Wingspan,Lofty Dreams,identical_text
+Conclave Equenaut,Flight of Equenauts,identical_text
+Flight of Equenauts,Thunderhead Squadron,identical_text
+Autochthon Wurm,Siege Wurm,identical_text
+Guardian of Vitu-Ghazi,Rosemane Centaur,identical_text
+Rosemane Centaur,Sun-Dappled Celebrant,identical_text
+Reverberate,Twincast,identical_text
+Bind,Squelch,identical_text
+Repudiate // Replicate,Stifle,identical_text
+Scatter Ray,Spectral Interference,identical_text
+Essence Scatter,False Summoning,identical_text
+False Summoning,Preemptive Strike,identical_text
+Preemptive Strike,Remove Soul,identical_text
+Bone to Ash,Exclude,identical_text
+Dispel,Flash Counter,identical_text
+Negate,Spite // Malice,identical_text
+Envelop,Extinguish,identical_text
+Rebuff the Wicked,Turn Aside,identical_text
+Force Spike,Jwari Disruption // Jwari Ruins,identical_text
+Jwari Disruption // Jwari Ruins,Mana Tithe,identical_text
+It'll Quench Ya!,Quench,identical_text
+Mana Leak,Reduce // Rubble,identical_text
+Disallow,Voidslime,identical_text
+Cancel,Counterspell,identical_text
+Failed Inspection,Refute,identical_text
+Contradict,Dismiss,identical_text
+Lapse of Certainty,Memory Lapse,identical_text
+Didn't Say Please,Thought Collapse,identical_text
+Elven Ambush,Elvish Promenade,identical_text
+Dragon Fodder,Krenko's Command,identical_text
+Call the Cavalry,Knight Watch,identical_text
+Phantom General,Pollen-Shield Hare // Hare Raising,identical_text
+Ghostly Prison,Propaganda,identical_text
+Tocatli Honor Guard,Torpor Orb,identical_text
+Marble Titan,Meekstone,identical_text
+Magus of the Moat,Moat,identical_text
+Falter,Magmatic Chasm,identical_text
+Magmatic Chasm,Seismic Stomp,identical_text
+Banners Raised,Chorus of Woe,identical_text
+Chorus of Woe,Scare Tactics,identical_text
+Charge,Glorious Charge,identical_text
+Glorious Charge,Virtuous Charge,identical_text
+Virtuous Charge,Warrior's Charge,identical_text
+Warrior's Charge,Warrior's Honor,identical_text
+Anthem of Champions,Gaea's Anthem,identical_text
+Gaea's Anthem,Glorious Anthem,identical_text
+Burn Bright,Desperate Charge,identical_text
+Desperate Charge,Path of Anger's Flame,identical_text
+Ethereal Guidance,Inspired Charge,identical_text
+Makindi Stampede // Makindi Mesas,Righteous Charge,identical_text
+Cyclops of Eternal Fury,Madrush Cyclops,identical_text
+Cumber Stone,Dampening Pulse,identical_text
+Dampening Pulse,Haunter of Nightveil,identical_text
+Cower in Fear,Make Obsolete,identical_text
+Beyeen Veil // Beyeen Coast,Turn the Tide,identical_text
+Futurist Sentinel,Irontread Crusher,identical_text
+Barkhide Mauler,Ridge Rannet,identical_text
+Ridge Rannet,Sandbar Merfolk,identical_text
+Sandbar Merfolk,Sandbar Serpent,identical_text
+Sandbar Serpent,Yoked Plowbeast,identical_text
+Mardu Scout,Screamreach Brawler,identical_text
+Alesha's Vanguard,Kolaghan Skirmisher,identical_text
+Hookhand Mariner // Riphook Raider,Tavern Ruffian // Tavern Smasher,identical_text
+Daggerback Basilisk,Feral Abomination,identical_text
+Feral Abomination,Giant Scorpion,identical_text
+Giant Scorpion,Gilacorn,identical_text
+Gilacorn,Greater Basilisk,identical_text
+Greater Basilisk,Hand of Silumgar,identical_text
+Hand of Silumgar,Moonglove Winnower,identical_text
+Moonglove Winnower,Pharika's Chosen,identical_text
+Pharika's Chosen,Sedge Scorpion,identical_text
+Sedge Scorpion,Typhoid Rats,identical_text
+Typhoid Rats,Ukud Cobra,identical_text
+Ukud Cobra,Vampire Champion,identical_text
+Bilious Skulldweller,Ichorspit Basilisk,identical_text
+Blooming Stinger,Toxic Scorpion,identical_text
+Daggerfang Duo,Deathcap Marionette,identical_text
+Blistering Barrier,Glacial Wall,identical_text
+Glacial Wall,Guardians of Meletis,identical_text
+Guardians of Meletis,Moat Piranhas,identical_text
+Moat Piranhas,Steel Wall,identical_text
+Steel Wall,Tundra Wall,identical_text
+Tundra Wall,Wall of Earth,identical_text
+Wall of Earth,Wall of Granite,identical_text
+Wall of Granite,Wall of Heat,identical_text
+Wall of Heat,Wall of Ice,identical_text
+Wall of Ice,Wall of Stone,identical_text
+Wall of Stone,Wall of Torches,identical_text
+Wall of Torches,Wall of Wood,identical_text
+Wall of Razors,Wall of Spears,identical_text
+Angelic Wall,Wall of Swords,identical_text
+Cemetery Gate,Wall of Light,identical_text
+Carven Caryatid,Jungle Barrier,identical_text
+Wall of Brambles,Wall of Pine Needles,identical_text
+Alabaster Wall,Benevolent Ancestor,identical_text
+Mechan Shieldmate,Shipwreck Sentry,identical_text
+Archers of Qarsi,Consulate Skygate,identical_text
+Wall of Blossoms,Wall of Omens,identical_text
+Thermo-Alchemist,Unruly Catapult,identical_text
+Dragon's Eye Sentry,Haunted Guardian,identical_text
+Damnation,Wrath of God,identical_text
+Back to Nature,Cleanfall,identical_text
+Cleanfall,Tempest of Light,identical_text
+Tempest of Light,Tranquility,identical_text
+Ondu Inversion // Ondu Skyruins,Planar Cleansing,identical_text
+Disenchant,Naturalize,identical_text
+Naturalize,Nature's Chant,identical_text
+Break Asunder,Wilt,identical_text
+Natural End,Sanctify,identical_text
+Invoke the Divine,Solemn Offering,identical_text
+Solemn Offering,Springsage Ritual,identical_text
+Demolish,Sunder from Within,identical_text
+Violent Impact,Volcanic Submersion,identical_text
+Broken Wings,Return to the Earth,identical_text
+Creeping Mold,Reclaiming Vines,identical_text
+Shatter,Smelt,identical_text
+Smelt,Verdigris,identical_text
+Immolating Glare,Kill Shot,identical_text
+Kill Shot,Rebuke,identical_text
+Divine Verdict,Farm // Market,identical_text
+Farm // Market,Neck Snap,identical_text
+Neck Snap,Sudden Strike,identical_text
+Lava Flow,Wrecking Ball,identical_text
+Dreadbore,Fell the Profane // Fell Mire,identical_text
+Fell the Profane // Fell Mire,Finishing Blow,identical_text
+Finishing Blow,Hero's Downfall,identical_text
+Hero's Downfall,Never // Return,identical_text
+Deadly Derision,Grim Bounty,identical_text
+Daring Demolition,Spin Out,identical_text
+Mirrodin Avenged,You Are Already Dead,identical_text
+Plummet,Wing Snare,identical_text
+Reave Soul,Vanquish the Weak,identical_text
+Legion's Judgment,Smite the Monstrous,identical_text
+Collar the Culprit,Sungold Barrage,identical_text
+Eviscerate,Fell,identical_text
+Fell,Impale,identical_text
+Impale,Murder,identical_text
+Flesh to Dust,Terminate,identical_text
+Misfortune's Gain,Path of Peace,identical_text
+Demystify,Quiet Purity,identical_text
+Despoil,Spreading Rot,identical_text
+Melt Terrain,Poison the Well,identical_text
+Doom Blade,Ghostly Visit,identical_text
+Ghostly Visit,Hand of Death,identical_text
+Dark Offering,Poison Arrow,identical_text
+Desert Twister,Vindicate,identical_text
+Assassinate,Death Stroke,identical_text
+Death Stroke,Push // Pull,identical_text
+Push // Pull,Swift Response,identical_text
+Swift Response,Take Vengeance,identical_text
+Take Vengeance,Vengeance,identical_text
+Reckless Spite,Wicked Pact,identical_text
+Fast // Furious,Romantic Rendezvous,identical_text
+Thalakos Drifters,Trespasser il-Vec,identical_text
+Gaea's Might,Might of Alara,identical_text
+Fencing Ace,Iroas's Champion,identical_text
+Iroas's Champion,Raging Redcap,identical_text
+Raging Redcap,Ridgetop Raptor,identical_text
+Ridgetop Raptor,Two-Headed Cerberus,identical_text
+Dragon-Style Twins,Jeskai Brushmaster,identical_text
+"Borrowing 100,000 Arrows",Theft of Dreams,identical_text
+Frantic Inventory,Take Inventory,identical_text
+Control of the Court,Goblin Lore,identical_text
+Prying Eyes,Thoughtflare,identical_text
+Cruel Bargain,Infernal Contract,identical_text
+Ancestral Reminiscence,Enhanced Awareness,identical_text
+Enhanced Awareness,Rain of Revelation,identical_text
+Rain of Revelation,Sift,identical_text
+Thassa's Bounty,Weight of Memory,identical_text
+Mystic Meditation,Thirst for Identity,identical_text
+Embrace the Paradox,Lessons from Life,identical_text
+Hardy Veteran,Sporeback Wolf,identical_text
+Fresh-Faced Recruit,Pouncing Lynx,identical_text
+Pouncing Lynx,Ratcatcher Trainee // Pest Problem,identical_text
+Solar Blaze,Wave of Reckoning,identical_text
+Blanket of Night,"Urborg, Tomb of Yawgmoth",identical_text
+Arcane Laboratory,Eidolon of Rhetoric,identical_text
+Eidolon of Rhetoric,Rule of Law,identical_text
+Destined Confrontation,Slaughter the Strong,identical_text
+Temporary Truce,Truce,identical_text
+Coma Veil,Ice Over,identical_text
+Bound in Silence,Detained by Legionnaires,identical_text
+Detained by Legionnaires,Luminous Bonds,identical_text
+Luminous Bonds,Pacifism,identical_text
+Cooped Up,Dreadful Apathy,identical_text
+Frenzied Rage,Untamed Hunger,identical_text
+One With the Wind,Spectral Flight,identical_text
+Goblin War Paint,Swashbuckling,identical_text
+Giant Strength,Knight's Pledge,identical_text
+Divine Transformation,Hardened-Scale Armor,identical_text
+Hardened-Scale Armor,Oakenform,identical_text
+Boon of Emrakul,Sangrite Backlash,identical_text
+Dead Weight,Debilitating Injury,identical_text
+Sensory Deprivation,Torment,identical_text
+Light of Promise,Sunbond,identical_text
+Hermetic Study,Power of Fire,identical_text
+Power of Fire,Psionic Gift,identical_text
+Illusory Wrappings,Reduce in Stature,identical_text
+Gaseous Form,Sandskin,identical_text
+Defang,Muzzle,identical_text
+False Demise,Unhallowed Pact,identical_text
+Mire Blight,Mortal Wound,identical_text
+Castaway's Despair,Charmed Sleep,identical_text
+Charmed Sleep,Claustrophobia,identical_text
+Claustrophobia,Containment Protocol,identical_text
+Containment Protocol,Sleep Paralysis,identical_text
+Sleep Paralysis,Starlight Snare,identical_text
+Starlight Snare,Waterknot,identical_text
+Curiosity,Keen Sense,identical_text
+Control Magic,Mind Control,identical_text
+Convincing Mirage,Phantasmal Terrain,identical_text
+Abundant Growth,Urban Utopia,identical_text
+Dawn's Reflection,Market Festival,identical_text
+Entangling Vines,Glimmerdust Nap,identical_text
+Imperial Ceratops,Ravenous Daggertooth,identical_text
+Aeronaut's Wings,Kitesail,identical_text
+Boots of Speed,Crystal Slipper,identical_text
+Honed Khopesh,Leonin Scimitar,identical_text
+Leonin Scimitar,Short Sword,identical_text
+Short Sword,Veteran's Sidearm,identical_text
+Sai of the Shinobi,Stormrider Rig,identical_text
+Jackhammer,Marauder's Axe,identical_text
+Marauder's Axe,Torch Gauntlet,identical_text
+Torch Gauntlet,Vanquisher's Axe,identical_text
++2 Mace,Cultist's Staff,identical_text
+Cloak of the Bat,Fleetfeather Sandals,identical_text
+Akrasan Squire,Ethercaste Knight,identical_text
+Ethercaste Knight,Outrider of Jhess,identical_text
+Outrider of Jhess,Servant of Nefarox,identical_text
+Servant of Nefarox,Sigiled Behemoth,identical_text
+Altar's Light,Fade into Antiquity,identical_text
+Fade into Antiquity,Fate Forgotten,identical_text
+Fate Forgotten,Ironwright's Cleansing,identical_text
+Ironwright's Cleansing,Revoke Existence,identical_text
+Not on My Watch,Order // Chaos,identical_text
+Consecrate // Consume,Cremate,identical_text
+Angelic Edict,Blessed Light,identical_text
+Blessed Light,Iona's Judgment,identical_text
+Grotesque Demise,Reaver Ambush,identical_text
+Blade Banish,Bring to Trial,identical_text
+Acrobatic Maneuver,Blur,identical_text
+Final Death,Final Reward,identical_text
+Final Reward,Unmake,identical_text
+Unmake,Wander Off,identical_text
+Long Road Home,Otherworldly Journey,identical_text
+Excoriate,Expel,identical_text
+Reckless Impulse,Wrenn's Resolve,identical_text
+Dust to Dust,Into the Core,identical_text
+Syndic of Tithes,Syndicate Enforcer,identical_text
+Accomplished Automaton,Ambitious Aetherborn,identical_text
+Ambitious Aetherborn,Glint-Sleeve Artisan,identical_text
+Visionary Augmenter,Weaponcraft Enthusiast,identical_text
+Dross Prowler,Gluttonous Zombie,identical_text
+Gluttonous Zombie,Prickly Boggart,identical_text
+Prickly Boggart,Razortooth Rats,identical_text
+Razortooth Rats,Severed Legion,identical_text
+Severed Legion,Squirming Mass,identical_text
+Anaba Bodyguard,Deer-Dog,identical_text
+Deer-Dog,Tundra Wolves,identical_text
+Tundra Wolves,Viashino Spearhunter,identical_text
+Viashino Spearhunter,Warclamp Mastiff,identical_text
+Kruin Outlaw // Terror of Kruin Pass,Village Ironsmith // Ironfang,identical_text
+Ondu Greathorn,Plated Geopede,identical_text
+Lim-Dûl's High Guard,Sanguine Guard,identical_text
+Narwhal,Silver Knight,identical_text
+Kjeldoran Phalanx,Pikemen,identical_text
+Ancient Spider,Longbow Archer,identical_text
+Benalish Cavalry,Mtenda Herder,identical_text
+Mtenda Herder,Shadow Rider,identical_text
+Ashcoat Bear,Crystacean,identical_text
+Crystacean,Fire Nation Ambushers,identical_text
+Fire Nation Ambushers,Hired Blade,identical_text
+Hired Blade,Merfolk of the Depths,identical_text
+Cloaked Siren,Faerie Invaders,identical_text
+Faerie Invaders,Nephalia Seakite,identical_text
+Nephalia Seakite,Skyline Predator,identical_text
+Skyline Predator,Spire Monitor,identical_text
+Spire Monitor,Wind Strider,identical_text
+Swift Spinner,Tangle Spider,identical_text
+Greel's Caress,Torpor Dust,identical_text
+Aspect of Manticore,Fire-Rim Form,identical_text
+Brinebarrow Intruder,Cogwork Wrestler,identical_text
+Cogwork Wrestler,Humbling Elder,identical_text
+Bartizan Bats,Bog Imp,identical_text
+Bog Imp,Colorful Feiyi Sparrow,identical_text
+Colorful Feiyi Sparrow,Dancing Scimitar,identical_text
+Dancing Scimitar,Flying Dolphin-Fish,identical_text
+Flying Dolphin-Fish,Goblin Sky Raider,identical_text
+Goblin Sky Raider,Mahamoti Djinn,identical_text
+Mahamoti Djinn,Nimbus of the Isles,identical_text
+Nimbus of the Isles,Silverbeak Griffin,identical_text
+Silverbeak Griffin,Snapping Drake,identical_text
+Snapping Drake,Storm Crow,identical_text
+Storm Crow,Stormcloud Spirit,identical_text
+Pegasus Charger,Razorfoot Griffin,identical_text
+Cloud Sprite,Scrapskin Drake,identical_text
+Scrapskin Drake,Welkin Tern,identical_text
+"Aang, Air Nomad",Serra's Guardian,identical_text
+Phantasmal Forces,Spindrift Drake,identical_text
+Fledgling Djinn,Serendib Efreet,identical_text
+Araba Mothrider,Mothrider Samurai,identical_text
+Dragonfly Suit,Sky Skiff,identical_text
+Angel of the God-Pharaoh,Keeneye Aven,identical_text
+Keeneye Aven,Pendrell Drake,identical_text
+Pendrell Drake,Primoc Escapee,identical_text
+Primoc Escapee,Shimmerscale Drake,identical_text
+Deathgaze Cockatrice,Midnight Assassin,identical_text
+Midnight Assassin,Tidehollow Strix,identical_text
+Ephemeron,Skywing Aven,identical_text
+Aven Squire,Waveskimmer Aven,identical_text
+Basilica Screecher,Kingpin's Pet,identical_text
+Anvilwrought Raptor,Cloud Crusader,identical_text
+Cloud Crusader,Peregrine Griffin,identical_text
+Akroan Skyguard,War-Wing Siren,identical_text
+War-Wing Siren,Wingsteed Rider,identical_text
+Ascended Lawmage,Aven Fleetwing,identical_text
+Aven Fleetwing,Soul of the Rapids,identical_text
+Plague Stinger,Shriek Raptor,identical_text
+Shriek Raptor,Tine Shrike,identical_text
+Wave-Wing Elemental,Windrider Eel,identical_text
+Daggerdrome Imp,Healer's Hawk,identical_text
+Healer's Hawk,Sungrace Pegasus,identical_text
+Breezekeeper,Teferi's Drake,identical_text
+Teferi's Drake,Tolarian Drake,identical_text
+Jeskai Windscout,Lotus Path Djinn,identical_text
+Lotus Path Djinn,Mistral Singer,identical_text
+Mistral Singer,Niblis of Dusk,identical_text
+Niblis of Dusk,Riverwheel Aerialists,identical_text
+Riverwheel Aerialists,Wing Commando,identical_text
+Hawkeater Moth,Zephid,identical_text
+Urborg Drake,Utvara Scalper,identical_text
+Belbe's Percher,Cloud Djinn,identical_text
+Cloud Djinn,Cloud Dragon,identical_text
+Cloud Dragon,Cloud Elemental,identical_text
+Cloud Elemental,Cloud Pirates,identical_text
+Cloud Pirates,Cloud Spirit,identical_text
+Cloud Spirit,Hoverguard Observer,identical_text
+Hoverguard Observer,Long-Finned Skywhale,identical_text
+Long-Finned Skywhale,Rishadan Airship,identical_text
+Rishadan Airship,Skywinder Drake,identical_text
+Skywinder Drake,Stratozeppelid,identical_text
+Stratozeppelid,Stronghold Zeppelin,identical_text
+Stronghold Zeppelin,Tattered Haunter,identical_text
+Tattered Haunter,Vaporkin,identical_text
+Vaporkin,Wanderlight Spirit,identical_text
+Fylamarid,Metathran Transport,identical_text
+Aesthir Glider,Daggerclaw Imp,identical_text
+Daggerclaw Imp,Goblin Glider,identical_text
+Goblin Glider,Kyren Glider,identical_text
+Kyren Glider,Nightshade Stinger,identical_text
+Nightshade Stinger,Order of Midnight // Alter Fate,identical_text
+Order of Midnight // Alter Fate,Vampire Interloper,identical_text
+Vampire Interloper,Young Red Dragon // Bathe in Gold,identical_text
+Pigment Wrangler // Striking Palette,Spellbook Seeker // Careful Study,identical_text
+Guidelight Synergist,Nim Shrieker,identical_text
+Griffin Sentinel,Serra Angel,identical_text
+Dirgur Island Dragon // Skimming Strike,Waterfall Aerialist,identical_text
+Gossamer Phantasm,Illusionary Servant,identical_text
+Illusionary Servant,Phantasmal Dragon,identical_text
+Phantasmal Dragon,Skulking Ghost,identical_text
+Darkslick Drake,Ithilien Kingfisher,identical_text
+Ithilien Kingfisher,Kingfisher,identical_text
+Kingfisher,Messenger Drake,identical_text
+Messenger Drake,Palace Familiar,identical_text
+Palace Familiar,Runewing,identical_text
+Spyglass Siren,Waterwind Scout,identical_text
+Angel of the Dawn,Dawnfeather Eagle,identical_text
+Icewind Elemental,Owl Familiar,identical_text
+Owl Familiar,Quicksilver Fisher,identical_text
+Quicksilver Fisher,Screeching Drake,identical_text
+Screeching Drake,Sky-Eel School,identical_text
+Cloudkin Seer,Gryff Vanguard,identical_text
+Gryff Vanguard,Messenger Falcons,identical_text
+Messenger Falcons,Muse Drake,identical_text
+Muse Drake,Skyscanner,identical_text
+Skyscanner,Tome Raider,identical_text
+Liliana's Specter,Spellscorn Coven // Take It Back,identical_text
+Glidedive Duo,Sneering Shadewriter,identical_text
+Sage Owl,Spire Owl,identical_text
+Emancipation Angel,Kor Skyfisher,identical_text
+Senate Griffin,Thaumaturge's Familiar,identical_text
+Cloudreader Sphinx,Faerie Seer,identical_text
+Faerie Seer,Horizon Scholar,identical_text
+Aerie Auxiliary,Expedition Raptor,identical_text
+Watcher in the Mist,Wreckage Wickerfolk,identical_text
+Frost Trickster,Spire Patrol,identical_text
+Battleflight Eagle,Welkin Guide,identical_text
+Courier Griffin,Kemba's Skyguard,identical_text
+Kemba's Skyguard,Mesa Cavalier,identical_text
+Angel of Mercy,Aven of Enduring Hope,identical_text
+Aven of Enduring Hope,Sagu Wildling // Roost Seek,identical_text
+City Pigeon,Featherbrained Filcher,identical_text
+Aerialephant,Glitterflitter,identical_text
+Dazzling Angel,Lifecreed Duo,identical_text
+Aerial Guide,Pegasus Courser,identical_text
+Il Mheg Pixie,Nightveil Sprite,identical_text
+Blessed Hippogriff // Tyr's Blessing,Roc Charger,identical_text
+Gustcloak Harrier,Gustcloak Skirmisher,identical_text
+Jetting Glasskite,Shimmering Glasskite,identical_text
+Grateful Apparition,Guildpact Informant,identical_text
+Aven Wind Mage,Frolicking Familiar // Blow Off Steam,identical_text
+Clinquant Skymage,Oneirophage,identical_text
+Bloodthirsty Aerialist,Scion of the Swarm,identical_text
+Mistform Dreamer,Mistform Skyreaver,identical_text
+Blighted Bat,Shriekdiver,identical_text
+Nightwing Shade,Tattered Apparition,identical_text
+Cloudheath Drake,Senate Courier,identical_text
+Mesa Falcon,Pearl Dragon,identical_text
+Fog of Gnats,Tattered Drake,identical_text
+Phyrexian Battleflies,Pit Imp,identical_text
+Balshan Collaborator,Drifting Shade,identical_text
+Drifting Shade,Dungeon Shade,identical_text
+Dragon Hatchling,Firefly,identical_text
+Firefly,Furnace Whelp,identical_text
+Furnace Whelp,Hellkite Punisher,identical_text
+Hellkite Punisher,Shivan Dragon,identical_text
+Fire Drake,Spitting Drake,identical_text
+Birds of Paradise,Lotus Guardian,identical_text
+Lotus Guardian,Ornithopter of Paradise,identical_text
+Mawcor,Thornwind Faeries,identical_text
+Fencer Clique,Wayward Soul,identical_text
+Advanced Hoverguard,Glimmering Angel,identical_text
+Azimaet Drake,Drake Hatchling,identical_text
+Marble Gargoyle,Moonwing Moth,identical_text
+Moonwing Moth,Tower Drake,identical_text
+Cephalopod Sentry,Filigree Attendant,identical_text
+Duskrider Falcon,Melesse Spirit,identical_text
+Melesse Spirit,Nightwind Glider,identical_text
+Nightwind Glider,Voice of Grace,identical_text
+Voice of Reason,Windreaper Falcon,identical_text
+Cerulean Wyvern,Coast Watcher,identical_text
+Coast Watcher,Treetop Sentinel,identical_text
+Treetop Sentinel,Voice of Duty,identical_text
+Abbey Gargoyles,Aven Smokeweaver,identical_text
+Aven Smokeweaver,Freewind Falcon,identical_text
+Freewind Falcon,Hazerider Drake,identical_text
+Hazerider Drake,Sea Sprite,identical_text
+Sea Sprite,Thermal Glider,identical_text
+Thermal Glider,Voice of Law,identical_text
+Voice of Law,Weatherseed Faeries,identical_text
+Buzz Bots,Malcator's Watcher,identical_text
+Lightning Angel,Mantis Rider,identical_text
+Mesa Pegasus,Teremko Griffin,identical_text
+Kjeldoran Skycaptain,Kjeldoran Skyknight,identical_text
+Cat Warriors,Elite Cat Warrior,identical_text
+Elite Cat Warrior,Emerald Oryx,identical_text
+Emerald Oryx,Heartwood Treefolk,identical_text
+Heartwood Treefolk,Jukai Messenger,identical_text
+Jukai Messenger,Koth's Courier,identical_text
+Koth's Courier,Leaf Dancer,identical_text
+Leaf Dancer,Lynx,identical_text
+Lynx,Rushwood Dryad,identical_text
+Rushwood Dryad,Shanodin Dryads,identical_text
+Shanodin Dryads,Slinking Serpent,identical_text
+Slinking Serpent,Somberwald Dryad,identical_text
+Somberwald Dryad,Willow Dryad,identical_text
+Willow Dryad,Zendikar Farguide,identical_text
+Zendikar Farguide,Zodiac Monkey,identical_text
+Zodiac Monkey,Zodiac Rabbit,identical_text
+Zodiac Rabbit,Zodiac Tiger,identical_text
+Brazen Scourge,Dragon Moose,identical_text
+Dragon Moose,Fire Nation Soldier,identical_text
+Fire Nation Soldier,Goblin Chariot,identical_text
+Goblin Chariot,Hostile Minotaur,identical_text
+Hostile Minotaur,Lightning Elemental,identical_text
+Lightning Elemental,Pyromantic Pilgrim,identical_text
+Pyromantic Pilgrim,Raging Goblin,identical_text
+Raging Goblin,Thundering Giant,identical_text
+Thundering Giant,Vulshok Berserker,identical_text
+Viashino Sandscout,Viashino Sandstalker,identical_text
+Geier Reach Bandit // Vildin-Pack Alpha,Village Messenger // Moonrise Intruder,identical_text
+Glitterfang,Viashino Cutthroat,identical_text
+Tiamat's Fanatics,Warchief Giant,identical_text
+Ashen Monstrosity,Flameborn Hellion,identical_text
+Flameborn Hellion,Valley Dasher,identical_text
+Fervent Cathar,Voldaren Duelist,identical_text
+Erdwal Ripper,Slith Firewalker,identical_text
+Furnace Spirit,Pyre Charger,identical_text
+Charging Strifeknight,Mad Prophet,identical_text
+Hotfoot Gnome,Trailblazing Historian,identical_text
+Cunning Sparkmage,Vulshok Sorcerer,identical_text
+Pheres-Band Thunderhoof,Setessan Oathsworn,identical_text
+Setessan Oathsworn,Staunch-Hearted Warrior,identical_text
+Benthic Giant,Cold-Water Snapper,identical_text
+Cold-Water Snapper,Conifer Strider,identical_text
+Conifer Strider,Gladecover Scout,identical_text
+Gladecover Scout,Humongulus,identical_text
+Humongulus,Plated Slagwurm,identical_text
+Plated Slagwurm,Primal Huntbeast,identical_text
+Primal Huntbeast,Rubbleback Rhino,identical_text
+Rubbleback Rhino,Sacred Wolf,identical_text
+Sacred Wolf,Scaled Behemoth,identical_text
+Scaled Behemoth,Slippery Bogle,identical_text
+Slippery Bogle,Taoist Hermit,identical_text
+Taoist Hermit,The Terror of Serpent's Pass,identical_text
+The Terror of Serpent's Pass,Wardscale Crocodile,identical_text
+Barbarian General,"Lady Zhurong, Warrior Queen",identical_text
+"Lady Zhurong, Warrior Queen","Lu Meng, Wu General",identical_text
+"Lu Meng, Wu General",Shu Cavalry,identical_text
+Shu Cavalry,Shu Elite Companions,identical_text
+Shu Elite Companions,Wei Elite Companions,identical_text
+Wei Elite Companions,Wei Scout,identical_text
+Wei Scout,Wei Strike Force,identical_text
+Wei Strike Force,Wu Elite Cavalry,identical_text
+Wu Elite Cavalry,Wu Light Cavalry,identical_text
+Yellow Scarves Cavalry,Yellow Scarves General,identical_text
+Anointed Procession,Parallel Lives,identical_text
+Contagious Nim,Cystbearer,identical_text
+Cystbearer,Glistener Elf,identical_text
+Glistener Elf,Lost Leonin,identical_text
+Lost Leonin,Phyrexian Digester,identical_text
+Phyrexian Digester,Scourge Servant,identical_text
+Accursed Spirit,Bladetusk Boar,identical_text
+Bladetusk Boar,Highborn Ghoul,identical_text
+Highborn Ghoul,Krenko's Enforcer,identical_text
+Krenko's Enforcer,Spectral Rider,identical_text
+Benthic Behemoth,Bull Hippo,identical_text
+Bull Hippo,Devouring Deep,identical_text
+Devouring Deep,Grayscaled Gharial,identical_text
+Grayscaled Gharial,Pale Bears,identical_text
+Pale Bears,River Bear,identical_text
+River Bear,Rootwater Commando,identical_text
+Rootwater Commando,Segovian Leviathan,identical_text
+Segovian Leviathan,Zodiac Horse,identical_text
+Blink of an Eye,Into the Roil,identical_text
+Into the Roil,Whoosh!,identical_text
+Final Flourish,Vayne's Treachery,identical_text
+Sazh's Chocobo,Vinelasher Kudzu,identical_text
+Spitfire Lagac,Tunneling Geopede,identical_text
+Fledgling Griffin,Geyser Glider,identical_text
+Hedron Scrabbler,Scythe Leopard,identical_text
+Scythe Leopard,Snapping Gnarlid,identical_text
+Akoum Hellhound,Canopy Baloth,identical_text
+Canopy Baloth,Hedron Rover,identical_text
+Hedron Rover,Kazandu Mammoth // Kazandu Valley,identical_text
+Kazandu Mammoth // Kazandu Valley,Steppe Lynx,identical_text
+Steppe Lynx,Territorial Baloth,identical_text
+Territorial Baloth,Valakut Predator,identical_text
+Eumidian Terrabotanist,Kazandu Nectarpot,identical_text
+"Hokori, Dust Drinker",Rising Waters,identical_text
+Aardvark Sloth,Ajani's Sunstriker,identical_text
+Ajani's Sunstriker,Bishop's Soldier,identical_text
+Bishop's Soldier,Blood Glutton,identical_text
+Blood Glutton,Caravan Hurda,identical_text
+Caravan Hurda,Champion of Arashin,identical_text
+Champion of Arashin,Daybreak Chaplain,identical_text
+Daybreak Chaplain,Faithbearer Paladin,identical_text
+Faithbearer Paladin,Golden-Tail Disciple,identical_text
+Golden-Tail Disciple,Markov Patrician,identical_text
+Markov Patrician,Mesa Unicorn,identical_text
+Mesa Unicorn,Nip Gwyllion,identical_text
+Nip Gwyllion,Scrounger of Souls,identical_text
+Scrounger of Souls,Trained Caracal,identical_text
+Basri's Acolyte,Felidar Savior,identical_text
+Omen,Ponder,identical_text
+Glimpse the Future,Ransack the Lab,identical_text
+Ransack the Lab,Strategic Planning,identical_text
+Twins of Maurer Estate,Weirded Vampire,identical_text
+Boggart Brute,Conceited Witch // Price of Beauty,identical_text
+Conceited Witch // Price of Beauty,Cursed Minotaur,identical_text
+Cursed Minotaur,Deranged Whelp,identical_text
+Deranged Whelp,Elephant-Rat,identical_text
+Elephant-Rat,Goblin Trailblazer,identical_text
+Goblin Trailblazer,Kraul Raider,identical_text
+Kraul Raider,Ripscale Predator,identical_text
+Ripscale Predator,Shatterskull Recruit,identical_text
+Shatterskull Recruit,Two-Headed Hunter // Twice the Rage,identical_text
+Two-Headed Hunter // Twice the Rage,Two-Headed Zombie,identical_text
+Two-Headed Zombie,Viashino Runner,identical_text
+Viashino Runner,"Zhao, the Seething Flame",identical_text
+Fearful Villager // Fearsome Werewolf,Shady Traveler // Stalking Predator,identical_text
+Blade Instructor,Hammer Dropper,identical_text
+Ardent Recruit,Carapace Forger,identical_text
+Carapace Forger,Chrome Steed,identical_text
+Chrome Steed,Ghalma's Warden,identical_text
+Ghalma's Warden,Razorfield Rhino,identical_text
+Auriok Edgewright,Spiraling Duelist,identical_text
+Treespring Lorian,Woolly Loxodon,identical_text
+Canyon Wildcat,Cliff Threader,identical_text
+Cliff Threader,Dwarven Grunt,identical_text
+Dwarven Grunt,Glissa's Courier,identical_text
+Glissa's Courier,Goblin Mountaineer,identical_text
+Goblin Mountaineer,Goblin Spelunkers,identical_text
+Goblin Spelunkers,Hillcomber Giant,identical_text
+Hillcomber Giant,Mountain Goat,identical_text
+Mountain Goat,Rock Badger,identical_text
+Rock Badger,Sokenzan Bruiser,identical_text
+Sokenzan Bruiser,Zodiac Dog,identical_text
+Zodiac Dog,Zodiac Goat,identical_text
+Dokuchi Shadow-Walker,Ninja of the New Moon,identical_text
+Dueling Grounds,Silent Arbiter,identical_text
+Blood Moon,Magus of the Moon,identical_text
+Glowrider,Thorn of Amethyst,identical_text
+Stronghold Taskmaster,Urborg Shambler,identical_text
+Blessed Orator,Veteran Armorer,identical_text
+Benalish Marshal,"Kongming, ""Sleeping Dragon""",identical_text
+Legion Lieutenant,Thirsting Bloodlord,identical_text
+Gravelgill Axeshark,Putrid Goblin,identical_text
+Putrid Goblin,Safehold Elite,identical_text
+Righteous Avengers,Zodiac Rooster,identical_text
+Future Sight,Magus of the Future,identical_text
+Damping Field,Imi Statue,identical_text
+Darkness,Fog,identical_text
+Fog,Holy Day,identical_text
+Holy Day,Root Snare,identical_text
+Angelsong,Lull,identical_text
+Commencement of Festivities,Defend the Hearth,identical_text
+Indestructible Aura,Shielded Passage,identical_text
+Champion Lancer,Uncle Istvan,identical_text
+Contentious Plan,Steady Progress,identical_text
+Nacatl Savage,Tel-Jilad Chosen,identical_text
+Tel-Jilad Chosen,Tel-Jilad Outrider,identical_text
+Tel-Jilad Outrider,Yavimaya Scion,identical_text
+Death Speakers,Llanowar Knight,identical_text
+Llanowar Knight,Scalebane's Elite,identical_text
+Scalebane's Elite,Valeron Outlander,identical_text
+Darkwatch Elves,Disciple of Grace,identical_text
+Order of Leitbur,Order of the White Shield,identical_text
+Vodalian Zombie,Zombie Outlander,identical_text
+Goblin Outlander,Ihsan's Shade,identical_text
+Ihsan's Shade,Shivan Zombie,identical_text
+Knight of Stromgald,Order of the Ebon Hand,identical_text
+Bloodfire Expert,Jeskai Student,identical_text
+Jeskai Student,Lightning Visionary,identical_text
+Lightning Visionary,Nimble-Blade Khenra,identical_text
+Nimble-Blade Khenra,Sanguinary Mage,identical_text
+Sanguinary Mage,Umara Entangler,identical_text
+Umara Entangler,Vedalken Blademaster,identical_text
+Pinnacle Monk // Mystic Peak,Shipwreck Dowser,identical_text
+Basri's Solidarity,Inspiring Roar,identical_text
+Inspiring Roar,Titania's Boon,identical_text
+Growth Curve,Invigorating Surge,identical_text
+Dig Site Inventory,Homestead Courage,identical_text
+Battlegrowth,Vastwood Fortification // Vastwood Thicket,identical_text
+Footbottom Feast,Forever Young,identical_text
+Forever Young,Gravepurge,identical_text
+Warrant // Warden,Whisk Away,identical_text
+False Mourning,Reclaim,identical_text
+Reclaim,Salvage,identical_text
+Chronostutter,Isolation at Orthanc,identical_text
+Excommunicate,Forced Retreat,identical_text
+Forced Retreat,Griptide,identical_text
+Griptide,Repel,identical_text
+Repel,Time Ebb,identical_text
+Fallow Earth,Uproot,identical_text
+Goblin Boarders,Swaggering Corsair,identical_text
+Gorehorn Raider,Mardu Heart-Piercer,identical_text
+Mardu Heart-Piercer,Storm Fleet Pyromancer,identical_text
+Horrible Hordes,Hunding Gjornersen,identical_text
+Hunding Gjornersen,Marhault Elsdragon,identical_text
+Frost Giant,Wolverine Pack,identical_text
+Alaborn Musketeer,Arachnoid,identical_text
+Arachnoid,Canopy Spider,identical_text
+Canopy Spider,Cloudcrown Oak,identical_text
+Cloudcrown Oak,Feiyi Snake,identical_text
+Feiyi Snake,Frog-Squirrels,identical_text
+Frog-Squirrels,Giant Mantis,identical_text
+Giant Mantis,Giant Spider,identical_text
+Giant Spider,Goliath Spider,identical_text
+Goliath Spider,Grappler Spider,identical_text
+Grappler Spider,Keen-Eyed Archers,identical_text
+Keen-Eyed Archers,Magnigoth Sentry,identical_text
+Magnigoth Sentry,Mammoth Spider,identical_text
+Mammoth Spider,Needleshot Gourna,identical_text
+Needleshot Gourna,Nimble Birdsticker,identical_text
+Nimble Birdsticker,Norwood Archers,identical_text
+Norwood Archers,Plated Spider,identical_text
+Plated Spider,Rib Cage Spider,identical_text
+Rib Cage Spider,Skyraker Giant,identical_text
+Skyraker Giant,Towering Indrik,identical_text
+Towering Indrik,Tree Monkey,identical_text
+Deadly Recluse,Kessig Recluse,identical_text
+Kessig Recluse,Thornweald Archer,identical_text
+Sagu Archer,Spitting Gourna,identical_text
+High-Rise Sawjack,Netcaster Spider,identical_text
+Giant Ladybug,Spider-Bot,identical_text
+Cogwork Archivist,Jade-Cast Sentinel,identical_text
+Jade-Cast Sentinel,Phyrexian Archivist,identical_text
+Death Ward,Mending Touch,identical_text
+Argivian Restoration,Refurbish,identical_text
+Reconstruction,Ritual of Restoration,identical_text
+Auroral Procession,Bala Ged Recovery // Bala Ged Sanctuary,identical_text
+Bala Ged Recovery // Bala Ged Sanctuary,Elven Cache,identical_text
+Elven Cache,Recollect,identical_text
+Recollect,Regrowth,identical_text
+Breath of Life,False Defeat,identical_text
+False Defeat,Resurrection,identical_text
+Resurrection,Rise Again,identical_text
+Rise Again,Zombify,identical_text
+Disentomb,Raise Dead,identical_text
+Raise Dead,Return to Battle,identical_text

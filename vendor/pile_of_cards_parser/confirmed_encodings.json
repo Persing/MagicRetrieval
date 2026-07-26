@@ -1,0 +1,503 @@
+[
+  {
+    "card": {
+      "name": "Animar, Soul of Elements",
+      "color": "[G, R, U]",
+      "color_identity": "[G, R, U]",
+      "layout": "normal",
+      "cost": "{G}{U}{R}",
+      "supertypes": "[Legendary]",
+      "types": "[Creature]",
+      "subtypes": "[Elemental]",
+      "oracle_text": "Protection from white and from black\nWhenever you cast a creature spell, put a +1/+1 counter on Animar.\nCreature spells you cast cost {1} less to cast for each +1/+1 counter on Animar.",
+      "power": "1",
+      "toughness": "1"
+    },
+    "output": "CARD {\n  NAME: \"Animar, Soul of Elements\"\n  MANA_COST: \"{G}{U}{R}\"\n  SUPERTYPES: [\"Legendary\"]\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Elemental\"]\n  POWER: 1\n  TOUGHNESS: 1\n\n  @PROTECTION(FILTER { COLOR: W })\n  @PROTECTION(FILTER { COLOR: B })\n\n  TRIGGERED {\n    WHEN_CAST { FILTER { TYPE: \"Creature\" CONTROLLER: YOU } }\n    EFFECT: [\n      ADD_COUNTER { SELF NAME: \"+1/+1\" }\n    ]\n  }\n\n  STATIC {\n    EFFECT: [\n      GRANT {\n        FILTER { COLOR: C CATEGORY: SPELL }\n        COST_REDUCTION: \"{1}\"\n      }\n    ]\n  }\n}\n",
+    "note": "Protection compound color list (white and from black)"
+  },
+  {
+    "card": {
+      "name": "Artisan of Kozilek",
+      "cost": "{9}",
+      "types": "[Creature]",
+      "subtypes": "[Eldrazi]",
+      "oracle_text": "When you cast this spell, you may return target creature card from your graveyard to the battlefield.\nAnnihilator 2 (Whenever this creature attacks, defending player sacrifices two permanents of their choice.)",
+      "power": "10",
+      "toughness": "9"
+    },
+    "output": "CARD {\n  NAME: \"Artisan of Kozilek\"\n  MANA_COST: \"{9}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Eldrazi\"]\n  POWER: 10\n  TOUGHNESS: 9\n\n  TRIGGERED {\n    # SPEC_GAP: event not matched: When you cast this spell\n    EFFECT: [\n      MOVE {\n        TARGET {\n          TARGET_CLASSES: [CARD]\n          ZONE: ALL.graveyard\n          FILTER { TYPE: \"Creature\" }\n        } AS $target\n        TO: BATTLEFIELD\n        CONTROLLER: YOU\n        MAY: TRUE\n      }\n    ]\n  }\n\n  @ANNIHILATOR(2)\n}\n",
+    "note": "Annihilator numeric keyword"
+  },
+  {
+    "card": {
+      "name": "Breezekeeper",
+      "cost": "{3}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Djinn]",
+      "oracle_text": "Flying\nPhasing (This phases in or out before you untap during each of your untap steps. While it's phased out, it's treated as though it doesn't exist.)",
+      "power": "4",
+      "toughness": "4"
+    },
+    "output": "CARD {\n  NAME: \"Breezekeeper\"\n  MANA_COST: \"{3}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Djinn\"]\n  POWER: 4\n  TOUGHNESS: 4\n\n  @FLYING\n\n  @PHASING\n}\n",
+    "note": "Phasing keyword_store entry"
+  },
+  {
+    "card": {
+      "name": "Craw Giant",
+      "cost": "{3}{G}{G}{G}{G}",
+      "types": "[Creature]",
+      "subtypes": "[Giant]",
+      "oracle_text": "Trample\nRampage 2 (Whenever this creature becomes blocked, it gets +2/+2 until end of turn for each creature blocking it beyond the first.)",
+      "power": "6",
+      "toughness": "4"
+    },
+    "output": "CARD {\n  NAME: \"Craw Giant\"\n  MANA_COST: \"{3}{G}{G}{G}{G}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Giant\"]\n  POWER: 6\n  TOUGHNESS: 4\n\n  @TRAMPLE\n\n  @RAMPAGE(2)\n}\n",
+    "note": "Rampage numeric keyword"
+  },
+  {
+    "card": {
+      "name": "Dawn Elemental",
+      "cost": "{W}{W}{W}{W}",
+      "types": "[Creature]",
+      "subtypes": "[Elemental]",
+      "oracle_text": "Flying\nPrevent all damage that would be dealt to this creature.",
+      "power": "3",
+      "toughness": "3"
+    },
+    "output": "CARD {\n  NAME: \"Dawn Elemental\"\n  MANA_COST: \"{W}{W}{W}{W}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Elemental\"]\n  POWER: 3\n  TOUGHNESS: 3\n\n  @FLYING\n\n  STATIC {\n    EFFECT: [\n      PREVENT {\n        TARGET: SELF\n        AMOUNT: ALL\n      }\n    ]\n  }\n}\n",
+    "note": "PREVENT static, TARGET: SELF"
+  },
+  {
+    "card": {
+      "name": "Defang",
+      "cost": "{1}{W}",
+      "types": "[Enchantment]",
+      "subtypes": "[Aura]",
+      "oracle_text": "Enchant creature\nPrevent all damage that would be dealt by enchanted creature."
+    },
+    "output": "CARD {\n  NAME: \"Defang\"\n  MANA_COST: \"{1}{W}\"\n  TYPES: [\"Enchantment\"]\n  SUBTYPES: [\"Aura\"]\n\n  @ENCHANT(FILTER { TYPE: \"Creature\" }) AS $enchanted\n\n  STATIC {\n    EFFECT: [\n      PREVENT {\n        SOURCE: $enchanted\n        AMOUNT: ALL\n      }\n    ]\n  }\n}\n",
+    "note": "PREVENT static, SOURCE: $enchanted"
+  },
+  {
+    "card": {
+      "name": "Dragon Fangs",
+      "cost": "{1}{G}",
+      "types": "[Enchantment]",
+      "subtypes": "[Aura]",
+      "oracle_text": "Enchant creature\nEnchanted creature gets +1/+1 and has trample.\nWhen a creature with mana value 6 or greater enters, you may return this card from your graveyard to the battlefield attached to that creature."
+    },
+    "output": "CARD {\n  NAME: \"Dragon Fangs\"\n  MANA_COST: \"{1}{G}\"\n  TYPES: [\"Enchantment\"]\n  SUBTYPES: [\"Aura\"]\n\n  @ENCHANT(FILTER { TYPE: \"Creature\" }) AS $enchanted\n\n  STATIC {\n    EFFECT: [\n      GRANT { $enchanted\n        POWER: +1\n        TOUGHNESS: +1\n        @TRAMPLE\n      }\n    ]\n  }\n\n  TRIGGERED {\n    # SPEC_GAP: event not matched: When a creature with mana value 6 or greater enters\n    EFFECT: [\n      MOVE {\n        SELF\n        ZONE: YOU.graveyard\n        TO: BATTLEFIELD\n        MAY: TRUE\n      }\n      ATTACH { SELF TO: $event }\n    ]\n  }\n}\n",
+    "note": "Self-graveyard-return + ATTACH { SELF TO: $event }; re-confirmed after fixing the equipped-grant compound gets+has silent-drop bug (trample was being dropped entirely, no gap marker)"
+  },
+  {
+    "card": {
+      "name": "Elite Inquisitor",
+      "cost": "{W}{W}",
+      "types": "[Creature]",
+      "subtypes": "[Human, Soldier]",
+      "oracle_text": "First strike, vigilance\nProtection from Vampires, from Werewolves, and from Zombies",
+      "power": "2",
+      "toughness": "2"
+    },
+    "output": "CARD {\n  NAME: \"Elite Inquisitor\"\n  MANA_COST: \"{W}{W}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Human\", \"Soldier\"]\n  POWER: 2\n  TOUGHNESS: 2\n\n  @FIRST_STRIKE\n  @VIGILANCE\n\n  @PROTECTION(FILTER { TYPE: \"Vampire\" })\n  @PROTECTION(FILTER { TYPE: \"Werewolf\" })\n  @PROTECTION(FILTER { TYPE: \"Zombie\" })\n}\n",
+    "note": "Protection 3-clause compound (Vampires, Werewolves, Zombies)"
+  },
+  {
+    "card": {
+      "name": "Faithless Looting",
+      "cost": "{R}",
+      "types": "[Sorcery]",
+      "oracle_text": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+    },
+    "output": "CARD {\n  NAME: \"Faithless Looting\"\n  MANA_COST: \"{R}\"\n  TYPES: [\"Sorcery\"]\n\n  @FLASHBACK(\"{2}{R}\")\n\n  SPELL {\n    EFFECT: [\n      DRAW { PLAYER: YOU COUNT: 2 }\n      DISCARD { PLAYER: YOU COUNT: 2 }\n    ]\n  }\n}\n",
+    "note": "Flashback on a spell (silent-drop fix)"
+  },
+  {
+    "card": {
+      "name": "Fear of Infinity",
+      "cost": "{1}{U}{B}",
+      "types": "[Enchantment, Creature]",
+      "subtypes": "[Nightmare]",
+      "oracle_text": "Flying, lifelink\nThis creature can't block.\nEerie — Whenever an enchantment you control enters and whenever you fully unlock a Room, you may return this card from your graveyard to your hand.",
+      "power": "2",
+      "toughness": "2"
+    },
+    "output": "CARD {\n  NAME: \"Fear of Infinity\"\n  MANA_COST: \"{1}{U}{B}\"\n  TYPES: [\"Enchantment\", \"Creature\"]\n  SUBTYPES: [\"Nightmare\"]\n  POWER: 2\n  TOUGHNESS: 2\n\n  @FLYING\n  @LIFELINK\n\n  STATIC {\n    EFFECT: [\n      CANT { SELF EFFECTS: [BLOCK] }\n    ]\n  }\n\n  TRIGGERED {\n    # SPEC_GAP: event not matched: Whenever an enchantment you control enters and whenever you fully unlock a Room\n    EFFECT: [\n      MOVE {\n        SELF\n        ZONE: YOU.graveyard\n        TO: YOU.hand\n        MAY: TRUE\n      }\n    ]\n  }\n}\n",
+    "note": "Self-referential CANT composition for 'This creature can't block.' -- re-confirmed after wiring the static-line CANT/MUST/CASE cluster"
+  },
+  {
+    "card": {
+      "name": "Glint-Nest Crane",
+      "cost": "{1}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Bird]",
+      "oracle_text": "Flying\nWhen this creature enters, look at the top four cards of your library. You may reveal an artifact card from among them and put it into your hand. Put the rest on the bottom of your library in any order.",
+      "power": "1",
+      "toughness": "3"
+    },
+    "output": "CARD {\n  NAME: \"Glint-Nest Crane\"\n  MANA_COST: \"{1}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Bird\"]\n  POWER: 1\n  TOUGHNESS: 3\n\n  @FLYING\n\n  TRIGGERED {\n    @WHEN_ETB { FILTER { SELF } }\n    EFFECT: [\n      LOOK { FROM: YOU.library COUNT: 4 } AS $top\n      CHOOSE {\n        FROM: $top\n        COUNT: RANGE 0..1\n        FILTER { TYPE: \"Artifact\" }\n      } AS $chosen\n      MOVE { $chosen TO: YOU.hand }\n      MOVE { $top EXCEPT: $chosen TO: YOU.library LOCATION: BOTTOM ORDER: RANDOM }\n    ]\n  }\n}\n",
+    "note": "'reveal a <type> card ... and put it' phrasing (not 'put a <type> card')"
+  },
+  {
+    "card": {
+      "name": "Guard Gomazoa",
+      "cost": "{2}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Jellyfish]",
+      "oracle_text": "Defender, flying\nPrevent all combat damage that would be dealt to this creature.",
+      "power": "1",
+      "toughness": "3"
+    },
+    "output": "CARD {\n  NAME: \"Guard Gomazoa\"\n  MANA_COST: \"{2}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Jellyfish\"]\n  POWER: 1\n  TOUGHNESS: 3\n\n  @DEFENDER\n  @FLYING\n\n  STATIC {\n    EFFECT: [\n      PREVENT {\n        TARGET: SELF\n        AMOUNT: ALL\n        DURATION: END_OF_COMBAT\n      }\n    ]\n  }\n}\n",
+    "note": "PREVENT combat-qualified, TARGET: SELF + DURATION: END_OF_COMBAT"
+  },
+  {
+    "card": {
+      "name": "Harbinger of Spring",
+      "cost": "{4}{G}",
+      "types": "[Creature]",
+      "subtypes": "[Spirit]",
+      "oracle_text": "Protection from non-Spirit creatures\nSoulshift 4 (When this creature dies, you may return target Spirit card with mana value 4 or less from your graveyard to your hand.)",
+      "power": "2",
+      "toughness": "1"
+    },
+    "output": "CARD {\n  NAME: \"Harbinger of Spring\"\n  MANA_COST: \"{4}{G}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Spirit\"]\n  POWER: 2\n  TOUGHNESS: 1\n\n  @PROTECTION(FILTER { AND { TYPE: \"Creature\" NOT { TYPE: \"Spirit\" } } })\n\n  # SPEC_GAP: static pattern unmatched: Soulshift 4\n}\n",
+    "note": "Protection from non-Spirit creatures"
+  },
+  {
+    "card": {
+      "name": "Hard Evidence",
+      "cost": "{U}",
+      "types": "[Sorcery]",
+      "oracle_text": "Create a 0/3 blue Crab creature token.\nInvestigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")"
+    },
+    "output": "CARD {\n  NAME: \"Hard Evidence\"\n  MANA_COST: \"{U}\"\n  TYPES: [\"Sorcery\"]\n\n  SPELL {\n    EFFECT: [\n      CREATE_TOKEN {\n        COLOR: U\n        TYPES: [\"Creature\"]\n        SUBTYPES: [\"Crab\"]\n        POWER: 0\n        TOUGHNESS: 3\n      }\n      CREATE_TOKEN { TOKEN: @Clue PLAYER: YOU COUNT: 1 }\n    ]\n  }\n}\n",
+    "note": "Investigate inside a SPELL"
+  },
+  {
+    "card": {
+      "name": "Haunted Dead",
+      "cost": "{3}{B}",
+      "types": "[Creature]",
+      "subtypes": "[Zombie]",
+      "oracle_text": "When this creature enters, create a 1/1 white Spirit creature token with flying.\n{1}{B}, Discard two cards: Return this card from your graveyard to the battlefield tapped.",
+      "power": "2",
+      "toughness": "2"
+    },
+    "output": "CARD {\n  NAME: \"Haunted Dead\"\n  MANA_COST: \"{3}{B}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Zombie\"]\n  POWER: 2\n  TOUGHNESS: 2\n\n  TRIGGERED {\n    @WHEN_ETB { FILTER { SELF } }\n    EFFECT: [\n      CREATE_TOKEN {\n        COLOR: W\n        TYPES: [\"Creature\"]\n        SUBTYPES: [\"Spirit\"]\n        POWER: 1\n        TOUGHNESS: 1\n        @FLYING\n      }\n    ]\n  }\n\n  ACTIVATED {\n    COST {\n      MANA: \"{1}{B}\"\n      DISCARD: SELF\n    }\n    EFFECT: [\n      MOVE {\n        SELF\n        ZONE: YOU.graveyard\n        TO: BATTLEFIELD\n        STATE: TAPPED\n      }\n    ]\n  }\n}\n",
+    "note": "Self-graveyard-return to battlefield tapped, discard-cost ACTIVATED"
+  },
+  {
+    "card": {
+      "name": "Icebreaker Kraken",
+      "cost": "{10}{U}{U}",
+      "supertypes": "[Snow]",
+      "types": "[Creature]",
+      "subtypes": "[Kraken]",
+      "oracle_text": "Affinity for snow lands (This spell costs {1} less to cast for each snow land you control.)\nWhen this creature enters, artifacts and creatures target opponent controls don't untap during that player's next untap step.\nReturn three snow lands you control to their owner's hand: Return this creature to its owner's hand.",
+      "power": "8",
+      "toughness": "8"
+    },
+    "output": "CARD {\n  NAME: \"Icebreaker Kraken\"\n  MANA_COST: \"{10}{U}{U}\"\n  SUPERTYPES: [\"Snow\"]\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Kraken\"]\n  POWER: 8\n  TOUGHNESS: 8\n  COST_REDUCTION: \"{1}\" * COUNT(BATTLEFIELD FILTER { AND { TYPE: \"Snow\" TYPE: \"Land\" } CONTROLLER: YOU })\n\n  TRIGGERED {\n    @WHEN_ETB { FILTER { SELF } } AS $event\n    EFFECT: [\n      # SPEC_GAP: effect not matched: artifacts and creatures target opponent controls don't untap during that player's next untap step.\n    ]\n  }\n\n  ACTIVATED {\n    COST {\n      # COST_UNKNOWN: Return three snow lands you control to their owner's hand\n    }\n    EFFECT: [\n      # SPEC_GAP: effect not matched: Return this creature to its owner's hand.\n    ]\n  }\n}\n",
+    "note": "Affinity compound descriptor (snow lands)"
+  },
+  {
+    "card": {
+      "name": "Ignis Scientia",
+      "cost": "{1}{G}{U}",
+      "supertypes": "[Legendary]",
+      "types": "[Creature]",
+      "subtypes": "[Human, Advisor]",
+      "oracle_text": "When Ignis Scientia enters, look at the top six cards of your library. You may put a land card from among them onto the battlefield tapped. Put the rest on the bottom of your library in a random order.\nI've Come Up with a New Recipe! — {1}{G}{U}, {T}: Exile target card from a graveyard. If a creature card was exiled this way, create a Food token.",
+      "power": "2",
+      "toughness": "2"
+    },
+    "output": "CARD {\n  NAME: \"Ignis Scientia\"\n  MANA_COST: \"{1}{G}{U}\"\n  SUPERTYPES: [\"Legendary\"]\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Human\", \"Advisor\"]\n  POWER: 2\n  TOUGHNESS: 2\n\n  TRIGGERED {\n    @WHEN_ETB { FILTER { SELF } }\n    EFFECT: [\n      LOOK { FROM: YOU.library COUNT: 6 } AS $top\n      CHOOSE {\n        FROM: $top\n        COUNT: RANGE 0..1\n        FILTER { TYPE: \"Land\" }\n      } AS $chosen\n      MOVE { $chosen TO: BATTLEFIELD STATE: TAPPED }\n      MOVE { $top EXCEPT: $chosen TO: YOU.library LOCATION: BOTTOM ORDER: RANDOM }\n    ]\n  }\n\n  ACTIVATED {\n    COST {\n      # COST_UNKNOWN: I've Come Up with a New Recipe! — {1}{G}{U}\n      TAP: SELF\n    }\n    EFFECT: [\n      EXILE {\n        TARGET {\n          TARGET_CLASSES: [CARD]\n          ZONE: ALL.graveyard\n          FILTER { CATEGORY: CARD }\n        } AS $exiled\n      }\n      # SPEC_GAP: effect not matched: If a creature card was exiled this way, create a Food token\n    ]\n  }\n}\n",
+    "note": "LOOK type-filtered onto battlefield TAPPED (silent-drop fix)"
+  },
+  {
+    "card": {
+      "name": "Inscription of Insight",
+      "cost": "{3}{U}",
+      "types": "[Sorcery]",
+      "oracle_text": "Kicker {2}{U}{U}\nChoose one. If this spell was kicked, choose any number instead.\n• Return up to two target creatures to their owners' hands.\n• Scry 2, then draw two cards.\n• Target player creates an X/X blue Illusion creature token, where X is the number of cards in their hand."
+    },
+    "output": "CARD {\n  NAME: \"Inscription of Insight\"\n  MANA_COST: \"{3}{U}\"\n  TYPES: [\"Sorcery\"]\n\n  @KICKER(\"{2}{U}{U}\")\n  SPELL {\n    EFFECT: [\n      CHOICE {\n        PLAYER: YOU\n        COUNT: 1\n        OPTION {\n          EFFECT: [\n            # SPEC_GAP: effect not matched: Return up to two target creatures to their owners' hands.\n          ]\n        }\n        OPTION {\n          EFFECT: [\n            @SURVEIL(2)\n          ]\n        }\n        OPTION {\n          EFFECT: [\n            # SPEC_GAP: effect not matched: Target player creates an X/X blue Illusion creature token, where X is the number of cards in their hand.\n          ]\n        }\n      }\n    ]\n  }\n}\n",
+    "note": "Kicker + CHOICE on same spell (dedup fix)"
+  },
+  {
+    "card": {
+      "name": "Jaheira's Respite",
+      "cost": "{4}{G}",
+      "types": "[Instant]",
+      "oracle_text": "Search your library for up to X basic land cards, where X is the number of creatures attacking you, put those cards onto the battlefield tapped, then shuffle.\nPrevent all combat damage that would be dealt this turn."
+    },
+    "output": "CARD {\n  NAME: \"Jaheira's Respite\"\n  MANA_COST: \"{4}{G}\"\n  TYPES: [\"Instant\"]\n\n  SPELL {\n    EFFECT: [\n      SEARCH {\n        ZONE: YOU.library\n        COUNT: RANGE 0..1\n        FILTER { AND { TYPE: \"Basic\" TYPE: \"Land\" } }\n      } AS $found\n      MOVE { $found TO: YOU.hand }\n      PREVENT { AMOUNT: ALL DURATION: END_OF_COMBAT }\n    ]\n  }\n}\n",
+    "note": "PREVENT bare Fog pattern"
+  },
+  {
+    "card": {
+      "name": "Kadena's Silencer",
+      "cost": "{1}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Snake, Wizard]",
+      "oracle_text": "When this creature is turned face up, counter all abilities your opponents control.\nMegamorph {1}{U} (You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its megamorph cost and put a +1/+1 counter on it.)",
+      "power": "2",
+      "toughness": "1"
+    },
+    "output": "CARD {\n  NAME: \"Kadena's Silencer\"\n  MANA_COST: \"{1}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Snake\", \"Wizard\"]\n  POWER: 2\n  TOUGHNESS: 1\n\n  TRIGGERED {\n    WHEN_ZONE_CHANGE { FILTER { SELF } TO: BATTLEFIELD }  # face-up event\n    EFFECT: [\n      # SPEC_GAP: effect not matched: counter all abilities your opponents control.\n    ]\n  }\n\n  @MEGAMORPH(\"{1}{U}\")\n}\n",
+    "note": "Megamorph"
+  },
+  {
+    "card": {
+      "name": "Loxodon Eavesdropper",
+      "cost": "{3}{G}",
+      "types": "[Creature]",
+      "subtypes": "[Elephant, Detective]",
+      "oracle_text": "When this creature enters, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\nWhenever you draw your second card each turn, this creature gets +1/+1 and gains vigilance until end of turn.",
+      "power": "3",
+      "toughness": "3"
+    },
+    "output": "CARD {\n  NAME: \"Loxodon Eavesdropper\"\n  MANA_COST: \"{3}{G}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Elephant\", \"Detective\"]\n  POWER: 3\n  TOUGHNESS: 3\n\n  TRIGGERED {\n    @WHEN_ETB { FILTER { SELF } }\n    EFFECT: [\n      CREATE_TOKEN { TOKEN: @Clue PLAYER: YOU COUNT: 1 }\n    ]\n  }\n\n  TRIGGERED {\n    # SPEC_GAP: event not matched: Whenever you draw your second card each turn\n    EFFECT: [\n      GRANT { SELF POWER: +1 TOUGHNESS: +1 DURATION: END_OF_TURN }\n      GRANT { SELF @VIGILANCE DURATION: END_OF_TURN }\n    ]\n  }\n}\n",
+    "note": "Investigate inside an ETB TRIGGERED"
+  },
+  {
+    "card": {
+      "name": "Mechanized Production",
+      "color": "[U]",
+      "color_identity": "[U]",
+      "layout": "normal",
+      "cost": "{2}{U}{U}",
+      "types": "[Enchantment]",
+      "subtypes": "[Aura]",
+      "oracle_text": "Enchant artifact you control\nAt the beginning of your upkeep, create a token that's a copy of enchanted artifact. Then if you control eight or more artifacts with the same name as one another, you win the game."
+    },
+    "output": "CARD {\n  NAME: \"Mechanized Production\"\n  MANA_COST: \"{2}{U}{U}\"\n  TYPES: [\"Enchantment\"]\n  SUBTYPES: [\"Aura\"]\n\n  @ENCHANT(FILTER { TYPE: \"Artifact\" CONTROLLER: YOU }) AS $enchanted\n\n  TRIGGERED {\n    WHEN_UPKEEP_BEGIN { FILTER { YOU } }\n    EFFECT: [\n      CREATE_TOKEN { COPY_OF: $enchanted } AS $token\n      # SPEC_GAP: effect not matched: then if you control eight or more artifacts with the same name as one another, you win the game.\n    ]\n  }\n}\n",
+    "note": "Enchant with restriction clause (already working pre-session; baseline)"
+  },
+  {
+    "card": {
+      "name": "Misthollow Griffin",
+      "cost": "{2}{U}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Griffin]",
+      "oracle_text": "Flying\nYou may cast this card from exile.",
+      "power": "3",
+      "toughness": "3"
+    },
+    "output": "CARD {\n  NAME: \"Misthollow Griffin\"\n  MANA_COST: \"{2}{U}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Griffin\"]\n  POWER: 3\n  TOUGHNESS: 3\n\n  @FLYING\n\n  STATIC {\n    EFFECT: [\n      GRANT {\n        SELF\n        CAST { SELF FROM: YOU.exile }\n      }\n    ]\n  }\n}\n",
+    "note": "'You may cast this card from exile' -> GRANT+CAST FROM: YOU.exile"
+  },
+  {
+    "card": {
+      "name": "Mizzium Mortars",
+      "cost": "{1}{R}",
+      "types": "[Sorcery]",
+      "oracle_text": "Mizzium Mortars deals 4 damage to target creature you don't control.\nOverload {3}{R}{R}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")"
+    },
+    "output": "CARD {\n  NAME: \"Mizzium Mortars\"\n  MANA_COST: \"{1}{R}\"\n  TYPES: [\"Sorcery\"]\n\n  @OVERLOAD(\"{3}{R}{R}{R}\")\n\n  SPELL {\n    EFFECT: [\n      DAMAGE {\n        TARGET { TARGET_CLASSES: [CREATURE] } AS $dmg_target\n        SOURCE: SELF\n        AMOUNT: 4\n      }\n    ]\n  }\n}\n",
+    "note": "Overload on a spell (silent-drop fix)"
+  },
+  {
+    "card": {
+      "name": "Pacifism",
+      "cost": "{1}{W}",
+      "types": "[Enchantment]",
+      "subtypes": "[Aura]",
+      "oracle_text": "Enchant creature\nEnchanted creature can't attack or block."
+    },
+    "output": "CARD {\n  NAME: \"Pacifism\"\n  MANA_COST: \"{1}{W}\"\n  TYPES: [\"Enchantment\"]\n  SUBTYPES: [\"Aura\"]\n\n  @ENCHANT(FILTER { TYPE: \"Creature\" }) AS $enchanted\n\n  STATIC {\n    EFFECT: [\n      # SPEC_GAP: equipped grant: Enchanted creature can't attack or block.\n    ]\n  }\n}\n",
+    "note": "Plain 'Enchant creature' (no restriction clause) — the core Enchant fix"
+  },
+  {
+    "card": {
+      "name": "Progenitus",
+      "cost": "{W}{W}{U}{U}{B}{B}{R}{R}{G}{G}",
+      "supertypes": "[Legendary]",
+      "types": "[Creature]",
+      "subtypes": "[Hydra, Avatar]",
+      "oracle_text": "Protection from everything\nIf Progenitus would be put into a graveyard from anywhere, reveal Progenitus and shuffle it into its owner's library instead.",
+      "power": "10",
+      "toughness": "10"
+    },
+    "output": "CARD {\n  NAME: \"Progenitus\"\n  MANA_COST: \"{W}{W}{U}{U}{B}{B}{R}{R}{G}{G}\"\n  SUPERTYPES: [\"Legendary\"]\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Hydra\", \"Avatar\"]\n  POWER: 10\n  TOUGHNESS: 10\n\n  @PROTECTION(FILTER {  })\n\n  # SPEC_GAP: replacement (instead): If Progenitus would be put into a graveyard from anywhere, reveal Progenitus and shuffle it into its owner's library instead.\n}\n",
+    "note": "Protection from everything -> empty FILTER"
+  },
+  {
+    "card": {
+      "name": "Questing Beast",
+      "cost": "{2}{G}{G}",
+      "supertypes": "[Legendary]",
+      "types": "[Creature]",
+      "subtypes": "[Beast]",
+      "oracle_text": "Vigilance, deathtouch, haste\nQuesting Beast can't be blocked by creatures with power 2 or less.\nCombat damage that would be dealt by creatures you control can't be prevented.\nWhenever Questing Beast deals combat damage to an opponent, it deals that much damage to target planeswalker that player controls.",
+      "power": "4",
+      "toughness": "4"
+    },
+    "output": "CARD {\n  NAME: \"Questing Beast\"\n  MANA_COST: \"{2}{G}{G}\"\n  SUPERTYPES: [\"Legendary\"]\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Beast\"]\n  POWER: 4\n  TOUGHNESS: 4\n\n  @VIGILANCE\n  @DEATHTOUCH\n  @HASTE\n\n  STATIC {\n    EFFECT: [\n      CANT {\n        FILTER { TYPE: \"Creature\" POWER: LTE 2 SELECTION: ALL }\n        EFFECTS: [ BLOCK { SELF } ]\n      }\n    ]\n  }\n\n  STATIC {\n    EFFECT: [\n      GRANT {\n        FILTER { TYPE: \"Creature\" CONTROLLER: YOU SELECTION: ALL }\n        DAMAGE_UNPREVENTABLE\n      }\n    ]\n  }\n\n  TRIGGERED {\n    WHEN_DAMAGE_DEALT { FILTER { SELF } COMBAT: TRUE TARGET_TYPE: PLAYER } AS $event\n    EFFECT: [\n      DAMAGE {\n        TARGET {\n          TARGET_CLASSES: [PLANESWALKER]\n        } AS $dmg_target\n        SOURCE: SELF\n        AMOUNT: $event.amount\n      }\n    ]\n  }\n}\n",
+    "note": "Baseline complex creature, unrelated to any single fix"
+  },
+  {
+    "card": {
+      "name": "Refurbished Familiar",
+      "cost": "{3}{B}",
+      "types": "[Artifact, Creature]",
+      "subtypes": "[Zombie, Rat]",
+      "oracle_text": "Affinity for artifacts (This spell costs {1} less to cast for each artifact you control.)\nFlying\nWhen this creature enters, each opponent discards a card. For each opponent who can't, you draw a card.",
+      "power": "2",
+      "toughness": "1"
+    },
+    "output": "CARD {\n  NAME: \"Refurbished Familiar\"\n  MANA_COST: \"{3}{B}\"\n  TYPES: [\"Artifact\", \"Creature\"]\n  SUBTYPES: [\"Zombie\", \"Rat\"]\n  POWER: 2\n  TOUGHNESS: 1\n  COST_REDUCTION: \"{1}\" * COUNT(BATTLEFIELD FILTER { TYPE: \"Artifact\" CONTROLLER: YOU })\n\n  @FLYING\n\n  TRIGGERED {\n    @WHEN_ETB { FILTER { SELF } }\n    EFFECT: [\n      # SPEC_GAP: effect not matched: each opponent discards a card. For each opponent who can't, you draw a card.\n    ]\n  }\n}\n",
+    "note": "Affinity for artifacts -> COST_REDUCTION"
+  },
+  {
+    "card": {
+      "name": "Retrofitted Transmogrant",
+      "cost": "{B}",
+      "types": "[Artifact, Creature]",
+      "subtypes": "[Zombie]",
+      "oracle_text": "{3}{B}: Return this card from your graveyard to the battlefield tapped with two +1/+1 counters on it.",
+      "power": "1",
+      "toughness": "1"
+    },
+    "output": "CARD {\n  NAME: \"Retrofitted Transmogrant\"\n  MANA_COST: \"{B}\"\n  TYPES: [\"Artifact\", \"Creature\"]\n  SUBTYPES: [\"Zombie\"]\n  POWER: 1\n  TOUGHNESS: 1\n\n  ACTIVATED {\n    COST: MANA: \"{3}{B}\"\n    EFFECT: [\n      MOVE {\n        SELF\n        ZONE: YOU.graveyard\n        TO: BATTLEFIELD\n        STATE: TAPPED\n      }\n      ADD_COUNTER { SELF NAME: \"+1/+1\" COUNT: 2 }\n    ]\n  }\n}\n",
+    "note": "Self-graveyard-return + ADD_COUNTER (+1/+1 x2)"
+  },
+  {
+    "card": {
+      "name": "Ronom Hulk",
+      "cost": "{4}{G}",
+      "types": "[Creature]",
+      "subtypes": "[Beast]",
+      "oracle_text": "Protection from snow\nCumulative upkeep {1} (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)",
+      "power": "5",
+      "toughness": "6"
+    },
+    "output": "CARD {\n  NAME: \"Ronom Hulk\"\n  MANA_COST: \"{4}{G}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Beast\"]\n  POWER: 5\n  TOUGHNESS: 6\n\n  @PROTECTION(FILTER { TYPE: \"Snow\" })\n\n  TRIGGERED {\n    WHEN_UPKEEP_BEGIN { FILTER { YOU } }\n    EFFECT: [\n      ADD_COUNTER { SELF NAME: \"age\" COUNT: 1 }\n      CHOICE {\n        PLAYER: YOU\n        TIMING: RESOLUTION\n        COUNT: 1\n        OPTION { COST: MANA: \"{1}\" * SELF.counters.age }\n        OPTION { EFFECT: [ SACRIFICE { SELF } ] }\n      }\n    ]\n  }\n}\n",
+    "note": "Protection from snow (supertype via TYPE)"
+  },
+  {
+    "card": {
+      "name": "Sandskin",
+      "cost": "{2}{W}",
+      "types": "[Enchantment]",
+      "subtypes": "[Aura]",
+      "oracle_text": "Enchant creature\nPrevent all combat damage that would be dealt to and dealt by enchanted creature."
+    },
+    "output": "CARD {\n  NAME: \"Sandskin\"\n  MANA_COST: \"{2}{W}\"\n  TYPES: [\"Enchantment\"]\n  SUBTYPES: [\"Aura\"]\n\n  @ENCHANT(FILTER { TYPE: \"Creature\" }) AS $enchanted\n\n  STATIC {\n    EFFECT: [\n      PREVENT {\n        TARGET: $enchanted\n        SOURCE: $enchanted\n        AMOUNT: ALL\n        DURATION: END_OF_COMBAT\n      }\n    ]\n  }\n}\n",
+    "note": "PREVENT elided 'to and dealt by enchanted creature', combat DURATION"
+  },
+  {
+    "card": {
+      "name": "Seraphic Greatsword",
+      "cost": "{1}{W}",
+      "types": "[Artifact]",
+      "subtypes": "[Equipment]",
+      "oracle_text": "Equipped creature gets +2/+2.\nWhenever equipped creature attacks the player with the most life or tied for most life, create a 4/4 white Angel creature token with flying that's tapped and attacking that player.\nEquip {4}"
+    },
+    "output": "CARD {\n  NAME: \"Seraphic Greatsword\"\n  MANA_COST: \"{1}{W}\"\n  TYPES: [\"Artifact\"]\n  SUBTYPES: [\"Equipment\"]\n\n  STATIC {\n    EFFECT: [\n      GRANT { $equipped\n        POWER: +2\n        TOUGHNESS: +2\n      }\n    ]\n  }\n\n  TRIGGERED {\n    # SPEC_GAP: event not matched: Whenever equipped creature attacks the player with the most life or tied for most life\n    EFFECT: [\n      CREATE_TOKEN {\n        COLOR: W\n        TYPES: [\"Creature\"]\n        SUBTYPES: [\"Angel\"]\n        POWER: 4\n        TOUGHNESS: 4\n        STATE: TAPPED_AND_ATTACKING\n        @FLYING\n      }\n    ]\n  }\n\n  @EQUIP(\"{4}\") AS $equipped\n}\n",
+    "note": "Token-ability trailing entry-state clause (tapped and attacking) stripped into STATE field"
+  },
+  {
+    "card": {
+      "name": "Shaper Parasite",
+      "cost": "{1}{U}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Illusion]",
+      "oracle_text": "Morph {2}{U} (You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its morph cost.)\nWhen this creature is turned face up, target creature gets +2/-2 or -2/+2 until end of turn.",
+      "power": "2",
+      "toughness": "3"
+    },
+    "output": "CARD {\n  NAME: \"Shaper Parasite\"\n  MANA_COST: \"{1}{U}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Illusion\"]\n  POWER: 2\n  TOUGHNESS: 3\n\n  @MORPH(\"{2}{U}\")\n\n  TRIGGERED {\n    WHEN_ZONE_CHANGE { FILTER { SELF } TO: BATTLEFIELD }  # face-up event\n    EFFECT: [\n      TARGET { TARGET_CLASSES: [CREATURE] } AS $target\n      GRANT { $target POWER: +2 TOUGHNESS: -2 DURATION: END_OF_TURN }\n    ]\n  }\n}\n",
+    "note": "Morph multi-symbol cost"
+  },
+  {
+    "card": {
+      "name": "Shieldmate's Blessing",
+      "cost": "{W}",
+      "types": "[Instant]",
+      "oracle_text": "Prevent the next 3 damage that would be dealt to any target this turn."
+    },
+    "output": "CARD {\n  NAME: \"Shieldmate's Blessing\"\n  MANA_COST: \"{W}\"\n  TYPES: [\"Instant\"]\n\n  SPELL {\n    EFFECT: [\n      TARGET { TARGET_CLASSES: [CREATURE, PLANESWALKER, PLAYER] } AS $prevent_target\n      PREVENT { TARGET: $prevent_target AMOUNT: 3 }\n    ]\n  }\n}\n",
+    "note": "PREVENT next-N-damage to fresh TARGET"
+  },
+  {
+    "card": {
+      "name": "Skaab Ruinator",
+      "cost": "{1}{U}{U}",
+      "types": "[Creature]",
+      "subtypes": "[Zombie, Horror]",
+      "oracle_text": "As an additional cost to cast this spell, exile three creature cards from your graveyard.\nFlying\nYou may cast this card from your graveyard.",
+      "power": "5",
+      "toughness": "6"
+    },
+    "output": "CARD {\n  NAME: \"Skaab Ruinator\"\n  MANA_COST: \"{1}{U}{U}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Zombie\", \"Horror\"]\n  POWER: 5\n  TOUGHNESS: 6\n  # SPEC_GAP: ADDL_COST: As an additional cost to cast this spell, exile three creature cards from your graveyard.\n\n  @FLYING\n\n  STATIC {\n    EFFECT: [\n      GRANT {\n        SELF\n        CAST { SELF FROM: YOU.graveyard }\n      }\n    ]\n  }\n}\n",
+    "note": "'You may cast this card from your graveyard' -> GRANT+CAST"
+  },
+  {
+    "card": {
+      "name": "Sleight of Hand",
+      "cost": "{U}",
+      "types": "[Sorcery]",
+      "oracle_text": "Look at the top two cards of your library. Put one of them into your hand and the other on the bottom of your library."
+    },
+    "output": "CARD {\n  NAME: \"Sleight of Hand\"\n  MANA_COST: \"{U}\"\n  TYPES: [\"Sorcery\"]\n\n  SPELL {\n    EFFECT: [\n      LOOK { FROM: YOU.library COUNT: 2 } AS $top\n      CHOOSE {\n        FROM: $top\n        COUNT: 1\n      } AS $chosen\n      MOVE { $chosen TO: YOU.hand }\n      MOVE { $top EXCEPT: $chosen TO: YOU.library LOCATION: BOTTOM ORDER: RANDOM }\n    ]\n  }\n}\n",
+    "note": "LOOK-top-N free pick to hand, rest to bottom"
+  },
+  {
+    "card": {
+      "name": "Sol Ring",
+      "cost": "{1}",
+      "types": "[Artifact]",
+      "oracle_text": "{T}: Add {C}{C}."
+    },
+    "output": "CARD {\n  NAME: \"Sol Ring\"\n  MANA_COST: \"{1}\"\n  TYPES: [\"Artifact\"]\n\n  MANA_ABILITY {\n    COST: TAP\n    ADD_MANA: { \"{C}{C}\" }\n  }\n}\n",
+    "note": "Baseline simple mana ability"
+  },
+  {
+    "card": {
+      "name": "Soldier of the Pantheon",
+      "cost": "{W}",
+      "types": "[Creature]",
+      "subtypes": "[Human, Soldier]",
+      "oracle_text": "Protection from multicolored\nWhenever an opponent casts a multicolored spell, you gain 1 life.",
+      "power": "2",
+      "toughness": "1"
+    },
+    "output": "CARD {\n  NAME: \"Soldier of the Pantheon\"\n  MANA_COST: \"{W}\"\n  TYPES: [\"Creature\"]\n  SUBTYPES: [\"Human\", \"Soldier\"]\n  POWER: 2\n  TOUGHNESS: 1\n\n  # UNKNOWN_KEYWORD: Protection from multicolored\n\n  TRIGGERED {\n    # SPEC_GAP: event not matched: Whenever an opponent casts a multicolored spell\n    EFFECT: [\n      GAIN_LIFE { PLAYER: YOU AMOUNT: 1 }\n    ]\n  }\n}\n",
+    "note": "Protection from multicolored — must stay an honest gap, not TYPE:\"Multicolored\""
+  },
+  {
+    "card": {
+      "name": "Stall for Time",
+      "cost": "{2}{W}",
+      "types": "[Instant]",
+      "oracle_text": "Kicker {1}{U} (You may pay an additional {1}{U} as you cast this spell.)\nTap up to two target creatures. If this spell was kicked, put a stun counter on each of those creatures. (If a permanent with a stun counter would become untapped, remove one from it instead.)\nDraw a card."
+    },
+    "output": "CARD {\n  NAME: \"Stall for Time\"\n  MANA_COST: \"{2}{W}\"\n  TYPES: [\"Instant\"]\n\n  @KICKER(\"{1}{U}\")\n\n  SPELL {\n    EFFECT: [\n      # SPEC_GAP: effect not matched: Tap up to two target creatures. If this spell was kicked, put a stun counter on each of those creatures.\n      DRAW { PLAYER: YOU COUNT: 1 }\n    ]\n  }\n}\n",
+    "note": "Kicker on an Instant (spell-keyword routing fix)"
+  },
+  {
+    "card": {
+      "name": "Strategic Planning",
+      "cost": "{1}{U}",
+      "types": "[Sorcery]",
+      "oracle_text": "Look at the top three cards of your library. Put one of them into your hand and the rest into your graveyard."
+    },
+    "output": "CARD {\n  NAME: \"Strategic Planning\"\n  MANA_COST: \"{1}{U}\"\n  TYPES: [\"Sorcery\"]\n\n  SPELL {\n    EFFECT: [\n      LOOK { FROM: YOU.library COUNT: 3 } AS $top\n      CHOOSE {\n        FROM: $top\n        COUNT: 1\n      } AS $chosen\n      MOVE { $chosen TO: YOU.hand }\n      MOVE { $top EXCEPT: $chosen TO: YOU.graveyard }\n    ]\n  }\n}\n",
+    "note": "LOOK-top-N free pick (no type filter) to hand, rest to graveyard"
+  },
+  {
+    "card": {
+      "name": "Tamiyo's Journal",
+      "cost": "{5}",
+      "supertypes": "[Legendary]",
+      "types": "[Artifact]",
+      "subtypes": "[Book]",
+      "oracle_text": "At the beginning of your upkeep, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\n{T}, Sacrifice three Clues: Search your library for a card, put that card into your hand, then shuffle."
+    },
+    "output": "CARD {\n  NAME: \"Tamiyo's Journal\"\n  MANA_COST: \"{5}\"\n  SUPERTYPES: [\"Legendary\"]\n  TYPES: [\"Artifact\"]\n  SUBTYPES: [\"Book\"]\n\n  TRIGGERED {\n    WHEN_UPKEEP_BEGIN { FILTER { YOU } }\n    EFFECT: [\n      CREATE_TOKEN { TOKEN: @Clue PLAYER: YOU COUNT: 1 }\n    ]\n  }\n\n  ACTIVATED {\n    COST {\n      TAP: SELF\n      SACRIFICE: CHOOSE { FROM: BATTLEFIELD COUNT: 3 FILTER { TYPE: \"Clue\" CONTROLLER: YOU } }\n    }\n    EFFECT: [\n      SEARCH {\n        ZONE: YOU.library\n      } AS $found\n      MOVE { $found TO: YOU.hand }\n    ]\n  }\n}\n",
+    "note": "Investigate in upkeep trigger + unrelated activated ability"
+  }
+]

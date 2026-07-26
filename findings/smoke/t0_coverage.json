@@ -1,0 +1,160 @@
+{
+  "git_dirty": true,
+  "git_rev": null,
+  "inputs": {
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/vendor/magicspike_data/archidekt_census_popular.jsonl": {
+      "bytes": 28416697,
+      "exists": true,
+      "mtime": 1785025369,
+      "sha256": "267d9797ecb73c7f39b2ba704ba7c0583c3eb0a3a1b1f1d2374ad732f4e26766"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/vendor/magicspike_data/backup_precon_only": {
+      "bytes": 383579,
+      "exists": true,
+      "file_count": 1,
+      "is_dir": true
+    },
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/vendor/magicspike_data/cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1785025369,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    },
+    "/Users/nickpersing/PycharmProjects/MagicRetrieval/vendor/magicspike_data/decks_combined.parquet": {
+      "bytes": 14636160,
+      "exists": true,
+      "mtime": 1785025369,
+      "sha256": "4bfec438d7ec52ea63469c3b08178aaa567215410a5f28133bee3d4f3d144164"
+    }
+  },
+  "results": {
+    "casual": {
+      "appearance_coverage": 0.4478247162673392,
+      "distinct_coverage_all_cards": 0.31819206855449245,
+      "distinct_coverage_in_corpus": 0.2923848726524312,
+      "encoded_coverage": 0.966057166876839,
+      "exclusion_reasons": {
+        "digital": 201,
+        "multi_faced": 415,
+        "set_type": 30
+      },
+      "gap_categories": {
+        "ADDL_COST": 95,
+        "ALT_COST": 40,
+        "ETB replacement": 523,
+        "UNKNOWN_KEYWORD": 168,
+        "create token pattern unmatched": 118,
+        "damage pattern unmatched": 82,
+        "effect not matched": 4948,
+        "event not matched": 1453,
+        "mana side effect": 201,
+        "replacement": 160,
+        "replacement (instead)": 131,
+        "static pattern unmatched": 1827
+      },
+      "guard_drop": 0.07723242976596179,
+      "guarded_coverage": 0.37059228650137743,
+      "n_cards_in_corpus": 7816,
+      "n_cards_parsed": 31041,
+      "n_decks": 200,
+      "n_staples": 5,
+      "staple_names": [
+        "Arcane Signet",
+        "Command Tower",
+        "Exotic Orchard",
+        "Sol Ring"
+      ],
+      "status_share": {
+        "clean": {
+          "appearances": 8523,
+          "n_cards": 2273,
+          "share": 0.4478247162673392
+        },
+        "crash": {
+          "appearances": 0,
+          "n_cards": 0,
+          "share": 0.0
+        },
+        "excluded": {
+          "appearances": 646,
+          "n_cards": 392,
+          "share": 0.033942833123160994
+        },
+        "gap": {
+          "appearances": 9863,
+          "n_cards": 5109,
+          "share": 0.5182324506094997
+        }
+      },
+      "strata": {
+        "all": {
+          "coverage": 0.4478247162673392,
+          "covered": 8523,
+          "total": 19032
+        },
+        "non_land": {
+          "coverage": 0.3848690852796661,
+          "covered": 5718,
+          "total": 14857
+        },
+        "non_land_non_staple": {
+          "coverage": 0.37059228650137743,
+          "covered": 5381,
+          "total": 14520
+        },
+        "non_staple": {
+          "coverage": 0.42950979859942456,
+          "covered": 7912,
+          "total": 18421
+        }
+      },
+      "top_breakouts": {
+        "top_100": {
+          "appearance_coverage": 0.8982131461391193,
+          "distinct_coverage": 0.8842105263157894,
+          "n_cards": 95
+        },
+        "top_2000": {
+          "appearance_coverage": 0.555666168906587,
+          "distinct_coverage": 0.38972809667673713,
+          "n_cards": 1986
+        },
+        "top_500": {
+          "appearance_coverage": 0.7148634984833164,
+          "distinct_coverage": 0.6077235772357723,
+          "n_cards": 492
+        }
+      },
+      "verdict": "FAIL"
+    }
+  },
+  "run_args": {
+    "corpora": [
+      "casual"
+    ],
+    "limit": 200,
+    "parser": "pile_of_cards_parser@/Users/nickpersing/PycharmProjects/MagicRetrieval/vendor/pile_of_cards_parser"
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    }
+  }
+}
