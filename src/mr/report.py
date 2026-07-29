@@ -51,8 +51,8 @@ def write(name: str, payload: dict, markdown: str, findings_dir: Path | None = N
     d.mkdir(parents=True, exist_ok=True)
     json_path = d / f"{name}.json"
     md_path = d / f"{name}.md"
-    json_path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n")
-    md_path.write_text(markdown)
+    json_path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    md_path.write_text(markdown, encoding="utf-8")
     return json_path, md_path
 
 

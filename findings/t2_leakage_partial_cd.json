@@ -2,12 +2,12 @@
   "git_dirty": true,
   "git_rev": "c0bebf0",
   "harness": {
-    "corpus_caveat": "2a is a precon-only rebuild (224 decks); the historical baseline's corpus additionally included several hundred early cEDH decks that no longer exist in isolated form. A mismatch is expected.",
+    "corpus_caveat": "arm 2a was not run",
     "expected_random": 0.748,
     "expected_substitute": 0.717,
-    "matches_reference": false,
-    "observed_random": 0.6455906229714553,
-    "observed_substitute": 0.7933705225586891,
+    "matches_reference": null,
+    "observed_random": null,
+    "observed_substitute": null,
     "tolerance": 0.02
   },
   "inputs": {
@@ -49,101 +49,6 @@
     }
   },
   "results": [
-    {
-      "arm": "2a",
-      "corpus": "precon",
-      "curated": {
-        "lift_vs_cluster": 0.1477798995872338,
-        "lift_vs_cluster_ci": [
-          0.10352428050090874,
-          0.19197519536130128
-        ],
-        "lift_vs_stratum": 0.17013157444695637,
-        "lift_vs_stratum_ci": [
-          0.12554804366081954,
-          0.21495462199673052
-        ],
-        "mean_random_cluster_cosine": 0.6455906229714553,
-        "mean_random_stratum_cosine": 0.6232389481117327,
-        "mean_substitute_cosine": 0.7933705225586891,
-        "n_pairs_in_vocab": 40
-      },
-      "mined_holdout": {
-        "lift_vs_cluster": 0.04526361221010189,
-        "lift_vs_cluster_ci": [
-          0.042396765645264435,
-          0.048074493126570875
-        ],
-        "lift_vs_stratum": 0.1521336944800049,
-        "lift_vs_stratum_ci": [
-          0.14930693827123845,
-          0.15505621560301963
-        ],
-        "mean_random_cluster_cosine": 0.6795152955675267,
-        "mean_random_stratum_cosine": 0.5726452132976236,
-        "mean_substitute_cosine": 0.7247789077776285,
-        "n_pairs_in_vocab": 6541
-      },
-      "n_cards_vocab": 6332,
-      "n_decks": 224,
-      "n_extra_negatives_2d": 0,
-      "n_extra_positives_2d": 0,
-      "n_holdout_positives": 6541,
-      "n_negatives": 0,
-      "n_positives_mined": 43609,
-      "n_positives_strict": 43183,
-      "n_positives_trained": 37068,
-      "narrow_effect": true,
-      "verdict": "PASS"
-    },
-    {
-      "arm": "2b",
-      "corpus": "casual",
-      "curated": {
-        "lift_vs_cluster": 0.168694295141267,
-        "lift_vs_cluster_ci": [
-          0.13718458468261457,
-          0.19820329947593754
-        ],
-        "lift_vs_stratum": 0.16109325534399643,
-        "lift_vs_stratum_ci": [
-          0.13036263697539216,
-          0.19069117469092206
-        ],
-        "mean_random_cluster_cosine": 0.6721416746158837,
-        "mean_random_stratum_cosine": 0.6797427144131543,
-        "mean_substitute_cosine": 0.8408359697571507,
-        "n_pairs_in_vocab": 54
-      },
-      "mined_holdout": {
-        "lift_vs_cluster": 0.02181547842370446,
-        "lift_vs_cluster_ci": [
-          0.02043861867315706,
-          0.023183806278951193
-        ],
-        "lift_vs_stratum": 0.05790576080718668,
-        "lift_vs_stratum_ci": [
-          0.056607487330285276,
-          0.05919682681886993
-        ],
-        "mean_random_cluster_cosine": 0.6876729220188957,
-        "mean_random_stratum_cosine": 0.6515826396354135,
-        "mean_substitute_cosine": 0.7094884004426002,
-        "n_pairs_in_vocab": 37500
-      },
-      "n_cards_vocab": 24762,
-      "n_decks": 4982,
-      "n_extra_negatives_2d": 0,
-      "n_extra_positives_2d": 0,
-      "n_holdout_positives": 37500,
-      "n_negatives": 0,
-      "n_positives_mined": 250000,
-      "n_positives_mined_total": 1288988,
-      "n_positives_strict": 1287114,
-      "n_positives_trained": 212500,
-      "narrow_effect": true,
-      "verdict": "PASS"
-    },
     {
       "arm": "2c",
       "corpus": "casual",
@@ -335,62 +240,20 @@
       "n_positives_trained": 177905,
       "narrow_effect": true,
       "verdict": "PASS"
-    },
-    {
-      "arm": "2b",
-      "corpus": "cedh",
-      "curated": {
-        "lift_vs_cluster": 0.11708103120326996,
-        "lift_vs_cluster_ci": [
-          0.08414960412745486,
-          0.14887604230072024
-        ],
-        "lift_vs_stratum": 0.14676690497148182,
-        "lift_vs_stratum_ci": [
-          0.11398005179233023,
-          0.17955110624524542
-        ],
-        "mean_random_cluster_cosine": 0.7030160079399744,
-        "mean_random_stratum_cosine": 0.6733301341717626,
-        "mean_substitute_cosine": 0.8200970391432444,
-        "n_pairs_in_vocab": 54
-      },
-      "mined_holdout": {
-        "lift_vs_cluster": 0.01081121622365111,
-        "lift_vs_cluster_ci": [
-          0.00962361919987446,
-          0.012020918837823382
-        ],
-        "lift_vs_stratum": 0.07860977065155561,
-        "lift_vs_stratum_ci": [
-          0.07738874145750867,
-          0.07986993140045225
-        ],
-        "mean_random_cluster_cosine": 0.7243131032087006,
-        "mean_random_stratum_cosine": 0.6565145487807961,
-        "mean_substitute_cosine": 0.7351243194323517,
-        "n_pairs_in_vocab": 31341
-      },
-      "n_cards_vocab": 10569,
-      "n_decks": 46798,
-      "n_extra_negatives_2d": 0,
-      "n_extra_positives_2d": 0,
-      "n_holdout_positives": 31341,
-      "n_negatives": 0,
-      "n_positives_mined": 208946,
-      "n_positives_strict": 203901,
-      "n_positives_trained": 177605,
-      "narrow_effect": true,
-      "verdict": "PASS"
     }
   ],
   "run_args": {
-    "merged_from": [
-      "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t2_leakage_partial_2a.json",
-      "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t2_leakage_partial_casual2b.json",
-      "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t2_leakage_partial_cd.json",
-      "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t2_leakage_partial_cedh2b.json"
-    ]
+    "arms": [
+      "2c",
+      "2d"
+    ],
+    "corpora": [
+      "casual",
+      "cedh"
+    ],
+    "epochs": 2,
+    "max_decks": null,
+    "max_positives": 250000
   },
   "thresholds": {
     "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",

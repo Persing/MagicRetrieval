@@ -12,10 +12,20 @@ dependencies = [
     "tqdm>=4.67.3",
     "sentence-transformers>=3.0.0",
     "torch>=2.4.0",
+    "datasets>=2.14.0",
+    "accelerate>=1.1.0",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu130", marker = "sys_platform == 'win32'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
 
 [build-system]
 requires = ["hatchling"]

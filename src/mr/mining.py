@@ -100,7 +100,8 @@ def mine_hard_negatives(
         ci_a = card_index.get(oid_a)
         if ci_a is None:
             continue
-        color_a = set(oid_to_color.get(oid_a) or [])
+        ci_val = oid_to_color.get(oid_a)
+        color_a = set(ci_val) if ci_val is not None and len(ci_val) else set()
         row = ppmi_csr.getrow(ci_a).toarray().flatten()
         zero_idx = np.where(row == 0)[0]
         if len(zero_idx) == 0:
@@ -110,7 +111,8 @@ def mine_hard_negatives(
             oid_b = idx_to_oid.get(ci_b)
             if not oid_b or oid_b == oid_a:
                 continue
-            color_b = set(oid_to_color.get(oid_b) or [])
+            cb_val = oid_to_color.get(oid_b)
+            color_b = set(cb_val) if cb_val is not None and len(cb_val) else set()
             if color_a.isdisjoint(color_b):
                 continue  # require shared colour — otherwise this is a trivial negative
             key = frozenset((oid_a, oid_b))
