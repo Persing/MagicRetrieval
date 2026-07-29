@@ -1,0 +1,269 @@
+{
+  "arms": {
+    "A": {
+      "arm": "A",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 0,
+      "n_empty_body": 360,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.0,
+      "share_over_512": 0.0,
+      "tokens_max": 158,
+      "tokens_mean": 45.497535517541316,
+      "tokens_p50": 42,
+      "tokens_p90": 72,
+      "tokens_p99": 101
+    },
+    "A_raw": {
+      "arm": "A_raw",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 0,
+      "n_empty_body": 348,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.0,
+      "share_over_512": 0.0,
+      "tokens_max": 172,
+      "tokens_mean": 53.50526722721562,
+      "tokens_p50": 50,
+      "tokens_p90": 85,
+      "tokens_p99": 112
+    },
+    "A_t2": {
+      "arm": "A_t2",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 0,
+      "n_empty_body": 0,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.0,
+      "share_over_512": 0.0,
+      "tokens_max": 154,
+      "tokens_mean": 45.38465255629651,
+      "tokens_p50": 42,
+      "tokens_p90": 76,
+      "tokens_p99": 103
+    },
+    "B": {
+      "arm": "B",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 0,
+      "n_empty_body": 360,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.0,
+      "share_over_512": 0.0,
+      "tokens_max": 164,
+      "tokens_mean": 49.79591508005541,
+      "tokens_p50": 46,
+      "tokens_p90": 77,
+      "tokens_p99": 107
+    },
+    "B+": {
+      "arm": "B+",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 0,
+      "n_empty_body": 360,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.01939370509970684,
+      "share_over_512": 0.0,
+      "tokens_max": 436,
+      "tokens_mean": 114.89562191939693,
+      "tokens_p50": 105,
+      "tokens_p90": 191,
+      "tokens_p99": 280
+    },
+    "B_type": {
+      "arm": "B_type",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 0,
+      "n_empty_body": 360,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.0,
+      "share_over_512": 0.0,
+      "tokens_max": 210,
+      "tokens_mean": 61.63551431977063,
+      "tokens_p50": 57,
+      "tokens_p90": 96,
+      "tokens_p99": 134
+    },
+    "C": {
+      "arm": "C",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 20404,
+      "n_cdl_used": 10637,
+      "n_empty_body": 53,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 31041,
+      "share_over_256": 0.017718501336941465,
+      "share_over_512": 0.0,
+      "tokens_max": 436,
+      "tokens_mean": 105.26996552946103,
+      "tokens_p50": 92,
+      "tokens_p90": 185,
+      "tokens_p99": 277
+    },
+    "D": {
+      "arm": "D",
+      "n_canonicalize_failed": 0,
+      "n_cards_in_pool": 31041,
+      "n_cdl_fallback": 0,
+      "n_cdl_used": 10637,
+      "n_empty_body": 0,
+      "n_over_512": 0,
+      "n_span_clause_misaligned": 0,
+      "n_texts": 10637,
+      "share_over_256": 0.00018802293879853342,
+      "share_over_512": 0.0,
+      "tokens_max": 269,
+      "tokens_mean": 65.2563692770518,
+      "tokens_p50": 62,
+      "tokens_p90": 104,
+      "tokens_p99": 160
+    }
+  },
+  "base_model": "all-MiniLM-L6-v2",
+  "content_loss_vs_A": {
+    "B": {
+      "alphanumeric": {
+        "max": 0.05063291139240506,
+        "mean": 0.00011155155425374474,
+        "p90": 0.0,
+        "p99": 0.0,
+        "share_over_1pct": 0.006088721368512612,
+        "share_zero": 0.9922038594117457
+      },
+      "non_space": {
+        "max": 0.14965986394557823,
+        "mean": 0.02141151891098847,
+        "p90": 0.03389830508474576,
+        "p99": 0.0625,
+        "share_over_1pct": 0.8928191746399923,
+        "share_zero": 0.05718243613285654
+      }
+    },
+    "B+": {
+      "alphanumeric": {
+        "max": 0.03571428571428571,
+        "mean": 4.6504559670281955e-05,
+        "p90": 0.0,
+        "p99": 0.0,
+        "share_over_1pct": 0.002061789246480461,
+        "share_zero": 0.9956509133082053
+      },
+      "non_space": {
+        "max": 0.1188118811881188,
+        "mean": 0.01868161916838662,
+        "p90": 0.030534351145038167,
+        "p99": 0.0547945205479452,
+        "share_over_1pct": 0.8417254598756483,
+        "share_zero": 0.06253020199091525
+      }
+    },
+    "B_type": {
+      "alphanumeric": {
+        "max": 0.05063291139240506,
+        "mean": 0.00011143525296502178,
+        "p90": 0.0,
+        "p99": 0.0,
+        "share_over_1pct": 0.006088721368512612,
+        "share_zero": 0.9922038594117457
+      },
+      "non_space": {
+        "max": 0.14965986394557823,
+        "mean": 0.021411413631717304,
+        "p90": 0.03389830508474576,
+        "p99": 0.0625,
+        "share_over_1pct": 0.8928191746399923,
+        "share_zero": 0.05718243613285654
+      }
+    }
+  },
+  "git_dirty": true,
+  "git_rev": "c0bebf0",
+  "inputs": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1785027795,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    }
+  },
+  "n_cards_in_pool": 31041,
+  "normalization_cost_A_raw_vs_A": {
+    "alphanumeric": {
+      "max": 0.92,
+      "mean": 0.12819995346042565,
+      "p90": 0.494949494949495,
+      "p99": 0.7481334617345491,
+      "share_over_1pct": 0.30772204503720885,
+      "share_zero": 0.6922779549627911
+    },
+    "non_space": {
+      "max": 0.9067055393586005,
+      "mean": 0.12540687418548707,
+      "p90": 0.48,
+      "p99": 0.7194901225030349,
+      "share_over_1pct": 0.30772204503720885,
+      "share_zero": 0.6919880158500048
+    }
+  },
+  "run_args": {
+    "arms": [
+      "A",
+      "B",
+      "B_type",
+      "B+",
+      "C",
+      "D",
+      "A_raw",
+      "A_t2"
+    ],
+    "parser_pin": "91341a572dec79a07fa6a0dfe6589cd2581621aa2be3c30c6af9bab321862719"
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    }
+  }
+}

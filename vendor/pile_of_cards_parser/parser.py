@@ -212,10 +212,22 @@ def strip_reminder_text(line: str) -> str:
     if re.match(r'^\([^)]+\)$', line.strip()):
         return ""  # discard pure reminder lines entirely
 
-    # Strip trailing reminder text: " (This creature...)", " (You may...)"
-    # But NOT cost-modifier parens like "({T}, Sacrifice...)"
+    # Strip trailing reminder text: " (This creature...)", " (You may...)".
+    # Previously required the paren to start with a capital letter, to
+    # avoid stripping "cost-modifier parens like ({T}, Sacrifice...)" --
+    # but a trailing parenthetical in real oracle text is ALWAYS reminder
+    # text by MTG's own definition (rule 207.2/708.5), never functionally
+    # load-bearing, regardless of what character it starts with. The
+    # capital-letter gate was blocking exactly the common shape it wasn't
+    # meant to touch: "Equip {1} ({1}: Attach to target creature you
+    # control. Equip only as a sorcery.)" -- the reminder starts with a
+    # mana symbol, not a capital letter, so it never got stripped at all
+    # (found via corpus check while testing popular Commander cards:
+    # 1,120 cards have a trailing reminder paren that doesn't start with
+    # a capital letter). The length gate ({10,}) still guards against
+    # stripping a genuinely short/non-reminder trailing paren.
     result = re.sub(
-        r'\s*\([A-Z][^)]{10,}\)\s*$',
+        r'\s*\([^)]{10,}\)\s*$',
         '',
         line.strip()
     )
@@ -921,7 +933,8 @@ class PatternMatcher:
             # "AS $event" to every other TRIGGERED block.
             aef = actual_effect.lower()
             if ("defending player" in aef or "that many" in aef or "that player" in aef
-                    or "copy of it" in aef or "that permanent" in aef or "copy that spell" in aef):
+                    or "copy of it" in aef or "that permanent" in aef or "copy that spell" in aef
+                    or "return it to its owner's hand" in aef):
                 event_block = _bind_event_block(event_block, "$event")
 
         result = ["  TRIGGERED {"]
@@ -1171,6 +1184,16 @@ class PatternMatcher:
         # silent-truncation risk: "dies during combat", "dies or...").
         if re.match(r'when(?:ever)? (?:this creature|' + name_pattern + r') dies\.?$', ll):
             return ["WHEN_DIES { FILTER { SELF } }"]
+        # "When this artifact/Aura/... is put into a graveyard from the
+        # battlefield" (Spine of Ish Sah, Slow Motion) — WHEN_DIES's own
+        # documented definition is "permanent put into graveyard from
+        # battlefield" (Section 5), not creature-specific, so this is the
+        # same event under its full rules phrasing rather than the
+        # creature-only "dies" shorthand. AS $event so "return it to its
+        # owner's hand" can resolve "it" downstream.
+        if re.match(r'when(?:ever)? (?:this (?:' + self_type_words + r')|' + name_pattern +
+                    r') is put into a graveyard from the battlefield\.?$', ll):
+            return ["WHEN_DIES { FILTER { SELF } } AS $event"]
         # "When enchanted/equipped creature dies" (Demonic Vigor, Squee's
         # Embrace) — a triggered ability printed on the Aura/Equipment
         # itself, referencing the object it's attached to rather than
@@ -3264,6 +3287,17 @@ class PatternMatcher:
                 f"DISCARD {{ PLAYER: $target COUNT: {n} }}",
             ]
 
+        # "That player discards a card." (Chilling Apparition, Cabal
+        # Slaver) — "that player" resolves to $event.recipient, the
+        # player affected by whatever triggered this ability (damage
+        # dealt, a permanent bounced to a player's hand, ...); already
+        # bound by match_triggered's $event heuristic whenever "that
+        # player" appears in the effect text.
+        m = re.match(r'^that player discards? (?:a card|(\d+|two|three) cards?)', ll)
+        if m:
+            n = _word_to_num(m.group(1)) if m.group(1) else 1
+            return [f"DISCARD {{ PLAYER: $event.recipient COUNT: {n} }}"]
+
         # ── ADD MANA (spell/side-effect form, Section 15.24) ──────────────
         # "Add {R} for each card in target opponent's hand" — variable count
         m = re.match(r"^add (\{[^}]+\}) for each card in target opponent'?s hand$", ll)
@@ -3351,7 +3385,7 @@ class PatternMatcher:
         # ── DESTROY ───────────────────────────────────────────────────────
         m = re.match(
             r"^destroy target ((?:nonland |noncreature |artifact or |"
-            r"white |blue |black |red |green )?(?:permanent|creature|artifact|enchantment|planeswalker))",
+            r"white |blue |black |red |green )?(?:permanent|creature|artifact|enchantment|planeswalker|land))",
             ll)
         if m:
             filter_str = _build_destroy_filter(m.group(0), ll)
@@ -3480,12 +3514,36 @@ class PatternMatcher:
                 "}",
             ]
 
+        # "Return this creature to its owner's hand." (Icebreaker Kraken) —
+        # a self-bounce, no TARGET needed.
+        if re.match(r'^return this (?:creature|permanent|artifact) to its owner\'?s hand$', ll):
+            return ["MOVE { SELF TO: SELF.owner.hand }"]
+
+        # "...return it to its owner's hand." (Spine of Ish Sah, Slow
+        # Motion) — "it" resolves to whatever object caused the trigger
+        # ($event, bound above whenever this phrase appears) — usually the
+        # card itself for a self-referential "is put into a graveyard from
+        # the battlefield"/dies trigger, but the same composition also
+        # covers a differently-filtered trigger subject ("a creature you
+        # control becomes blocked... return it") without needing a special
+        # case, since $event always refers to whatever the event was about.
+        if ll == "return it to its owner's hand":
+            return ["MOVE { $event TO: $event.owner.hand }"]
+
         # ── MONARCH ──────────────────────────────────────────────────────
         if ll == "you become the monarch":
             return ["BECOME_MONARCH { PLAYER: YOU }"]
 
         # ── GAIN/LOSE LIFE ────────────────────────────────────────────────
         m = re.match(r'^you gain (\d+|\$\w+) life', ll)
+        if m:
+            return [f"GAIN_LIFE {{ PLAYER: YOU AMOUNT: {m.group(1)} }}"]
+
+        # Bare "gain N life" — the subject is elided, not missing: this is
+        # always what's left after _extract_may strips a leading "you may "
+        # (Soul's Attendant: "you may gain 1 life" -> "gain 1 life"), which
+        # already implies YOU as the gaining player.
+        m = re.match(r'^gain (\d+|\$\w+) life$', ll)
         if m:
             return [f"GAIN_LIFE {{ PLAYER: YOU AMOUNT: {m.group(1)} }}"]
 
@@ -3503,6 +3561,30 @@ class PatternMatcher:
         m = re.match(r'^(?:each )?opponents? (?:lose|loses) (\d+) life', ll)
         if m:
             return [f"LOSE_LIFE {{ PLAYER: OPPONENTS AMOUNT: {m.group(1)} }}"]
+
+        # "Target opponent loses N life and you gain that much life" (the
+        # classic drain idiom — real oracle text is inconsistent between
+        # "that much life" and just repeating the literal number) — reuses
+        # the same literal N for both halves rather than a dynamic $event
+        # reference, since it's already known in this same sentence.
+        m = re.match(r'^target opponent loses (\d+) life and you gain (?:that much|\1) life', ll)
+        if m:
+            n = m.group(1)
+            return [
+                "TARGET { TARGET_CLASSES: [PLAYER] FILTER { OPPONENT } } AS $target",
+                f"LOSE_LIFE {{ PLAYER: $target AMOUNT: {n} }}",
+                f"GAIN_LIFE {{ PLAYER: YOU AMOUNT: {n} }}",
+            ]
+
+        # "Target player loses N life." — distinct from "target opponent"
+        # above (no controller restriction) and from bare "you"/"opponents"
+        # forms, needs its own TARGET declaration.
+        m = re.match(r'^target player loses (\d+) life', ll)
+        if m:
+            return [
+                "TARGET { TARGET_CLASSES: [PLAYER] } AS $target",
+                f"LOSE_LIFE {{ PLAYER: $target AMOUNT: {m.group(1)} }}",
+            ]
 
         m = re.match(r'^you lose life equal to', ll)
         if m:
@@ -3522,6 +3604,42 @@ class PatternMatcher:
                 "  SOURCE: $creature",
                 f"  AMOUNT: {amount}",
                 "}",
+            ]
+
+        # "It deals damage equal to its power to <recipient>." — "it" =
+        # SELF (the creature/permanent this ability belongs to); the
+        # dynamic-amount-then-recipient word order ("damage equal to X
+        # to Y") doesn't fit the generic dispatch regex below, which only
+        # has one slot for either an amount before "damage" or a
+        # recipient right after — checked first as its own composition.
+        m = re.match(r'^it deals damage equal to its power to (any target|target .+)', ll)
+        if m:
+            target_text = m.group(1)
+            if target_text == "any target":
+                tc = "CREATURE, PLANESWALKER, PLAYER"
+            else:
+                tc = _target_class_for(target_text)
+            return [
+                "DAMAGE {",
+                f"  TARGET {{ TARGET_CLASSES: [{tc}] }} AS $dmg_target",
+                "  SOURCE: SELF",
+                "  AMOUNT: SELF.power",
+                "}",
+            ]
+
+        # "Target creature you control deals damage equal to its power to
+        # <recipient>." (Run Over, Vivien of the Arkbow) — same shape as
+        # above but the source is itself a chosen target, not SELF.
+        m = re.match(r"^target creature you control deals damage equal to its power to (.+)$", ll)
+        if m:
+            recipient = m.group(1).rstrip('.')
+            tc = _target_class_for(recipient)
+            ctrl = ' FILTER { CONTROLLER: OPPONENT }' if (
+                    "you don't control" in recipient or "opponent controls" in recipient) else ""
+            return [
+                "TARGET { TARGET_CLASSES: [CREATURE] FILTER { CONTROLLER: YOU } } AS $source",
+                f"TARGET {{ TARGET_CLASSES: [{tc}]{ctrl} }} AS $dmg_target",
+                "DAMAGE { $dmg_target SOURCE: $source AMOUNT: $source.power }",
             ]
 
         m = re.match(
@@ -3565,6 +3683,13 @@ class PatternMatcher:
                     results.append("CANT { $target EFFECTS: [BLOCK] DURATION: END_OF_TURN }")
             return results
 
+        # "Double the number of +1/+1 counters on it/this creature."
+        # (Primordial Hydra, Aragorn, Fractal Harness) — adding a count
+        # equal to the current count doubles the total; SELF.counters.*
+        # dot-notation access is already documented (Section 13).
+        if re.match(r'^double the number of \+1/\+1 counters on (?:it|this creature)$', ll):
+            return ['ADD_COUNTER { SELF NAME: "+1/+1" COUNT: SELF.counters."+1/+1" }']
+
         # "Put N +1/+1 counters on each [type] you control"
         m = re.match(r'^put (\w+) (\+1/\+1|-1/-1) counters on each (\w+) you control', ll)
         if m:
@@ -3589,9 +3714,16 @@ class PatternMatcher:
                 results += self._render_grant("SELF", grants, "END_OF_TURN")
             return results
 
-        m = re.match(r'^put (\d+) (\+1/\+1) counters on', ll)
+        # Word-form counts only ("two"/"three"/...) — NOT a bare \w+, which
+        # would also match "x" (Zaxara, Slime Against Humanity: "put X
+        # +1/+1 counters on it, where X is <formula>") and silently
+        # default to 1 via _word_to_num's unrecognized-word fallback,
+        # rendering a dynamic count as a wrong literal instead of gapping.
+        m = re.match(r'^put (\d+|one|two|three|four|five|six|seven|eight|nine|ten|a|an) '
+                     r'(\+1/\+1) counters on', ll)
         if m:
-            n, counter = m.group(1), m.group(2)
+            n_word, counter = m.groups()
+            n = n_word if n_word.isdigit() else _word_to_num(n_word)
             subj = _infer_counter_subject(ll)
             results = []
             if subj == "$target":
@@ -3671,7 +3803,10 @@ class PatternMatcher:
         # ── PUMP — gets +N/+N [and gains X] until end of turn ───────────────
         # Handles fixed (+2/+2), variable (+X/-X), and "where X is N" forms
         m = re.match(
-            r'^(this creature|it|target (?:creature|permanent)|all (?:other )?creatures?(?:[^,]+)?|creatures you control|other creatures you control)\s+gets?\s+([+\-]\d+|[+\-]x)/([+\-]\d+|[+\-]x)',
+            r'^(this creature|it|target (?:creature|permanent)(?: you control| an? opponent controls)?|'
+            r'all (?:other )?creatures?(?:[^,]+)?|creatures you control|other creatures you control|'
+            r'creatures (?:your opponents|opponents) control)\s+'
+            r'gets?\s+([+\-]\d+|[+\-]x)/([+\-]\d+|[+\-]x)',
             ll)
         if m:
             subj_text = m.group(1).strip()
@@ -3681,7 +3816,7 @@ class PatternMatcher:
             results = []
             if subj == "$target":
                 tc = "PERMANENT" if "permanent" in subj_text else "CREATURE"
-                results.append(f"TARGET {{ TARGET_CLASSES: [{tc}] }} AS $target")
+                results.append(_target_declaration(subj_text, tc))
             results.append(f"GRANT {{ {subj} POWER: {pw.upper()} TOUGHNESS: {tg.upper()} DURATION: {duration} }}")
             gain_m = re.search(r'and (?:gains?|has) (.+?) until end of turn', ll)
             if gain_m:
@@ -3731,6 +3866,14 @@ class PatternMatcher:
         if m:
             return [f'ADD_COUNTER {{ FILTER {{ TARGET_CLASSES: [PLAYER] SELECTION: ALL }} NAME: "{m.group(1)}" COUNT: 1 }}']
 
+        # "You get {E}{E} (two energy counters)." — the reminder-stripped
+        # count comes from counting {E} symbols directly rather than
+        # parsing the parenthetical number word.
+        m = re.match(r'^you get ((?:\{e\})+)', ll)
+        if m:
+            n = m.group(1).count("{e}")
+            return [f'ADD_COUNTER {{ YOU NAME: "energy" COUNT: {n} }}']
+
         # ── ATTACH (Section 15.30b) ─────────────────────────────────────────
         # "attach up to one target Equipment you control to it"
         m = re.match(r'^attach up to one target equipment you control to (it|self)$', ll)
@@ -3745,6 +3888,16 @@ class PatternMatcher:
         # references it.
         if ll in ("attach this equipment to it", "then attach this equipment to it"):
             return ["ATTACH { SELF TO: $token }"]
+        # "attach it to target creature you control" (Maul of the
+        # Skyclaves, Squire's Lightblade) — "it" = SELF, the Equipment
+        # attaching itself to a newly chosen target (contrast the "attach
+        # up to one target Equipment... to it" pattern above, where the
+        # target IS the Equipment and SELF is the destination).
+        if ll == "attach it to target creature you control":
+            return [
+                "TARGET { TARGET_CLASSES: [CREATURE] FILTER { CONTROLLER: YOU } } AS $target",
+                "ATTACH { SELF TO: $target }",
+            ]
 
         # Named subject pump: "Put three +1/+1 counters on [Cardname]. It gains trample until end of turn."
         m = re.match(r'^put (\w+) (\+1/\+1) counters on (?:' + re.escape(card_name) + r'|this creature)', ll)
@@ -3763,11 +3916,15 @@ class PatternMatcher:
         # "Target creature gains flying until end of turn"
         # "Until end of turn, target creature gains trample and..."
         m = re.match(
-            r'^(?:until end of turn, )?(?:(creatures you control|permanents you control|target (?:creature|permanent)|all creatures|each creature you control|that creature|it))\s+(?:gains?|have)\s+(.+?)\s+until end of turn',
+            r'^(?:until end of turn, )?(?:(this creature|creatures you control|permanents you control|'
+            r'target (?:creature|permanent)(?: you control| an? opponent controls)?|'
+            r'all creatures|each creature you control|that creature|it))\s+(?:gains?|have)\s+(.+?)\s+until end of turn',
             ll)
         if not m:
             m = re.match(
-                r'^until end of turn,?\s+(?:(target (?:creature|permanent)|creatures you control|that creature))\s+(?:gains?|have)\s+(.+)',
+                r'^until end of turn,?\s+(?:(this creature|'
+                r'target (?:creature|permanent)(?: you control| an? opponent controls)?|'
+                r'creatures you control|that creature))\s+(?:gains?|have)\s+(.+)',
                 ll)
         if m:
             subj_text = m.group(1).strip()
@@ -3777,7 +3934,7 @@ class PatternMatcher:
             results = []
             if subj == "$target":
                 tc = "PERMANENT" if "permanent" in subj_text else "CREATURE"
-                results.append(f"TARGET {{ TARGET_CLASSES: [{tc}] }} AS $target")
+                results.append(_target_declaration(subj_text, tc))
             results += self._render_grant(subj, grants, "END_OF_TURN")
             return results
 
@@ -3853,6 +4010,15 @@ class PatternMatcher:
             return [
                 f'TAP {{ TARGET {{ TARGET_CLASSES: [PERMANENT] FILTER {{ TYPE: "{type_str}"{ctrl} }} }} AS $tapped }}']
 
+        # ── TAP ENCHANTED/EQUIPPED ────────────────────────────────────────
+        # "Tap enchanted/equipped creature." (Waterknot, Freed from the
+        # Real) — no TARGET declaration needed, $enchanted/$equipped is
+        # already bound card-wide via the header's @ENCHANT/@EQUIP(...).
+        if ll == "tap enchanted creature":
+            return ["TAP { $enchanted }"]
+        if ll == "tap equipped creature":
+            return ["TAP { $equipped }"]
+
         # ── SCRY ──────────────────────────────────────────────────────────
         m = re.match(r'^scry (\d+|x)', ll)
         if m:
@@ -3890,6 +4056,20 @@ class PatternMatcher:
                 "  EFFECTS: [BLOCK { $target }]",
                 "  DURATION: END_OF_TURN",
                 "}",
+            ]
+
+        # ── CANT ATTACK/BLOCK (target) ──────────────────────────────────────
+        # "Target creature can't block/attack this turn" — the restriction
+        # is on the target itself (contrast CANT BE BLOCKED above, which
+        # restricts everyone else from blocking it). $target is bound as
+        # its own TARGET {} declaration line, then referenced directly as
+        # CANT's own subject, matching how the pump/keyword-grant patterns
+        # above already bind and reference $target.
+        m = re.match(r"^target creature can't (attack|block) this turn", ll)
+        if m:
+            return [
+                "TARGET { TARGET_CLASSES: [CREATURE] } AS $target",
+                f"CANT {{ $target EFFECTS: [{m.group(1).upper()}] DURATION: END_OF_TURN }}",
             ]
 
         # ── DISTRIBUTE COUNTERS ───────────────────────────────────────────
@@ -4440,7 +4620,12 @@ class PatternMatcher:
 
         # ── COMPOUND: EXILE + EFFECT ───────────────────────────────────────
         # "Exile target X from a graveyard. Each opponent loses N life."
-        if re.match(r'^exile target .+ from (?:a |your )?graveyard', ll):
+        # "Exile up to one target card from a graveyard" — an optional
+        # up-front count qualifier, same RANGE 0..N SELECTION convention
+        # already used for "attach up to one target Equipment...".
+        m = re.match(r'^exile (?:up to (\w+) )?target .+ from (?:a |your )?graveyard', ll)
+        if m:
+            up_to = m.group(1)
             sentences = [s.strip() for s in re.split(r'\.\s+', text.strip().rstrip('.')) if s.strip()]
             if len(sentences) > 1:
                 results = []
@@ -4457,12 +4642,13 @@ class PatternMatcher:
                 type_filter = 'TYPE: "Creature"'
             else:
                 type_filter = 'CATEGORY: CARD'
+            selection = f"\n    SELECTION: RANGE 0..{_word_to_num(up_to)}" if up_to else ""
             return [
                 "EXILE {",
                 "  TARGET {",
                 "    TARGET_CLASSES: [CARD]",
                 f"    ZONE: {zone}",
-                f"    FILTER {{ {type_filter} }}",
+                f"    FILTER {{ {type_filter} }}{selection}",
                 "  } AS $exiled",
                 "}",
             ]
@@ -5800,9 +5986,31 @@ def _resolve_pump_subject(subj_text: str) -> str:
         return 'FILTER { TYPE: "Creature" CONTROLLER: YOU SELECTION: ALL }'
     if "each creature you control" in sl:
         return 'FILTER { TYPE: "Creature" CONTROLLER: YOU SELECTION: ALL }'
+    if "creatures your opponents control" in sl or "creatures opponents control" in sl:
+        return 'FILTER { TYPE: "Creature" CONTROLLER: OPPONENT SELECTION: ALL }'
     if "permanents you control" in sl:
         return 'FILTER { CONTROLLER: YOU SELECTION: ALL }'
     return "SELF"
+
+
+def _target_declaration(subj_text: str, tc: str = "CREATURE") -> str:
+    """
+    Build a TARGET {} AS $target declaration line for a "target
+    creature/permanent[ you control| an opponent controls]" subject —
+    shared by every match_effect pattern that resolves to $target via
+    _resolve_pump_subject, so the controller qualifier only needs
+    handling once. Without this, "target creature you control gets
+    +1/+1" and "target creature an opponent controls gets -1/-1" failed
+    to match their own pattern's subject alternation at all (it only
+    recognized bare "target creature/permanent", nothing in between it
+    and the verb) and fell through to an honest but avoidable gap.
+    """
+    filt = ""
+    if "you control" in subj_text:
+        filt = ' FILTER { CONTROLLER: YOU }'
+    elif "opponent controls" in subj_text:
+        filt = ' FILTER { CONTROLLER: OPPONENT }'
+    return f"TARGET {{ TARGET_CLASSES: [{tc}]{filt} }} AS $target"
 
 
 def _extract_mv_constraint(ll: str) -> str:
@@ -5851,9 +6059,11 @@ def _build_destroy_filter(matched: str, ll: str) -> str:
         parts.append('TYPE: "Artifact"')
     elif "enchantment" in ll:
         parts.append('TYPE: "Enchantment"')
+    elif "land" in ll:
+        parts.append('TYPE: "Land"')
     else:
         parts.append("CATEGORY: PERMANENT")
-    cm = re.search(r'\btarget (white|blue|black|red|green) (?:creature|permanent|artifact|enchantment|planeswalker)\b', ll)
+    cm = re.search(r'\btarget (white|blue|black|red|green) (?:creature|permanent|artifact|enchantment|planeswalker|land)\b', ll)
     if cm:
         parts.append(f"COLOR: {_color_word_to_symbol(cm.group(1))}")
     if "opponent controls" in ll or "an opponent" in ll:

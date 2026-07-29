@@ -94,8 +94,8 @@ def _discover() -> None:
     root_str = config.CDL_PARSER_PATH
     if not root_str:
         raise ParserUnavailable(
-            "No CDL parser configured. Set MR_CDL_PARSER=/path/to/PileOfCardsParser "
-            f"(clone of {config.CDL_PARSER_REPO}). T2 does not need it and runs without it."
+            "No complete CDL parser + clause pipeline found. T2 does not need it and runs "
+            f"without it; T0/T1/T4 do. {config.parser_gaps()}"
         )
     root = Path(root_str).expanduser().resolve()
     if not root.exists():
@@ -185,7 +185,16 @@ def gap_category(gap_line: str) -> str:
 # parser's actual output), so depth has to be tracked per-character across the whole text, with
 # quoted strings consumed whole so braces inside a mana cost string never enter the bracket count.
 
-_TOKEN = re.compile(r'"[^"]*"|[{}\[\],;]|[^\s{}\[\],;"]+')
+# Parentheses are structural, not text. The parser emits keywords in an at-form —
+# `@KICKER( "{B}" )`, `@WARD( "{4}" )`, `@PROTECTION(FILTER { COLOR: W })` — and leaving `(`/`)`
+# out of the delimiter set made `@KICKER(` a single atom while the matching `)` became a bare
+# node of its own. That node then sorted to the front under ORDER_INSENSITIVE_HEADS, producing
+# canonical forms like `CARD{););@PROTECTION(FILTER{...}`. It affected 1,277 of 10,637
+# clean-parse cards (12.0%), concentrated in exactly the keyword-carrying cards, and it is a
+# T4 blocker because arms C/D feed this string to a WordPiece tokenizer.
+_TOKEN = re.compile(r'"[^"]*"|[{}\[\](),;]|[^\s{}\[\](),;"]+')
+_OPENERS = {"{": "}", "[": "]", "(": ")"}
+_CLOSERS = frozenset(_OPENERS.values())
 
 
 def _strip_comments(cdl: str) -> str:
@@ -212,11 +221,13 @@ def _tokenize(text: str) -> list[str]:
 
 def _parse_block(tokens: list[str], pos: int) -> tuple[list[Any], int]:
     """Recursive-descent parse of one bracketed scope. Each node is either a leaf string
-    (a flushed run of atoms, e.g. 'TYPE: "Basic"') or (head, children) for a nested block.
+    (a flushed run of atoms, e.g. 'TYPE: "Basic"') or (head, children, opener) for a nested block.
 
     A key token (ends with ':') flushes the current buffer before starting a new one — that is
     what separates `TYPE: "Basic" TYPE: "Land"` into two leaves rather than one run-on string,
     since there is no other delimiter between two key:value pairs on the same line.
+
+    The opener is carried on the node so `FOO(x)` and `FOO{x}` cannot render to the same string.
     """
     nodes: list[Any] = []
     buffer: list[str] = []
@@ -228,15 +239,15 @@ def _parse_block(tokens: list[str], pos: int) -> tuple[list[Any], int]:
 
     while pos < len(tokens):
         tok = tokens[pos]
-        if tok in ("}", "]"):
+        if tok in _CLOSERS:
             flush()
             return nodes, pos
-        if tok in ("{", "["):
+        if tok in _OPENERS:
             head = " ".join(buffer)
             buffer.clear()
             children, pos = _parse_block(tokens, pos + 1)
             pos += 1  # consume the matching close bracket
-            nodes.append((head, children))
+            nodes.append((head, children, tok))
             continue
         if tok in (",", ";"):
             flush()
@@ -263,9 +274,10 @@ def _drop_header(nodes: list[Any]) -> list[Any]:
     out = []
     for n in nodes:
         if isinstance(n, tuple):
-            h = _head(n[0])
+            head, children, opener = n
+            h = _head(head)
             if h == "CARD":
-                out.append((n[0], _drop_header(n[1])))
+                out.append((head, _drop_header(children), opener))
             elif h not in HEADER_FIELD_NAMES:
                 out.append(n)
         elif not n.upper().startswith(HEADER_FIELDS):
@@ -277,7 +289,8 @@ def _render(nodes: list[Any], sort_all: bool, parent_head: str = "") -> str:
     parts = []
     for n in nodes:
         if isinstance(n, tuple):
-            parts.append(n[0] + "{" + _render(n[1], sort_all, _head(n[0])) + "}")
+            head, children, opener = n
+            parts.append(head + opener + _render(children, sort_all, _head(head)) + _OPENERS[opener])
         else:
             parts.append(n)
     if sort_all or parent_head in ORDER_INSENSITIVE_HEADS:

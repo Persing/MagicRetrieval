@@ -70,12 +70,60 @@ BATCH_SIZE = 256
 TRAIN_BATCH_SIZE = 32
 SEED = 42
 
-# ── CDL parser (external, required for T0/T1) ─────────────────────────────────
-# Deterministic rules/pattern parser: parser.encode_card(card, store) -> CDL source text.
-# Vendored copy wins; falls back to a sibling checkout; MR_CDL_PARSER overrides both.
-# T2 does not use the parser at all and runs without it.
+# ── CDL parser + clause pipeline (external, required for T0/T1/T4) ────────────
+# Two consumers live in this tree:
+#   parser.encode_card(card, store) -> CDL source text        (T0, T1, T4 arms C/D)
+#   clause_pipeline.process_card(...) -> list[clause dicts]   (T4 arms B/B_type/B+/C)
+# T2 uses neither and runs without them.
 CDL_PARSER_REPO = "github.com/Persing/PileOfCardsParser"
 _VENDOR_PARSER = VENDOR_DIR / "pile_of_cards_parser"
-CDL_PARSER_PATH = os.environ.get(
-    "MR_CDL_PARSER", str(_resolve(_VENDOR_PARSER, REPO_ROOT.parent / "PileOfCardsParser"))
+
+# The clause pipeline's own import closure — checked as a set, because a directory
+# holding only `parser.py` is a *usable CDL parser* and a *broken clause pipeline*, and
+# the difference is invisible until arm B dies at import time.
+CLAUSE_MODULES = (
+    "clause_pipeline.py", "clause_splitter.py", "type_classifier.py", "tag_extractor.py",
+    "numeral_extractor.py", "structural_linker.py", "clause_vocabulary.py", "parser.py",
 )
+
+
+def parser_candidates() -> list[Path]:
+    override = os.environ.get("MR_CDL_PARSER")
+    if override:
+        return [Path(override)]
+    return [_VENDOR_PARSER, REPO_ROOT.parent / "PileOfCardsParser"]
+
+
+def _resolve_parser() -> str | None:
+    """First candidate that can actually run the clause pipeline wins; None if none can.
+
+    Resolving on directory *existence* (what `_resolve` does, and what this used to do) is
+    wrong here: `vendor/pile_of_cards_parser/` existed for T0/T1 holding only `parser.py`,
+    so it won the race while containing none of the clause modules. Arms B/B_type/B+ would
+    have died at import, and — worse, because it is silent — arms C/D would have run against
+    a stale vendored `parser.py` producing different clean/gap rates than the T0 findings
+    report. Capability, not existence.
+
+    Returns None rather than raising: T2 touches neither the parser nor the clause pipeline,
+    and importing this module must not be what breaks it. `parser_gaps()` supplies the
+    diagnostic at the point of actual use (see cdl_adapter._discover).
+    """
+    for cand in parser_candidates():
+        if all((cand / m).exists() for m in CLAUSE_MODULES):
+            return str(cand)
+    return None
+
+
+def parser_gaps() -> str:
+    """Human-readable account of why `_resolve_parser()` came back empty."""
+    cands = parser_candidates()
+    best = max(cands, key=lambda c: sum((c / m).exists() for m in CLAUSE_MODULES))
+    missing = [m for m in CLAUSE_MODULES if not (best / m).exists()]
+    return (
+        f"Closest candidate {best} is missing {len(missing)} of {len(CLAUSE_MODULES)} module(s): "
+        f"{', '.join(missing)}. Checked: {[str(c) for c in cands]}. "
+        f"Set MR_CDL_PARSER, or re-vendor from {CDL_PARSER_REPO}."
+    )
+
+
+CDL_PARSER_PATH = _resolve_parser()

@@ -1,0 +1,383 @@
+{
+  "by_subsystem": {
+    "cross_clause_linking": {
+      "error_rate": 0.14634146341463414,
+      "fields": [
+        "excludes",
+        "refers_to_prior",
+        "resolved_reference"
+      ],
+      "n_emitted": 123,
+      "n_errors": 18,
+      "share_of_errors": 0.34615384615384615
+    },
+    "other": {
+      "error_rate": 0.03225806451612903,
+      "fields": [
+        "condition_kind",
+        "cost_components",
+        "event",
+        "keyword",
+        "zone"
+      ],
+      "n_emitted": 279,
+      "n_errors": 9,
+      "share_of_errors": 0.17307692307692307
+    },
+    "targeting": {
+      "error_rate": 0.07183908045977011,
+      "fields": [
+        "distributive",
+        "restriction",
+        "target_scope",
+        "target_type",
+        "target_type_compound"
+      ],
+      "n_emitted": 348,
+      "n_errors": 25,
+      "share_of_errors": 0.4807692307692308
+    }
+  },
+  "concentration_top2_share": 0.38461538461538464,
+  "concentration_top3_share": 0.5192307692307693,
+  "git_dirty": true,
+  "git_rev": "c0bebf0",
+  "inputs": {
+    "C:\\Users\\nick\\PycharmProjects\\PileOfCardsParser\\sample_accuracy_400.jsonl": {
+      "bytes": 431252,
+      "exists": true,
+      "mtime": 1785343080,
+      "sha256": "1bacbd705140933bcdf9e9b8d13440093dcf86f8c3c315fe7f5cd5d7642b9eeb"
+    }
+  },
+  "n_clauses_graded": 400,
+  "n_distinct_fields_with_errors": 13,
+  "n_failures_attributed_from_notes": 20,
+  "n_failures_attributed_structurally": 21,
+  "n_failures_unattributed": 6,
+  "n_field_level_errors": 52,
+  "n_tag_failures": 47,
+  "per_tag": [
+    {
+      "n_emitted": 65,
+      "n_errors": 10,
+      "n_from_notes": 6,
+      "n_omitted": 1,
+      "n_wrong_value": 3,
+      "tag": "refers_to_prior",
+      "wrong_value_rate": 0.13846153846153847,
+      "wrong_value_rate_ci": [
+        0.07459006187684232,
+        0.24268321474659466
+      ]
+    },
+    {
+      "n_emitted": 80,
+      "n_errors": 10,
+      "n_from_notes": 5,
+      "n_omitted": 1,
+      "n_wrong_value": 4,
+      "tag": "restriction",
+      "wrong_value_rate": 0.1125,
+      "wrong_value_rate_ci": [
+        0.06032618694827016,
+        0.20018410865677552
+      ]
+    },
+    {
+      "n_emitted": 50,
+      "n_errors": 7,
+      "n_from_notes": 6,
+      "n_omitted": 0,
+      "n_wrong_value": 1,
+      "tag": "resolved_reference",
+      "wrong_value_rate": 0.14,
+      "wrong_value_rate_ci": [
+        0.06950745262022862,
+        0.2618645719852809
+      ]
+    },
+    {
+      "n_emitted": 135,
+      "n_errors": 7,
+      "n_from_notes": 3,
+      "n_omitted": 3,
+      "n_wrong_value": 1,
+      "tag": "target_scope",
+      "wrong_value_rate": 0.02962962962962963,
+      "wrong_value_rate_ci": [
+        0.011581269352682073,
+        0.0737072896959028
+      ]
+    },
+    {
+      "n_emitted": 133,
+      "n_errors": 5,
+      "n_from_notes": 2,
+      "n_omitted": 2,
+      "n_wrong_value": 1,
+      "tag": "target_type",
+      "wrong_value_rate": 0.022556390977443608,
+      "wrong_value_rate_ci": [
+        0.0077002833384402225,
+        0.06421936682642192
+      ]
+    },
+    {
+      "n_emitted": 49,
+      "n_errors": 4,
+      "n_from_notes": 2,
+      "n_omitted": 0,
+      "n_wrong_value": 2,
+      "tag": "zone",
+      "wrong_value_rate": 0.08163265306122448,
+      "wrong_value_rate_ci": [
+        0.032202296241712225,
+        0.19189387041486136
+      ]
+    },
+    {
+      "n_emitted": 21,
+      "n_errors": 2,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 2,
+      "tag": "condition_kind",
+      "wrong_value_rate": 0.09523809523809523,
+      "wrong_value_rate_ci": [
+        0.026518208796947246,
+        0.2891458386074067
+      ]
+    },
+    {
+      "n_emitted": 0,
+      "n_errors": 2,
+      "n_from_notes": 1,
+      "n_omitted": 1,
+      "n_wrong_value": 0,
+      "tag": "distributive",
+      "wrong_value_rate": null,
+      "wrong_value_rate_ci": null
+    },
+    {
+      "n_emitted": 36,
+      "n_errors": 1,
+      "n_from_notes": 1,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "cost_components",
+      "wrong_value_rate": 0.027777777777777776,
+      "wrong_value_rate_ci": [
+        0.004920280295569679,
+        0.141700337350308
+      ]
+    },
+    {
+      "n_emitted": 52,
+      "n_errors": 1,
+      "n_from_notes": 1,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "event",
+      "wrong_value_rate": 0.019230769230769232,
+      "wrong_value_rate_ci": [
+        0.0034027204090655225,
+        0.10120746268024422
+      ]
+    },
+    {
+      "n_emitted": 7,
+      "n_errors": 1,
+      "n_from_notes": 0,
+      "n_omitted": 1,
+      "n_wrong_value": 0,
+      "tag": "excludes",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.35433884297520657
+      ]
+    },
+    {
+      "n_emitted": 54,
+      "n_errors": 1,
+      "n_from_notes": 1,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "keyword",
+      "wrong_value_rate": 0.018518518518518517,
+      "wrong_value_rate_ci": [
+        0.0032764033153519848,
+        0.09771665358487208
+      ]
+    },
+    {
+      "n_emitted": 0,
+      "n_errors": 1,
+      "n_from_notes": 0,
+      "n_omitted": 1,
+      "n_wrong_value": 0,
+      "tag": "target_type_compound",
+      "wrong_value_rate": null,
+      "wrong_value_rate_ci": null
+    },
+    {
+      "n_emitted": 27,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "duration",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        6.938893903907228e-18,
+        0.12455903714463581
+      ]
+    },
+    {
+      "n_emitted": 1,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "during",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.7934567085261071
+      ]
+    },
+    {
+      "n_emitted": 1,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "excludes_prior",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.7934567085261071
+      ]
+    },
+    {
+      "n_emitted": 5,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "is_mana_ability",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.43449149475208104
+      ]
+    },
+    {
+      "n_emitted": 8,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "modality",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.3244156195108769
+      ]
+    },
+    {
+      "n_emitted": 7,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "phase",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.35433884297520657
+      ]
+    },
+    {
+      "n_emitted": 7,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "restricted_action",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.35433884297520657
+      ]
+    },
+    {
+      "n_emitted": 7,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "restriction_kind",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.35433884297520657
+      ]
+    },
+    {
+      "n_emitted": 5,
+      "n_errors": 0,
+      "n_from_notes": 0,
+      "n_omitted": 0,
+      "n_wrong_value": 0,
+      "tag": "whose_turn",
+      "wrong_value_rate": 0.0,
+      "wrong_value_rate_ci": [
+        0.0,
+        0.43449149475208104
+      ]
+    }
+  ],
+  "run_args": {
+    "sample": "C:\\Users\\nick\\PycharmProjects\\PileOfCardsParser\\sample_accuracy_400.jsonl"
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
+    }
+  }
+}
