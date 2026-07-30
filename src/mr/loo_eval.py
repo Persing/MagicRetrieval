@@ -271,6 +271,63 @@ def score_ranks(embeddings: np.ndarray, qs: QuerySet, seed: int = 0,
     return out
 
 
+def top_candidates(embeddings: np.ndarray, qs: QuerySet, k: int = 50,
+                   restrict_to: np.ndarray | None = None, chunk: int = 128,
+                   max_ctx_rows: int = MAX_CTX_ROWS_PER_CHUNK) -> tuple[np.ndarray, np.ndarray]:
+    """Top-k candidate rows per query under `centroid`, plus the target's rank. `(Q, k)` and `(Q,)`.
+
+    A sibling of `score_ranks` rather than an extra return value from it: that function's contract
+    is what `summarize` and every partial on disk are keyed on. Both build eligibility the same
+    way here, so top-k and rank cannot disagree about which universe was searched.
+
+    `score_ranks` answers "where did the target land"; this answers "what came back instead", which
+    is what a displacement question needs. Centroid-only on purpose — `max_sim` needs the full
+    (context rows x candidates) block, and that is the cost driver.
+
+    One documented divergence: `topk` breaks ties by index while `_rank` counts strictly-greater,
+    so under a mass tie a target can have `rank <= k` and still be absent from `top`. Rare in float
+    cosine, pinned in the tests rather than left to be discovered.
+    """
+    import torch
+
+    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    E = torch.as_tensor(embeddings, dtype=torch.float32, device=dev)
+    masks = torch.as_tensor(qs.mask_table, device=dev)
+    ctx_flat = torch.as_tensor(qs.ctx_flat, device=dev)
+    targets_all = torch.as_tensor(qs.target_row, device=dev)
+    mask_idx_all = torch.as_tensor(qs.mask_idx, device=dev)
+    restrict = torch.as_tensor(restrict_to, device=dev) if restrict_to is not None else None
+    neg_inf = torch.finfo(torch.float32).min
+
+    q = len(qs)
+    top = np.empty((q, k), dtype=np.int64)
+    rank = np.empty(q, dtype=np.int64)
+
+    for lo, hi in _chunk_bounds(qs.ctx_offsets, max_ctx_rows, chunk):
+        b = hi - lo
+        off = qs.ctx_offsets[lo:hi + 1]
+        seg = torch.repeat_interleave(
+            torch.arange(b, device=dev), torch.as_tensor(np.diff(off), device=dev))
+        flat = ctx_flat[int(off[0]):int(off[-1])]
+        tgts = targets_all[lo:hi]
+
+        elig = masks[mask_idx_all[lo:hi]].clone()
+        if restrict is not None:
+            elig &= restrict
+        elig[seg, flat] = False
+        elig[torch.arange(b, device=dev), tgts] = True
+
+        cent = torch.zeros(b, E.shape[1], device=dev)
+        cent.index_add_(0, seg, E[flat])
+        cent = torch.nn.functional.normalize(cent, dim=1)
+        s = (cent @ E.T).masked_fill(~elig, neg_inf)
+
+        top[lo:hi] = s.topk(k, dim=1).indices.cpu().numpy()
+        rank[lo:hi] = _rank(s, tgts).cpu().numpy()
+
+    return top, rank
+
+
 def _popularity_vector(qs: QuerySet) -> np.ndarray:
     return qs.stats.get("popularity", np.zeros(len(qs.oid_order), dtype=np.float32))
 

@@ -234,3 +234,58 @@ def test_summarize_reports_every_stratum_column(cards, strata):
     assert set(res["strata"]) == {"play_bucket", "parse_status", "unusual_bucket"}
     assert res["overall"]["popularity"]["n"] == len(qs)
     assert res["overall"]["random"]["n"] == len(qs)
+
+
+# ── top_candidates: the sibling D2 needs ──────────────────────────────────────
+
+def test_top_candidates_rank_matches_score_ranks(cards, strata):
+    """The contract that keeps displacement accounting and recall on one universe. If these two
+    ever disagree, D2's slot counts describe a different search than the reported recall."""
+    qs = _qs(cards, [[0, 1, 5], [2, 3, 7]])
+    loo_eval.set_popularity(qs, {o: 1 for o in OIDS})
+    rng = np.random.default_rng(3)
+    E = rng.normal(size=(N, 16)).astype(np.float32)
+    E /= np.linalg.norm(E, axis=1, keepdims=True)
+    _, rank = loo_eval.top_candidates(E, qs, k=10)
+    assert np.array_equal(rank, loo_eval.score_ranks(E, qs)["centroid"])
+
+
+def test_top_candidates_excludes_context_and_ineligible(cards, strata):
+    cards = cards.copy()
+    idx = cards.index[cards["oracle_id"] == "o7"]
+    cards.loc[idx, "color_identity"] = pd.Series([np.array(["U"])], index=idx)
+    qs = _qs(cards, [[0, 1, 5]])
+    loo_eval.set_popularity(qs, {o: 1 for o in OIDS})
+    sims = np.full(N, 0.10, dtype=np.float32)
+    sims[[0, 1]] = 1.0          # context cards
+    sims[7] = 0.99              # off-colour
+    sims[5] = 0.50
+    top, _ = loo_eval.top_candidates(_unit(sims), qs, k=10)
+    for row in top:
+        assert 7 not in row, "off-colour card must not be retrievable"
+    q = [i for i, t in enumerate(qs.target_row) if t == 5][0]
+    assert 0 not in top[q] and 1 not in top[q], "context cards must not be retrievable"
+
+
+def test_top_candidates_honours_restrict_to(cards, strata):
+    qs = _qs(cards, [[0, 5]])
+    loo_eval.set_popularity(qs, {o: 1 for o in OIDS})
+    keep = np.zeros(N, dtype=bool)
+    keep[[0, 5, 6, 7, 8]] = True
+    top, _ = loo_eval.top_candidates(_planted(5, 3), qs, k=3, restrict_to=keep)
+    assert set(top.ravel().tolist()) <= {5, 6, 7, 8}
+
+
+def test_top_candidates_tie_divergence_is_pinned():
+    """Documented, not accidental: topk breaks ties by index, _rank counts strictly-greater. Under
+    a mass tie the target can have rank <= k and be absent from top."""
+    cards = pd.DataFrame([{"oracle_id": o, "name": f"C{i}", "color_identity": np.array(["G"]),
+                           "legalities_commander": "legal"} for i, o in enumerate(OIDS)])
+    qs = _qs(cards, [[0, 40]])
+    loo_eval.set_popularity(qs, {o: 1 for o in OIDS})
+    sims = np.full(N, 0.5, dtype=np.float32)     # everything ties
+    sims[0] = 1.0
+    top, rank = loo_eval.top_candidates(_unit(sims), qs, k=5)
+    q = [i for i, t in enumerate(qs.target_row) if t == 40][0]
+    assert rank[q] == 1
+    assert 40 not in top[q], "tie-break divergence is expected here; if this fails, revisit the docstring"

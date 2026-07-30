@@ -29,13 +29,20 @@ The clean-parse column re-scores **every** arm with candidates and targets restr
 for the other cards, so ranking it against the full pool would compare a model that knows a third
 of the corpus against models that know all of it.
 
-> **Arm D is confounded and its number is not a clean read on CDL.** D trains only on mined pairs
-> whose *both* ends parse cleanly, which is 28,215 pairs against 234,752 for every other arm —
-> **12% of the training data**. Its deficit therefore mixes representation with training-set size,
-> and the two cannot be separated: the restriction is structural, since the missing pairs involve
-> cards D has no text for at all. This is a flaw in the arm as specified, not in the run. Treat
-> `D − C` as uninterpretable, and use the parse-status stratification below — which holds the model
-> fixed and varies only which cards are being scored — for anything D was meant to answer.
+> **Arm D is confounded and its number is not a clean read on CDL.** D trained on
+> **8,702 examples against 234,593 for every other arm — 3.7% of the training
+> data**. Two compounding restrictions: it only trains on mined pairs whose *both* ends parse
+> cleanly, and `build_example_oids` then drops any survivor whose assigned negative also lacks
+> text under this arm, which removes a further 69% of them. Its deficit therefore mixes
+> representation with training-set size, and the two cannot be separated — the restriction is
+> structural, since the missing pairs involve cards D has no text for at all.
+>
+> An earlier version of this report quoted 28,215 / 12%, taken from `n_trainable_positives`, a
+> both-ends-have-text predicate that is **not** what training consumed. Arms with full text
+> coverage lose ~0.1% at that second step, which is why the discrepancy stayed invisible.
+>
+> Treat `D − C` as uninterpretable. Use the parse-status stratification below — which holds the
+> model fixed and varies only which cards are scored — for anything D was meant to answer.
 
 ## Gates
 

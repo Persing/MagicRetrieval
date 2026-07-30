@@ -59,6 +59,51 @@ def zero_shot_embeddings(oracle_ids: list[str], texts_by_oid: dict[str, str],
     )
 
 
+def build_example_oids(
+    positives: list[tuple[str, str]],
+    negatives: list[tuple[str, str]] | None,
+    has_text: set[str],
+) -> list[tuple[str, ...]]:
+    """The oid-level walk that decides which training examples exist. See `build_examples`.
+
+    Split out from the text mapping for two reasons. It makes the *count* of surviving examples
+    computable without building strings — and that count is not what the obvious predicate says
+    (below). And it lets a caller replay another arm's exact example set, which is the only way to
+    hold training data fixed while varying the encoding.
+
+    **A positive is dropped when its assigned NEGATIVE has no text under this arm**, not only when
+    one of its own ends does. That is easy to miss and it was: arm D has text for 10,628 of 30,958
+    cards, so of its 28,215 positives with text at both ends, only **8,702** survived the negative
+    lookup — 69.2% lost. The grid reported 28,215 as "trainable" and never saw the real figure.
+    Arms with full text coverage lose ~0.1%, which is why this stayed invisible.
+
+    The walk must run over the **full** positives list. `fallback_pool[i % len(fallback_pool)]` is
+    indexed by position, so filtering positives before the walk silently reassigns which negative
+    each surviving anchor trains against.
+    """
+    if not negatives:
+        return [(a, p) for a, p in positives if a in has_text and p in has_text]
+
+    neg_by_anchor: dict[str, str] = {}
+    for na, nb in negatives:
+        neg_by_anchor.setdefault(na, nb)
+    fallback_pool = list(negatives)
+
+    out: list[tuple[str, ...]] = []
+    for i, (a, p) in enumerate(positives):
+        if a not in has_text or p not in has_text:
+            continue
+        neg_partner = neg_by_anchor.get(a)
+        if neg_partner is None:
+            # No mined negative for this specific anchor — fall back to cycling the pool rather
+            # than dropping the example; still same-colour/non-co-occurring overall, just not
+            # guaranteed hard for THIS anchor.
+            neg_partner = fallback_pool[i % len(fallback_pool)][1]
+        if neg_partner in has_text:
+            out.append((a, p, neg_partner))
+    return out
+
+
 def build_examples(
     positives: list[tuple[str, str]],
     negatives: list[tuple[str, str]] | None,
@@ -77,32 +122,9 @@ def build_examples(
     Returns 2-tuples `(anchor_text, positive_text)` when `negatives` is None (in-batch-only
     training, arms 2a/2b), or 3-tuples `(anchor_text, positive_text, negative_text)` otherwise.
     """
-    if not negatives:
-        return [
-            (ta, tp) for a, p in positives
-            if (ta := texts_by_oid.get(a, "")) and (tp := texts_by_oid.get(p, ""))
-        ]
-
-    neg_by_anchor: dict[str, str] = {}
-    for na, nb in negatives:
-        neg_by_anchor.setdefault(na, nb)
-    fallback_pool = list(negatives)
-
-    examples = []
-    for i, (a, p) in enumerate(positives):
-        ta, tp = texts_by_oid.get(a, ""), texts_by_oid.get(p, "")
-        if not (ta and tp):
-            continue
-        neg_partner = neg_by_anchor.get(a)
-        if neg_partner is None:
-            # No mined negative for this specific anchor — fall back to cycling the pool rather
-            # than dropping the example; still same-colour/non-co-occurring overall, just not
-            # guaranteed hard for THIS anchor.
-            neg_partner = fallback_pool[i % len(fallback_pool)][1]
-        tn = texts_by_oid.get(neg_partner, "")
-        if tn:
-            examples.append((ta, tp, tn))
-    return examples
+    has_text = {oid for oid, t in texts_by_oid.items() if t}
+    return [tuple(texts_by_oid[o] for o in row)
+            for row in build_example_oids(positives, negatives, has_text)]
 
 
 def finetune(
@@ -115,6 +137,7 @@ def finetune(
     max_seq_length: int = thresholds.T4_MAX_SEQ_LENGTH,
     output_dir: Path | None = None,
     epochs: int = config.FINETUNE_EPOCHS,
+    examples: list[tuple[str, ...]] | None = None,
 ) -> np.ndarray:
     """Fine-tune and return embeddings in `oracle_ids` order.
 
@@ -152,7 +175,11 @@ def finetune(
     model = SentenceTransformer(config.BASE_MODEL)
     model.max_seq_length = max_seq_length
 
-    rows = build_examples(positives, negatives, texts_by_oid)
+    # `examples` lets a caller supply a pre-built example set — used to replay another arm's exact
+    # training data while swapping the encoding, which no (positives, negatives) pair can express:
+    # `neg_by_anchor` is one-negative-per-anchor, while the fallback path can hand two positives
+    # sharing an anchor different negatives.
+    rows = examples if examples is not None else build_examples(positives, negatives, texts_by_oid)
     if not rows:
         raise ValueError("No usable training examples — check text coverage for mined pairs.")
 

@@ -745,6 +745,7 @@
   },
   "n_texts_missing_in_pool": 0,
   "n_trainable_positives": 234752,
+  "n_training_examples": 234593,
   "seed": 42,
   "text_stats": {
     "arm": "A",

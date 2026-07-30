@@ -115,7 +115,7 @@
   },
   "frozen_n_seeds": 5,
   "git_dirty": true,
-  "git_rev": "a57ff2f",
+  "git_rev": "fcf95f3",
   "inputs": {
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
       "bytes": 5093341,
@@ -902,6 +902,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 42,
       "text_stats": {
         "arm": "A",
@@ -1663,6 +1664,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 43,
       "text_stats": {
         "arm": "A",
@@ -2424,6 +2426,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 44,
       "text_stats": {
         "arm": "A",
@@ -3185,6 +3188,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 42,
       "text_stats": {
         "arm": "B",
@@ -3946,6 +3950,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 43,
       "text_stats": {
         "arm": "B",
@@ -4707,6 +4712,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 44,
       "text_stats": {
         "arm": "B",
@@ -5468,6 +5474,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 42,
       "text_stats": {
         "arm": "B_type",
@@ -6229,6 +6236,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 43,
       "text_stats": {
         "arm": "B_type",
@@ -6990,6 +6998,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 44,
       "text_stats": {
         "arm": "B_type",
@@ -7751,6 +7760,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 42,
       "text_stats": {
         "arm": "B+",
@@ -8512,6 +8522,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 43,
       "text_stats": {
         "arm": "B+",
@@ -9273,6 +9284,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 44,
       "text_stats": {
         "arm": "B+",
@@ -10034,6 +10046,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 42,
       "text_stats": {
         "arm": "C",
@@ -10795,6 +10808,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 43,
       "text_stats": {
         "arm": "C",
@@ -11556,6 +11570,7 @@
       },
       "n_texts_missing_in_pool": 0,
       "n_trainable_positives": 234752,
+      "n_training_examples": 234593,
       "seed": 44,
       "text_stats": {
         "arm": "C",
@@ -11937,6 +11952,7 @@
       },
       "n_texts_missing_in_pool": 20330,
       "n_trainable_positives": 28215,
+      "n_training_examples": 8702,
       "seed": 42,
       "text_stats": {
         "arm": "D",
@@ -12318,6 +12334,7 @@
       },
       "n_texts_missing_in_pool": 20330,
       "n_trainable_positives": 28215,
+      "n_training_examples": 8702,
       "seed": 43,
       "text_stats": {
         "arm": "D",
@@ -12699,6 +12716,7 @@
       },
       "n_texts_missing_in_pool": 20330,
       "n_trainable_positives": 28215,
+      "n_training_examples": 8702,
       "seed": 44,
       "text_stats": {
         "arm": "D",

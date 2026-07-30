@@ -65,6 +65,23 @@ def layer0_dir(corpus_name: str, split_seed: int, root: Path,
     return root / corpus_name / f"split{split_seed}_max{max_distinct}"
 
 
+def embedding_path(corpus_name: str, arm: str, seed: int, l0: dict, root: Path) -> Path:
+    """Where an arm's embeddings live.
+
+    The embedding depends on the mined positives and negatives, which depend on the split and the
+    deck filter — so the basis is in the key, not just the arm and seed. Keyed on (corpus, arm,
+    seed) alone, a rerun after changing the deck filter would silently load a model trained on the
+    old corpus and score it against new queries: nothing errors, the numbers simply describe two
+    corpora at once.
+
+    Extracted so the diagnostics resolve exactly the files the runner wrote; two constructions of
+    the same name is how they would drift apart.
+    """
+    basis = layer0_dir(corpus_name, l0["meta"]["split_seed"], root,
+                       l0["meta"]["deck_filter"]["max_distinct"]).name
+    return root / "emb" / f"{corpus_name}_{basis}_{arm.replace('+', 'plus')}_s{seed}.npy"
+
+
 def _pairs_to_frame(pairs: list[tuple[str, str]]) -> pd.DataFrame:
     return pd.DataFrame(pairs, columns=["a", "b"]) if pairs else pd.DataFrame(columns=["a", "b"])
 
@@ -191,27 +208,26 @@ def cached_texts(arm: str, pool: pd.DataFrame, repr_tables: dict, root: Path,
 def run_one(arm: str, seed: int, corpus_name: str, l0: dict, cards_df: pd.DataFrame,
             repr_tables: dict, root: Path, epochs: int = config.FINETUNE_EPOCHS,
             force: bool = False) -> dict:
-    # The embedding depends on the mined positives and negatives, which depend on the split and the
-    # deck filter — so the basis has to be in the cache key. Keyed on (corpus, arm, seed) alone, a
-    # rerun after changing the deck filter would silently load a model trained on the old corpus
-    # and report it against new queries. Same class as the arm-D omission: nothing errors, the
-    # numbers simply describe two different corpora at once.
-    emb_dir = root / "emb"
-    emb_dir.mkdir(parents=True, exist_ok=True)
-    basis = layer0_dir(corpus_name, l0["meta"]["split_seed"], root,
-                       l0["meta"]["deck_filter"]["max_distinct"]).name
-    emb_path = emb_dir / f"{corpus_name}_{basis}_{arm.replace('+', 'plus')}_s{seed}.npy"
+    (root / "emb").mkdir(parents=True, exist_ok=True)
+    emb_path = embedding_path(corpus_name, arm, seed, l0, root)
 
     texts, text_stats = cached_texts(arm, l0["pool"], repr_tables, root, force=force)
 
-    # Arm D is defined only on clean-parse cards, so it trains only on mined pairs whose *both*
-    # ends parse cleanly. On a small corpus that set can be empty. Reported as a skipped arm with
-    # a reason rather than crashing the run or, worse, quietly vanishing from the results table.
-    n_trainable = sum(1 for a, b in l0["positives"] if texts.get(a) and texts.get(b))
-    if n_trainable == 0:
+    # Two different counts, and conflating them cost arm D two thirds of its data invisibly.
+    # `n_trainable_positives` is the obvious predicate — both ends have text — and it is NOT what
+    # training consumes: `build_example_oids` also drops a positive whose assigned negative has no
+    # text under this arm. For arm D that is 69.2% of them (28,215 -> 8,702). Record both, and
+    # judge coverage on the one training actually saw.
+    has_text = {oid for oid, t in texts.items() if t}
+    n_trainable = sum(1 for a, b in l0["positives"] if a in has_text and b in has_text)
+    example_oids = finetune.build_example_oids(l0["positives"], l0["negatives"], has_text)
+    n_examples = len(example_oids)
+    if n_examples == 0:
         return {"arm": arm, "seed": seed, "corpus": corpus_name, "text_stats": text_stats,
-                "skipped": "no training pair has text under this arm "
-                           f"(0 of {len(l0['positives']):,} mined positives)",
+                "n_trainable_positives": n_trainable, "n_training_examples": 0,
+                "skipped": "no training example survives under this arm "
+                           f"({n_trainable:,} positives had text at both ends, but none kept a "
+                           f"negative with text, of {len(l0['positives']):,} mined)",
                 "full": None, "clean_universe": None}
 
     t0 = time.time()
@@ -241,6 +257,7 @@ def run_one(arm: str, seed: int, corpus_name: str, l0: dict, cards_df: pd.DataFr
         "arm": arm, "seed": seed, "corpus": corpus_name,
         "text_stats": text_stats,
         "n_trainable_positives": n_trainable,
+        "n_training_examples": n_examples,
         "n_texts_missing_in_pool": int(sum(1 for o in l0["oid_order"] if o not in texts)),
         "trained": trained, "train_seconds": round(train_secs, 1),
         "eval_seconds": eval_secs,
@@ -406,6 +423,19 @@ def render(records: list[dict], agg: dict, agg_clean: dict, verd: dict, meta: di
 
     vrows = "\n".join(_vrow(n, d) for n, d in verd.items())
 
+    # Read the arm-D callout's numbers from the records rather than hard-coding them: the figure
+    # that was wrong before was wrong precisely because it was a constant in the prose that no
+    # longer matched what the code recorded.
+    def _examples(arm: str) -> int | None:
+        vals = [r.get("n_training_examples") for r in records if r["arm"] == arm]
+        vals = [v for v in vals if v is not None]
+        return max(vals) if vals else None
+
+    d_n, ref_n = _examples("D"), _examples("B+") or _examples("A")
+    d_examples = f"{d_n:,}" if d_n else "an unrecorded number of"
+    ref_examples = f"{ref_n:,}" if ref_n else "far more"
+    d_share = f"{d_n / ref_n:.1%}" if (d_n and ref_n) else "a small fraction of"
+
     banner = ("> **SMOKE RUN — no gated conclusions.** 200 decks and one seed. This exists to prove "
               "the harness runs end-to-end, not to rank arms. Every verdict below is arithmetic on "
               "a sample far too small to mean anything.\n\n" if smoke else "")
@@ -454,13 +484,20 @@ The clean-parse column re-scores **every** arm with candidates and targets restr
 for the other cards, so ranking it against the full pool would compare a model that knows a third
 of the corpus against models that know all of it.
 
-> **Arm D is confounded and its number is not a clean read on CDL.** D trains only on mined pairs
-> whose *both* ends parse cleanly, which is 28,215 pairs against 234,752 for every other arm —
-> **12% of the training data**. Its deficit therefore mixes representation with training-set size,
-> and the two cannot be separated: the restriction is structural, since the missing pairs involve
-> cards D has no text for at all. This is a flaw in the arm as specified, not in the run. Treat
-> `D − C` as uninterpretable, and use the parse-status stratification below — which holds the model
-> fixed and varies only which cards are being scored — for anything D was meant to answer.
+> **Arm D is confounded and its number is not a clean read on CDL.** D trained on
+> **{d_examples} examples against {ref_examples} for every other arm — {d_share} of the training
+> data**. Two compounding restrictions: it only trains on mined pairs whose *both* ends parse
+> cleanly, and `build_example_oids` then drops any survivor whose assigned negative also lacks
+> text under this arm, which removes a further 69% of them. Its deficit therefore mixes
+> representation with training-set size, and the two cannot be separated — the restriction is
+> structural, since the missing pairs involve cards D has no text for at all.
+>
+> An earlier version of this report quoted 28,215 / 12%, taken from `n_trainable_positives`, a
+> both-ends-have-text predicate that is **not** what training consumed. Arms with full text
+> coverage lose ~0.1% at that second step, which is why the discrepancy stayed invisible.
+>
+> Treat `D − C` as uninterpretable. Use the parse-status stratification below — which holds the
+> model fixed and varies only which cards are scored — for anything D was meant to answer.
 
 ## Gates
 

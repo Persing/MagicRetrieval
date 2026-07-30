@@ -66,3 +66,49 @@ def test_fallback_used_when_anchor_has_no_mined_negative():
     examples = build_examples(positives, negatives, TEXTS)
     assert examples[0][2] == TEXTS["counterspell"]  # sol_ring's own mined negative
     assert examples[1][2] == TEXTS["counterspell"]  # cultivate falls back to the only pool entry
+
+
+# ── the drop that cost arm D two thirds of its data ───────────────────────────
+
+def test_positive_is_dropped_when_its_NEGATIVE_lacks_text():
+    """The non-obvious drop, and the one that mattered.
+
+    A positive survives only if its anchor, its partner AND its assigned negative all have text
+    under this arm. Arm D has text for a third of the pool, so of 28,215 positives with text at
+    both ends only 8,702 survived — 69.2% lost at the negative lookup. The grid recorded the
+    both-ends figure as `n_trainable_positives` and reported it as the training-set size, so a
+    published caveat understated the confound by 3.2x. Arms with full coverage lose ~0.1% here,
+    which is why it stayed invisible.
+    """
+    from mr.finetune import build_example_oids
+    positives = [("a", "b")]
+    negatives = [("a", "no_text_card")]
+    assert build_example_oids(positives, negatives, {"a", "b", "no_text_card"}) == [("a", "b", "no_text_card")]
+    assert build_example_oids(positives, negatives, {"a", "b"}) == []   # negative has no text
+
+
+def test_build_example_oids_matches_build_examples():
+    """The oid walk and the text walk must not drift — D4 replays another arm's exact triples
+    through the former and trains on the latter."""
+    from mr.finetune import build_example_oids, build_examples
+    positives = [(f"c{i}", f"c{(i + 1) % 9}") for i in range(9)]
+    negatives = [("c0", "c5"), ("c3", "c7")]
+    texts = {f"c{i}": f"text {i}" for i in range(9)}
+    texts["c7"] = ""                                     # a negative with no text
+    oids = build_example_oids(positives, negatives, {o for o, t in texts.items() if t})
+    assert [tuple(texts[o] for o in row) for row in oids] == build_examples(positives, negatives, texts)
+
+
+def test_filtering_positives_first_reassigns_negatives():
+    """`fallback_pool[i % len]` is indexed by position in the FULL list, so pre-filtering silently
+    changes which negative each surviving anchor trains against. Pinned so nobody 'simplifies'
+    D4's selection into a filter."""
+    from mr.finetune import build_example_oids
+    positives = [("x", "y"), ("a", "b"), ("p", "q")]
+    negatives = [("n1", "neg1"), ("n2", "neg2"), ("n3", "neg3")]
+    everything = {"x", "y", "a", "b", "p", "q", "neg1", "neg2", "neg3"}
+
+    full = build_example_oids(positives, negatives, everything)
+    got = next(row for row in full if row[0] == "p")     # index 2 -> fallback_pool[2] -> neg3
+    pre_filtered = build_example_oids([("p", "q")], negatives, everything)[0]  # index 0 -> neg1
+    assert got[2] != pre_filtered[2]
