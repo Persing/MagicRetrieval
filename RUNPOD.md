@@ -9,6 +9,26 @@ local load is capped at ~1–2 h by the breaker. Six GPUs turn it into ~1.2 h dr
 ladder. Run Phase 5 locally in ~30-minute chunks. Only cedh — a fresh ladder with no shared sd —
 goes to rented hardware.
 
+## The short path
+
+Sections 1–3 are pod setup, done once by hand. After that two scripts run §4–§8 unattended, under
+`tmux` so they survive a dropped connection:
+
+```bash
+tmux new -s t4 'bash pod/01_preflight.sh 2>&1 | tee logs/01_preflight.log'
+# ... freeze the point predictions in THRESHOLDS.md and commit them ...
+NGPU=3 tmux new -s t4 'bash pod/02_grid.sh 2>&1 | tee logs/02_grid.log'
+```
+
+**The split between them is deliberate and is not a convenience.** The point predictions have to be
+frozen from the pre-flight's measured example ratios *before* any model trains; a script that ran
+straight through would produce byte-identical files that establish nothing. `02_grid.sh` refuses to
+start unless `THRESHOLDS.md` is newer than the pre-flight output — evidence that you saw the counts
+and then wrote the predictions, in that order.
+
+Both scripts are resumable. Every expensive step is skip-if-present, so re-running after a
+preemption costs only what had not finished. `logs/STATUS` records how far it got.
+
 ---
 
 ## 1. What to rent
