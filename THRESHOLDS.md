@@ -129,6 +129,39 @@ input would be the loophole; freezing the arithmetic is not.
 
 **The rule.** `predicted = 0.00389 × ln(realized n_training_examples ratio)`.
 
+### Measured counts and the frozen point prediction — added 2026-07-30, before any model trained
+
+`mr.t4_scaling --preflight --corpus cedh` on a 3×RTX 5090 pod. Counts only; no model was trained and
+no recall number existed when these were written.
+
+| level | seed | train decks | positives | training examples |
+|---|---|---|---|---|
+| full | 42 | 39,733 | 194,592 | **194,312** |
+| subsample | 42 | 3,142 | 67,912 | 67,763 |
+| subsample | 43 | 3,142 | 62,187 | 62,036 |
+| subsample | 44 | 3,142 | 66,625 | 66,475 |
+
+Mean subsample examples **65,425**; realized ratio **2.9700×**; identical for A, B+ and C.
+
+> **FROZEN PREDICTION: `+0.0042`** for every arm, on both the aggregate and the cold-start stratum.
+> An observed gap at or below this is what more training data alone buys.
+
+**The expectation this replaces was wrong, and it is recorded rather than quietly dropped.** The
+design anticipated the 250k cap binding at both levels, holding volume constant and making the null
+exactly 0.0000 — a clean diversity isolation. **The cap binds nowhere on cedh**: the full level
+mines 194,592 positives, well under it. cedh's narrow played vocabulary and homogeneous tournament
+decks yield far fewer top-decile PPMI pairs than casual, which mines 450,038 from only 3,142 decks.
+
+So this is **not** a matched-volume comparison. Decks vary 12.6× while examples vary only 2.97× —
+markedly sub-linear, examples ≈ decks^0.43 — and the volume null does real work rather than being
+zero. That is precisely why the rule was frozen as a function of realized counts instead of as a
+number: the assumption failed and no threshold had to be renegotiated after seeing it.
+
+One consequence for reading the result: because examples are not held fixed, an observed gap above
++0.0042 is evidence that deck diversity buys something **beyond what the extra pairs explain under
+D4's slope**, which is a conditional claim resting on that slope transferring across corpora. The
+matched-volume version this was meant to be would not have needed it. Weigh accordingly.
+
 The slope is D4's de-skewed pure-volume measurement: `(0.0937 − 0.0809) / ln(234,593 / 8,702)`,
 `B+_random → B+_full`, encoding held constant and free of the clean-clean skew in arm D's slice.
 
