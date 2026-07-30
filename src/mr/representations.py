@@ -54,13 +54,43 @@ def parser_pin() -> dict:
     The per-module sha256 is the real identifier: the clause pipeline's source tree carries
     uncommitted work, so a git rev alone would name the wrong thing. The rev is recorded
     alongside as a recovery hint, with its dirty flag, never as the identity.
+
+    ## Line endings are normalized before hashing, and that is not cosmetic
+
+    Hashing `read_bytes()` directly made the pin identify *a checkout* rather than *a parser*. The
+    vendored tree has mixed line endings (`clause_splitter.py` is CRLF, `clause_pipeline.py` is LF)
+    and `core.autocrlf=true` on Windows, so the same commit produced one set of bytes on Windows and
+    another on Linux. The first Linux run of this branch therefore reported a completely different
+    pin — `174bc3a1...` against the recorded `2f61bf8d...` — and the cache-invalidation guard fired
+    on a difference that cannot change a single clause: Python does not care about `\\r`.
+
+    That is the wrong kind of strictness. A pin that trips on line endings is not protecting the
+    result, it is blocking a valid run on a platform difference, and the tempting response is to
+    bypass the guard — which would then also bypass it on a real parser change.
+
+    So the hash normalizes CRLF to LF first. The pin now names the parser's content on any platform,
+    and the Windows value equals what a Linux checkout produces with no normalization at all —
+    confirmed against the pod, which reported exactly `174bc3a1...`.
+
+    **This changed the pin value once**, from `2f61bf8d0f71...` (Windows bytes) to
+    `174bc3a164c5...` (normalized content). Layer 1 was rebuilt under the new pin to check that only
+    the identity moved: `cdl.parquet` and `signature_freq.parquet` are byte-identical and every
+    stat matches (10,637 clean / 2,042 excluded / 18,362 gap, 104,578 clauses). `clauses.jsonl.gz`
+    differs in bytes but **not in content** — gzip stamps the build time into its header, so that
+    file differs between any two builds; decompressed, it hashes the same across rebuilds. Findings
+    recorded against the old pin remain valid; see `findings/t4_handoff.md`.
+
+    Normalizing here rather than via `.gitattributes` is deliberate: a checkout-time fix would make
+    the pin correct only for checkouts made after it, and would silently rewrite the working copy of
+    a vendored dependency.
     """
     root = Path(config.CDL_PARSER_PATH) if config.CDL_PARSER_PATH else None
     if root is None:
         raise cdl_adapter.ParserUnavailable(config.parser_gaps())
     digests = {}
     for mod in config.CLAUSE_MODULES:
-        digests[mod] = hashlib.sha256((root / mod).read_bytes()).hexdigest()
+        source = (root / mod).read_bytes().replace(b"\r\n", b"\n")
+        digests[mod] = hashlib.sha256(source).hexdigest()
     combined = hashlib.sha256(
         "".join(f"{k}:{digests[k]}" for k in sorted(digests)).encode()
     ).hexdigest()

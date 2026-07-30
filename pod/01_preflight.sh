@@ -13,7 +13,7 @@
 set -euo pipefail
 
 CORPUS="${CORPUS:-cedh}"
-PIN_EXPECTED="2f61bf8d0f71a57303b2256a17304f95ee13fc912ce0018de4c553a3dd4537e0"
+PIN_EXPECTED="174bc3a164c5eae5fd473d0a4dc5fae49d73fbc7bb674bfe59630c3c28a5f8a0"
 
 cd "$(dirname "$0")/.."
 mkdir -p logs

@@ -155,11 +155,24 @@ probe processes and produced a badly wrong cost estimate.
 
 ## Provenance
 
-- **Parser pin `2f61bf8d`**, upstream `PileOfCardsParser` at `34dd00f` **plus uncommitted
+- **Parser pin `174bc3a1`** (was `2f61bf8d` before 2026-07-30 — see below), upstream
+  `PileOfCardsParser` at `34dd00f` **plus uncommitted
   `tag_extractor.py` changes** that were deliberately vendored (compound `target_type`: 20.9% of
   emissions changed shape). The per-module sha256 in `runs/t4/repr/parser_pin.json` is the
   authoritative identity; the git rev alone is not. Changing it invalidates the layer-1 clause
   cache automatically.
+- **The pin was recomputed on 2026-07-30 and its value changed, without the parser changing.**
+  It used to hash raw file bytes, which made it identify *a checkout* rather than *a parser*: the
+  vendored tree has mixed line endings and `core.autocrlf=true` on Windows, so the same commit
+  produced `2f61bf8d` on Windows and `174bc3a1` on Linux. The first pod run tripped the guard on
+  that difference alone. `parser_pin` now normalizes CRLF to LF before hashing, so both platforms
+  agree on `174bc3a1`, and `tests/test_parser_pin.py` pins the property in both directions —
+  line endings must not move it, a one-character source edit must.
+  **Layer 1 is unchanged**: rebuilt under the new pin, `cdl.parquet` and `signature_freq.parquet`
+  are byte-identical and the stats match exactly (10,637 clean / 2,042 excluded / 18,362 gap,
+  104,578 clauses). `clauses.jsonl.gz` differs in bytes only because gzip stamps the build time into
+  its header; decompressed, it hashes identically across rebuilds. **Findings recorded against
+  `2f61bf8d` therefore remain valid** — the two pins name the same parser.
 - **Deck filter ≤100 distinct cards** applied in T4 layer-0 only, never in `corpus.load_*` — T0/T1/T2
   recorded their numbers unfiltered and must stay reproducible. 21% of casual entries exceed 100
   distinct cards (max 1,947) and carried 56.5% of PPMI pairs. See `t4_corpus_deck_sizes.md`.
