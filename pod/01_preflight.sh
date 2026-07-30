@@ -20,6 +20,38 @@ mkdir -p logs
 say() { printf '\n\033[1m== %s\033[0m  %s\n' "$1" "$(date -u +%H:%M:%SZ)"; }
 status() { echo "$1 $(date -u +%FT%TZ)" >> logs/STATUS; }
 
+say "0/5 GPU availability"
+# Checked before anything else, and loudly. A pod whose CUDA is unavailable will still run the whole
+# test suite on CPU and fail somewhere confusing — the first time this happened it surfaced as a
+# tie-break assertion in test_loo_eval, because torch.topk picks a different tie order on CPU, and
+# the actual problem (device_count 0) was a warning three screens up.
+#
+# The retry loop is for the race, not the mismatch: a container can start before the GPU is attached.
+for i in $(seq 1 30); do
+    nvidia-smi >/dev/null 2>&1 && break
+    [ "$i" = 1 ] && echo "waiting for nvidia-smi ..."
+    sleep 2
+done
+nvidia-smi || echo "!! nvidia-smi is not working in this container"
+
+uv run python - <<'PY'
+import os, sys, torch
+print(f"torch {torch.__version__}  built against CUDA {torch.version.cuda}")
+print(f"CUDA_VISIBLE_DEVICES={os.environ.get('CUDA_VISIBLE_DEVICES')!r}")
+n = torch.cuda.device_count()
+print(f"torch.cuda.is_available()={torch.cuda.is_available()}  device_count={n}")
+for i in range(n):
+    print(f"  [{i}] {torch.cuda.get_device_name(i)}")
+if n == 0:
+    sys.exit(
+        "\nFATAL: no CUDA device visible, so nothing here can train.\n"
+        "Most likely a driver/runtime mismatch: torch on Linux pulls a CUDA 13 runtime\n"
+        "(nvidia-cublas 13.x, nvidia-cudnn-cu13), which needs a host driver new enough for it.\n"
+        "Compare the driver version nvidia-smi reports above against torch.version.cuda.\n"
+        "Fix by choosing a pod image/host with a matching CUDA, not by pinning a different torch —\n"
+        "the dependency set is frozen and shared with the local casual runs.")
+PY
+
 say "1/5 verification gate"
 uv run pytest -q
 

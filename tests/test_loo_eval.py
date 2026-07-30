@@ -278,7 +278,17 @@ def test_top_candidates_honours_restrict_to(cards, strata):
 
 def test_top_candidates_tie_divergence_is_pinned():
     """Documented, not accidental: topk breaks ties by index, _rank counts strictly-greater. Under
-    a mass tie the target can have rank <= k and be absent from top."""
+    a mass tie the target can have rank <= k and be absent from top.
+
+    **Which candidates survive a mass tie is device-dependent**, so the divergence itself is pinned
+    only on CUDA. `torch.topk` does not promise a tie-break order, and CPU and CUDA pick different
+    ones: on CPU this planted tie returns the target, on CUDA it does not. The invariant that
+    actually matters — `_rank` counts strictly-greater, so the target ranks 1 under a mass tie —
+    holds on both and is asserted on both. Discovered on a pod whose CUDA was unavailable, where
+    this failed as a bare tie-break assertion and buried the real problem.
+    """
+    import torch
+
     cards = pd.DataFrame([{"oracle_id": o, "name": f"C{i}", "color_identity": np.array(["G"]),
                            "legalities_commander": "legal"} for i, o in enumerate(OIDS)])
     qs = _qs(cards, [[0, 40]])
@@ -288,4 +298,6 @@ def test_top_candidates_tie_divergence_is_pinned():
     top, rank = loo_eval.top_candidates(_unit(sims), qs, k=5)
     q = [i for i, t in enumerate(qs.target_row) if t == 40][0]
     assert rank[q] == 1
-    assert 40 not in top[q], "tie-break divergence is expected here; if this fails, revisit the docstring"
+    if torch.cuda.is_available():
+        assert 40 not in top[q], \
+            "tie-break divergence is expected on CUDA; if this fails, revisit the docstring"
