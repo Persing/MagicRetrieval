@@ -24,24 +24,47 @@ PRE="findings/t4_scaling_preflight_${CORPUS}.json"
 # looked at the counts and then wrote the predictions down — in that order. Training first and
 # writing predictions afterwards produces the same files and means nothing.
 [ -f "$PRE" ] || { echo "FATAL: $PRE missing — run pod/01_preflight.sh first" >&2; exit 1; }
-if [ ! THRESHOLDS.md -nt "$PRE" ]; then
-    cat >&2 <<EOF
-FATAL: THRESHOLDS.md has not been updated since the pre-flight ran.
 
-The frozen rule needs its point predictions instantiated from the measured example ratios in
-$PRE, committed, before the grid trains anything. Running the grid first and
-recording predictions afterwards yields byte-identical files and is worth nothing.
+# Checked on CONTENT, not on file mtimes. The mtime version was wrong in the case that matters: a
+# fresh `git clone` writes every file at the same instant, so THRESHOLDS.md is never newer than the
+# pre-flight output and a correctly pre-registered run would be blocked — pushing whoever hit it
+# straight to the override, which is how a gate stops meaning anything.
+#
+# This instead verifies that THRESHOLDS.md records the ratio *these* counts imply and the
+# prediction that ratio yields. That is a stronger claim than "edited afterwards": it is evidence
+# the predictions were derived from this pre-flight and not from some other run.
+uv run python - <<PY || exit 1
+import json, math, pathlib, sys
 
-  1. Put the measured ratios and predictions in THRESHOLDS.md
-  2. git commit THRESHOLDS.md alone, noting that only counts were observed
-  3. re-run this script
+pre = json.loads(pathlib.Path("$PRE").read_text(encoding="utf-8"))
+full = [r for r in pre.values() if r["level"] == "full"]
+sub = [r for r in pre.values() if r["level"] == "subsample"]
+if not full or not sub:
+    sys.exit("FATAL: pre-flight output has no full/subsample rows")
 
-Override with FORCE_UNGATED=1 only if you are re-running after the freeze already happened and
-file mtimes were lost (e.g. a fresh clone).
-EOF
-    [ "${FORCE_UNGATED:-0}" = "1" ] || exit 1
-    echo "WARNING: proceeding ungated because FORCE_UNGATED=1" >&2
-fi
+arm = sorted(full[0]["examples"])[0]
+f = sum(r["examples"][arm] for r in full) / len(full)
+s = sum(r["examples"][arm] for r in sub) / len(sub)
+ratio = f / s
+pred = 0.00389 * math.log(ratio)
+
+md = pathlib.Path("THRESHOLDS.md").read_text(encoding="utf-8")
+want = ("%.4f" % ratio, "%+.4f" % pred)
+missing = [w for w in want if w not in md]
+if missing:
+    sys.exit(
+        "FATAL: THRESHOLDS.md does not record the prediction these counts imply.\n"
+        "  measured example ratio : %s\n"
+        "  implied prediction     : %s\n"
+        "  missing from THRESHOLDS.md: %s\n\n"
+        "The frozen rule has to be instantiated from THIS pre-flight, and committed, before the\n"
+        "grid trains anything. Recording predictions afterwards produces the same file and is\n"
+        "worth nothing.\n"
+        "  1. write the measured ratio and its prediction into THRESHOLDS.md\n"
+        "  2. commit it alone, noting that only counts were observed\n"
+        "  3. re-run this script" % (want[0], want[1], ", ".join(missing)))
+print("pre-registration OK — THRESHOLDS.md records ratio %s -> prediction %s" % want)
+PY
 
 say "grid — 6 shards over $NGPU GPU(s), $(( (6 + NGPU - 1) / NGPU )) wave(s)"
 i=0
