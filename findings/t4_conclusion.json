@@ -1,0 +1,261 @@
+{
+  "baselines": {
+    "agg_pop": 0.1807598190671577,
+    "agg_rand": 0.002768371357243493,
+    "cold_n": 5964,
+    "cold_pop": 0.0,
+    "cold_rand": 0.0038564721663313212,
+    "high_n": 11283,
+    "high_pop": 0.6481432243197731,
+    "n_near_zero": 881,
+    "n_queries": 40457,
+    "near_zero_underpowered": true
+  },
+  "cdl_case": {
+    "across_C": 0.5262489707679271,
+    "all_clean": {
+      "by_seed": {
+        "42": -0.019782922525797997,
+        "43": -0.021654280062022135,
+        "44": -0.023311768165534943
+      },
+      "mean": -0.02158299025111836,
+      "n_seeds": 3,
+      "sd": 0.001765502638096765
+    },
+    "baseline_clean_share": 0.3983867521367521,
+    "c_minus_bplus": {
+      "gap": -0.00885714050308558,
+      "gate": 0.02,
+      "paired_mean_gap": -0.008857140503085581,
+      "paired_sd": 0.00129250446764035,
+      "pooled_sd": 0.0006679090466725269,
+      "question": "does CDL justify continued development?",
+      "verdict": "BELOW_GATE"
+    },
+    "d_examples": 8702,
+    "dialect_gap_C": 0.0030903651815715008,
+    "dialect_gap_controls": [
+      0.0005862035189725945,
+      0.0011807784766422191
+    ],
+    "displaced_clean_share": 0.5016381954487655,
+    "encoding_effect": 0.042720419184088115,
+    "full_examples": 234593,
+    "matched_ratio": 26.958515283842793,
+    "n_cdl": 10628,
+    "n_fallback": 20330,
+    "non_staple": {
+      "by_seed": {
+        "42": -0.00951427140711067,
+        "43": -0.01652478718077116,
+        "44": -0.017225838758137213
+      },
+      "mean": -0.014421632448673014,
+      "n_seeds": 3,
+      "sd": 0.0042643302666086685
+    },
+    "non_staple_sd_multiple": 3.38192202456735,
+    "skew_effect": -0.006612129961325278,
+    "volume_effect": 0.019408651018553172
+  },
+  "corpus": "casual",
+  "dose_response": [
+    {
+      "aggregate": {
+        "mean": 0.06079706025327302,
+        "n_seeds": 3,
+        "sd": 0.0006997016996007979
+      },
+      "arm": "A",
+      "coldstart": {
+        "mean": 0.14151576123407109,
+        "n_seeds": 3,
+        "sd": 0.0004436202734850044
+      },
+      "pooled_sd": 0.0004436202734850044,
+      "verdict": "\u2014",
+      "vs_A": {
+        "mean": 0.0,
+        "n_seeds": 3,
+        "sd": 0.0
+      }
+    },
+    {
+      "aggregate": {
+        "mean": 0.05838297451615295,
+        "n_seeds": 3,
+        "sd": 0.0010437151707105026
+      },
+      "arm": "B",
+      "coldstart": {
+        "mean": 0.13860943438408227,
+        "n_seeds": 3,
+        "sd": 0.0047936019768369245
+      },
+      "pooled_sd": 0.0034040724771501104,
+      "verdict": "NULL",
+      "vs_A": {
+        "mean": -0.0029063268499888253,
+        "n_seeds": 3,
+        "sd": 0.005179793089245543
+      }
+    },
+    {
+      "aggregate": {
+        "mean": 0.06156330589679578,
+        "n_seeds": 3,
+        "sd": 0.0014814760624842548
+      },
+      "arm": "B_type",
+      "coldstart": {
+        "mean": 0.1381623071763917,
+        "n_seeds": 3,
+        "sd": 0.0013413816230717635
+      },
+      "pooled_sd": 0.0009990254265436762,
+      "verdict": "REAL_GAP",
+      "vs_A": {
+        "mean": -0.003353454057679404,
+        "n_seeds": 3,
+        "sd": 0.0009335620997367579
+      }
+    },
+    {
+      "aggregate": {
+        "mean": 0.062387225943594436,
+        "n_seeds": 3,
+        "sd": 0.0007674407245351889
+      },
+      "arm": "B+",
+      "coldstart": {
+        "mean": 0.13352336239660184,
+        "n_seeds": 3,
+        "sd": 0.001906854695867639
+      },
+      "pooled_sd": 0.0013843579338811507,
+      "verdict": "REAL_GAP",
+      "vs_A": {
+        "mean": -0.007992398837469264,
+        "n_seeds": 3,
+        "sd": 0.0022887989301859125
+      }
+    },
+    {
+      "aggregate": {
+        "mean": 0.05353008544050886,
+        "n_seeds": 3,
+        "sd": 0.0005506720653700456
+      },
+      "arm": "C",
+      "coldstart": {
+        "mean": 0.12776659959758552,
+        "n_seeds": 3,
+        "sd": 0.0016513846079470348
+      },
+      "pooled_sd": 0.0012091050554875892,
+      "verdict": "REAL_GAP",
+      "vs_A": {
+        "mean": -0.013749161636485577,
+        "n_seeds": 3,
+        "sd": 0.001452088202187197
+      }
+    }
+  ],
+  "git_dirty": true,
+  "git_rev": "90a3447",
+  "highplay_flip": {
+    "mean": 0.014830571065614936,
+    "n_seeds": 3,
+    "sd": 0.0035895620662516627
+  },
+  "inputs": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_diagnostics.json": {
+      "bytes": 17467,
+      "exists": true,
+      "mtime": 1785418408,
+      "sha256": "27349ccb7fc2e7d1b959cc9820c8075d871293a3c8b77bf60273879deb664d44"
+    },
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_matched_data.json": {
+      "bytes": 3361,
+      "exists": true,
+      "mtime": 1785419096,
+      "sha256": "78e9b62976c4dc156681989ab6371489b78100305107daafae80f125a5c94559"
+    },
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_representation.json": {
+      "bytes": 439462,
+      "exists": true,
+      "mtime": 1785424508,
+      "sha256": "abeb27373e186610dc12c699a31ea3db81d34fb226edd855a6b4a467ae75be50"
+    },
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_staple_reread.json": {
+      "bytes": 8706,
+      "exists": true,
+      "mtime": 1785412195,
+      "sha256": "271dee7beb1401418a74819047e35ffdb351d7b08ec8b68bb9476290b878a239"
+    }
+  },
+  "ladder_is_final": false,
+  "ladder_n_seeds": 3,
+  "run_args": {
+    "sources": [
+      "t4_diagnostics",
+      "t4_matched_data",
+      "t4_representation",
+      "t4_staple_reread"
+    ]
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
+    },
+    "t4_scaling": {
+      "arms": [
+        "A",
+        "B+",
+        "C"
+      ],
+      "bootstrap_n": 10000,
+      "cedh_subsample": 3142,
+      "ci": 0.95,
+      "decision_rule": "DIVERSITY_BEYOND_VOLUME requires all three: excess over the prediction >= min_lift, paired query-bootstrap CI excluding the prediction, and the gap exceeding the pooled seed sd",
+      "min_lift": 0.005,
+      "n_seeds": 3,
+      "prediction_rule": "predicted = slope_per_efold * ln(realized n_training_examples ratio); 0.0000 when the positive cap binds equally at both levels",
+      "slope_per_efold": 0.00389
+    }
+  }
+}
