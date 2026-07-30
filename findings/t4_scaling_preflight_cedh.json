@@ -1,0 +1,62 @@
+{
+  "full_s42": {
+    "examples": {
+      "A": 194312,
+      "B+": 194312,
+      "C": 194312
+    },
+    "level": "full",
+    "n_positives": 194592,
+    "n_ppmi_vocab": 10133,
+    "n_queries": 675233,
+    "n_train_available": 39733,
+    "n_train_decks": 39733,
+    "queries_sha256": "3fe8406f6b91e0ede8987d87afef2b780d85673de9841bf727a928a5f929209a",
+    "seed": 42
+  },
+  "subsample_s42": {
+    "examples": {
+      "A": 67763,
+      "B+": 67763,
+      "C": 67763
+    },
+    "level": "subsample",
+    "n_positives": 67912,
+    "n_ppmi_vocab": 4970,
+    "n_queries": 675233,
+    "n_train_available": 39733,
+    "n_train_decks": 3142,
+    "queries_sha256": "3fe8406f6b91e0ede8987d87afef2b780d85673de9841bf727a928a5f929209a",
+    "seed": 42
+  },
+  "subsample_s43": {
+    "examples": {
+      "A": 62036,
+      "B+": 62036,
+      "C": 62036
+    },
+    "level": "subsample",
+    "n_positives": 62187,
+    "n_ppmi_vocab": 4521,
+    "n_queries": 675233,
+    "n_train_available": 39733,
+    "n_train_decks": 3142,
+    "queries_sha256": "3fe8406f6b91e0ede8987d87afef2b780d85673de9841bf727a928a5f929209a",
+    "seed": 43
+  },
+  "subsample_s44": {
+    "examples": {
+      "A": 66475,
+      "B+": 66475,
+      "C": 66475
+    },
+    "level": "subsample",
+    "n_positives": 66625,
+    "n_ppmi_vocab": 4973,
+    "n_queries": 675233,
+    "n_train_available": 39733,
+    "n_train_decks": 3142,
+    "queries_sha256": "3fe8406f6b91e0ede8987d87afef2b780d85673de9841bf727a928a5f929209a",
+    "seed": 44
+  }
+}

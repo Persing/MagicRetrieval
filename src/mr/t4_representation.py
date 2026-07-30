@@ -811,9 +811,14 @@ def replicate_floor(arm: str, seed: int, corpus_name: str, l0: dict, cards_df: p
         runs.append({s: res["overall"][s][f"recall_at_{k}"] for s in loo_eval.SCORERS})
         print(f"  replicate {i + 1}/2 [{arm} s{seed}] "
               f"recall@{k} centroid {runs[-1]['centroid']:.4f} max_sim {runs[-1]['max_sim']:.4f}")
+    import torch
     return {
         "arm": arm, "seed": seed, "corpus": corpus_name, "metric": f"recall_at_{k}",
         "runs": runs,
+        # Recorded so a floor measured under a different training configuration cannot be mistaken
+        # for a valid one. A multi-GPU run trains at a different effective batch (see
+        # `finetune.finetune`), so its delta describes a recipe no ladder used.
+        "n_gpu": int(torch.cuda.device_count()),
         "delta": {s: abs(runs[0][s] - runs[1][s]) for s in loo_eval.SCORERS},
     }
 

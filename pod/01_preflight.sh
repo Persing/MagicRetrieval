@@ -107,10 +107,24 @@ say "3/5 replicate floor on this stack (~25 min)"
 # The pod's torch is the PyPI CUDA build, not the local cu130 — same version, different kernels — so
 # the locally measured floor does not transfer. This is also the real speed measurement: arm A is
 # 724 s per run on a local 4090, so the ratio here scales every shard estimate in RUNPOD.md.
-if [ -f "findings/t4_replicate_floor_${CORPUS}.json" ]; then
-    echo "already measured, skipping"
+#
+# CUDA_VISIBLE_DEVICES=0 is load-bearing, not tidiness. With every GPU visible, Trainer enables
+# DataParallel and trains at batch 32 x n_gpu, which changes the negative sampling and the LR
+# horizon — a floor measured that way describes a recipe no ladder used. `finetune` now refuses
+# outright, so this is what lets the step run at all on a multi-GPU box.
+NEED=$(uv run python - <<PY
+import json, pathlib
+p = pathlib.Path("findings/t4_replicate_floor_${CORPUS}.json")
+try:
+    print("no" if p.exists() and json.loads(p.read_text())["n_gpu"] == 1 else "yes")
+except Exception:
+    print("yes")
+PY
+)
+if [ "$NEED" = "no" ]; then
+    echo "already measured on a single GPU, skipping"
 else
-    uv run python -m mr.t4_representation --replicate A --corpus "$CORPUS" --seeds 42
+    CUDA_VISIBLE_DEVICES=0 uv run python -m mr.t4_representation --replicate A --corpus "$CORPUS" --seeds 42
 fi
 status "replicate-floor"
 

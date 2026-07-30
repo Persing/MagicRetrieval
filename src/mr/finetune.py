@@ -171,6 +171,29 @@ def finetune(
     )
     import torch
 
+    # One visible GPU, always. `transformers.Trainer` silently wraps the model in DataParallel when
+    # it sees more than one, and `per_device_train_batch_size` is then multiplied by the device
+    # count — so a 3-GPU box trains at an effective batch of 96 while every recorded number on this
+    # branch was produced at 32. Under MultipleNegativesRankingLoss the batch *is* the negative
+    # sampling, so that is not a speed knob, it changes the objective.
+    #
+    # It also silently breaks the schedule: `num_train_steps` below is computed as
+    # len(dataset) // 32, so WarmupLinear would decay against a horizon three times longer than the
+    # run actually takes and the learning rate would never reach zero. Observed on a 3x5090 pod —
+    # 4,048 steps against an assumed 12,144, final LR 1.4e-05 instead of ~0.
+    #
+    # Refusing is deliberate rather than quietly setting CUDA_VISIBLE_DEVICES here: by the time this
+    # runs torch is already initialized, so the environment variable would have no effect and the
+    # "fix" would be a no-op that reads as a fix. The caller pins the device; shard workers already
+    # do (`CUDA_VISIBLE_DEVICES=$gpu`), and anything else must too.
+    n_gpu = torch.cuda.device_count()
+    if n_gpu > 1:
+        raise RuntimeError(
+            f"{n_gpu} CUDA devices are visible. transformers.Trainer would enable DataParallel and "
+            f"train at an effective batch of {config.TRAIN_BATCH_SIZE * n_gpu} instead of the "
+            f"frozen {config.TRAIN_BATCH_SIZE}, changing the negative sampling and the LR schedule. "
+            "Pin one device before starting python, e.g. CUDA_VISIBLE_DEVICES=0.")
+
     seed_everything(seed)
     model = SentenceTransformer(config.BASE_MODEL)
     model.max_seq_length = max_seq_length

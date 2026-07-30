@@ -1,0 +1,92 @@
+{
+  "arm": "A",
+  "corpus": "cedh",
+  "delta": {
+    "centroid": 0.0,
+    "max_sim": 0.0,
+    "popularity": 0.0,
+    "random": 0.0
+  },
+  "git_dirty": true,
+  "git_rev": "90e43c0",
+  "inputs": {
+    "/workspace/MagicRetrieval/vendor/magicspike_data/cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1785434550,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    }
+  },
+  "metric": "recall_at_50",
+  "run_args": {
+    "mode": "replicate"
+  },
+  "runs": [
+    {
+      "centroid": 0.00978477059029994,
+      "max_sim": 0.12819871066728078,
+      "popularity": 0.6911747500492422,
+      "random": 0.0012899251073333205
+    },
+    {
+      "centroid": 0.00978477059029994,
+      "max_sim": 0.12819871066728078,
+      "popularity": 0.6911747500492422,
+      "random": 0.0012899251073333205
+    }
+  ],
+  "seed": 42,
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
+    },
+    "t4_scaling": {
+      "arms": [
+        "A",
+        "B+",
+        "C"
+      ],
+      "bootstrap_n": 10000,
+      "cedh_subsample": 3142,
+      "ci": 0.95,
+      "decision_rule": "DIVERSITY_BEYOND_VOLUME requires all three: excess over the prediction >= min_lift, paired query-bootstrap CI excluding the prediction, and the gap exceeding the pooled seed sd",
+      "min_lift": 0.005,
+      "n_seeds": 3,
+      "prediction_rule": "predicted = slope_per_efold * ln(realized n_training_examples ratio); 0.0000 when the positive cap binds equally at both levels",
+      "slope_per_efold": 0.00389
+    }
+  }
+}
