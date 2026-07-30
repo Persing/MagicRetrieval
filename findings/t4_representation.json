@@ -113,9 +113,11 @@
       ]
     }
   },
+  "corpus": "casual",
+  "excluded_other_corpora": {},
   "frozen_n_seeds": 5,
   "git_dirty": true,
-  "git_rev": "96a101d",
+  "git_rev": "90a3447",
   "inputs": {
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
       "bytes": 5093341,
@@ -12733,6 +12735,7 @@
     }
   ],
   "run_args": {
+    "corpus": "casual",
     "merged_from": [
       "t4_partial_casual_A_s42.json",
       "t4_partial_casual_A_s43.json",
@@ -12791,6 +12794,21 @@
         50
       ],
       "test_frac": 0.15
+    },
+    "t4_scaling": {
+      "arms": [
+        "A",
+        "B+",
+        "C"
+      ],
+      "bootstrap_n": 10000,
+      "cedh_subsample": 3142,
+      "ci": 0.95,
+      "decision_rule": "DIVERSITY_BEYOND_VOLUME requires all three: excess over the prediction >= min_lift, paired query-bootstrap CI excluding the prediction, and the gap exceeding the pooled seed sd",
+      "min_lift": 0.005,
+      "n_seeds": 3,
+      "prediction_rule": "predicted = slope_per_efold * ln(realized n_training_examples ratio); 0.0000 when the positive cap binds equally at both levels",
+      "slope_per_efold": 0.00389
     }
   },
   "verdicts": {

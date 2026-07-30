@@ -204,3 +204,72 @@ def test_full_seed_run_is_marked_final(tmp_path):
     md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
     assert "INTERIM" not in md
     assert payload["is_final"] is True
+
+
+# ── ragged completion ─────────────────────────────────────────────────────────
+
+def test_ragged_grid_reports_the_least_complete_arm(tmp_path):
+    """The grid is completed an arm at a time when a whole-grid block is not available, so halfway
+    through, one arm has more seeds than another. The banner must report the weaker one: a verdict
+    compares two arms and is only as complete as the less complete of them."""
+    recs = ([_rec("A", s, 0.5) for s in (42, 43, 44, 45)]      # 4 seeds
+            + [_rec("C", s, 0.5) for s in (42, 43, 44)])       # 3 seeds
+    _write(tmp_path, recs)
+    payload = T.merge_partials(tmp_path)
+    md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
+    assert payload["n_seeds"] == 3, "must be the min across arms, not the max"
+    assert "INTERIM — 3 of 5" in md
+    assert payload["is_final"] is False
+
+
+def test_ragged_grid_one_seed_short_is_still_not_final(tmp_path):
+    """The failure this guards: arm A reaching n=5 while C lags at 4 would, under `max`, clear the
+    frozen seed count and silently drop the INTERIM banner off a ladder that is not finished."""
+    recs = ([_rec("A", s, 0.5) for s in (42, 43, 44, 45, 46)]
+            + [_rec("C", s, 0.5) for s in (42, 43, 44, 45)])
+    _write(tmp_path, recs)
+    payload = T.merge_partials(tmp_path)
+    md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
+    assert payload["is_final"] is False
+    assert "INTERIM — 4 of 5" in md
+
+
+# ── corpus scoping ────────────────────────────────────────────────────────────
+
+def test_merge_never_pools_two_corpora(tmp_path):
+    """`aggregate` groups by arm alone. Without a corpus filter, cedh partials sitting next to
+    casual ones would be averaged into the casual ladder — arm A at n_seeds=6 spanning two corpora,
+    under casual's deck counts, with the INTERIM banner gone because the count now clears n=5.
+    Nothing errors and every individual number is correct, which is what makes it dangerous."""
+    _write(tmp_path, [_rec("A", s, 0.20) for s in (42, 43, 44)]
+                     + [_rec("A", s, 0.80, corpus="cedh") for s in (42, 43, 44)])
+
+    casual = T.merge_partials(tmp_path, corpus="casual")
+    assert casual["aggregate"]["A"]["n_seeds"] == 3
+    assert casual["aggregate"]["A"]["mean"] == pytest.approx(0.20)
+    assert casual["excluded_other_corpora"] == {"cedh": 3}
+    assert casual["is_final"] is False, "3 casual seeds must not read as final because cedh exists"
+
+    cedh = T.merge_partials(tmp_path, corpus="cedh")
+    assert cedh["aggregate"]["A"]["mean"] == pytest.approx(0.80)
+
+
+def test_each_corpus_writes_its_own_report(tmp_path):
+    """A second corpus must not land on top of `t4_representation.json` — `t4_matched_data` and
+    `t4_diagnostics` both read the casual ladder by that exact path."""
+    _write(tmp_path, [_rec("A", 42, 0.20)] + [_rec("A", 42, 0.80, corpus="cedh")])
+    T.merge_partials(tmp_path, corpus="casual")
+    T.merge_partials(tmp_path, corpus="cedh")
+
+    casual = json.loads((tmp_path / "t4_representation.json").read_text(encoding="utf-8"))
+    cedh = json.loads((tmp_path / "t4_representation_cedh.json").read_text(encoding="utf-8"))
+    assert casual["aggregate"]["A"]["mean"] == pytest.approx(0.20)
+    assert cedh["aggregate"]["A"]["mean"] == pytest.approx(0.80)
+    assert "Corpus **cedh**" in (tmp_path / "t4_representation_cedh.md").read_text(encoding="utf-8")
+
+
+def test_missing_corpus_names_what_was_actually_present(tmp_path):
+    """A silent empty merge is the wrong failure. Say which corpora do have partials."""
+    _write(tmp_path, [_rec("A", 42, 0.5, corpus="cedh")])
+    with pytest.raises(ValueError, match=r"corpus 'casual'.*cedh \(1\)"):
+        T.merge_partials(tmp_path, corpus="casual")

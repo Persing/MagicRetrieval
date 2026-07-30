@@ -199,7 +199,7 @@ def finetune(
     args = SentenceTransformerTrainingArguments(
         # Explicit: the shim's `_default_checkpoint_dir()` walks checkpoints/model, model_1, ...
         # and would leave one stray directory per run across a 30-run grid.
-        output_dir=str(output_dir) if output_dir else str(config.RUNS_DIR / "t4" / "hf"),
+        output_dir=str(output_dir) if output_dir else str(config.hf_scratch_dir()),
         batch_sampler=BatchSamplers.BATCH_SAMPLER,
         multi_dataset_batch_sampler=MultiDatasetBatchSamplers.ROUND_ROBIN,
         per_device_train_batch_size=batch_size,

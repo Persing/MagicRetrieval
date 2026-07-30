@@ -350,6 +350,24 @@ def _metrics(ranks: np.ndarray, ks: tuple[int, ...]) -> dict:
     }
 
 
+COLDSTART_BUCKETS = ("near_zero", "low")
+
+
+def coldstart_mask(qs: QuerySet, strata: pd.DataFrame,
+                   target_rows: np.ndarray | None = None) -> np.ndarray:
+    """Per-query boolean: is this query's target in the gated cold-start stratum?
+
+    One definition, used both by `summarize` (which reports the stratum) and by anything that needs
+    to select the same queries later — the scaling bootstrap does. Two copies of "near_zero ∪ low"
+    would be two things that could drift, and the drift would be invisible: both would produce a
+    plausible cold-start number over subtly different query sets.
+    """
+    rows = qs.target_row if target_rows is None else target_rows
+    target_oids = pd.Index([qs.oid_order[i] for i in rows])
+    play = strata.set_index("oracle_id")["play_bucket"].reindex(target_oids).fillna("unknown")
+    return np.isin(play.to_numpy(), list(COLDSTART_BUCKETS))
+
+
 def summarize(ranks: dict[str, np.ndarray], qs: QuerySet, strata: pd.DataFrame,
               ks: tuple[int, ...] = thresholds.T4_RECALL_KS,
               query_filter: np.ndarray | None = None) -> dict:
@@ -390,7 +408,7 @@ def summarize(ranks: dict[str, np.ndarray], qs: QuerySet, strata: pd.DataFrame,
     # The gated cold-start stratum is near_zero ∪ low. `near_zero` alone stays visible in the
     # play_bucket table above but is too small to gate on — it is flagged, not merged away.
     play = lab["play_bucket"].reindex(target_oids).fillna("unknown").to_numpy()
-    cold = np.isin(play, ["near_zero", "low"])
+    cold = coldstart_mask(qs, strata, target_rows=target_rows)
     res["coldstart_gated"] = {k: _metrics(v[cold], ks) for k, v in ranks.items()}
     res["n_near_zero"] = int((play == "near_zero").sum())
     res["near_zero_underpowered"] = bool(res["n_near_zero"] < 1000)

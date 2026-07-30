@@ -61,6 +61,17 @@ PRECON_BACKUP = _resolve(_VENDOR_SPIKE / "backup_precon_only", SPIKE_ARTIFACTS /
 
 CORPORA = ("casual", "cedh", "precon")
 
+
+def hf_scratch_dir() -> Path:
+    """Where the HF Trainer puts its own working directory. Overridable via `MR_HF_DIR`.
+
+    Nothing durable lands here — `save_strategy="no"` — but it is created and held open by the
+    Trainer, and parallel shard workers on one machine would otherwise all share the single path.
+    Give each worker its own so the run is isolated from anything the Trainer decides to write.
+    """
+    override = os.environ.get("MR_HF_DIR")
+    return Path(override) if override else RUNS_DIR / "t4" / "hf"
+
 # The prior fine-tune's text encoding, reproduced exactly so arm 2a is comparable.
 # See MagicSpike src/analysis/embeddings.py::_card_text — type line + oracle text, no card name.
 BASE_MODEL = "all-MiniLM-L6-v2"

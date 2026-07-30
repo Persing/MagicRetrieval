@@ -36,6 +36,7 @@ candidates and targets restricted to clean-parse cards, and `D − C` is read on
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -54,51 +55,141 @@ SMOKE_DECKS = 200
 # ── layer 0: everything that must be identical across arms ───────────────────
 
 def layer0_dir(corpus_name: str, split_seed: int, root: Path,
-               max_distinct: int = corpus.MAX_COMMANDER_DISTINCT) -> Path:
-    """The deck filter is part of the cache key, not just recorded in the payload.
+               max_distinct: int = corpus.MAX_COMMANDER_DISTINCT,
+               train_subsample: int | None = None, subsample_seed: int | None = None) -> Path:
+    """Everything that changes the mined pairs is part of the cache key, not just the payload.
 
-    Otherwise a cache built on the unfiltered corpus would be silently reused against filtered
-    train decks — mixing queries drawn from decks that are no longer in the training set. That is
-    exactly the class of silent inconsistency the arm-D bug belonged to: nothing errors, the
-    numbers just quietly describe two different corpora at once.
+    The deck filter is here because a cache built on the unfiltered corpus would otherwise be
+    silently reused against filtered train decks — mixing queries drawn from decks no longer in the
+    training set. That is the class of silent inconsistency the arm-D bug belonged to: nothing
+    errors, the numbers just quietly describe two different corpora at once.
+
+    **The train subsample is here for exactly the same reason, and the scaling sweep is what makes
+    it urgent.** Two levels of a deck sweep differ only in how many train decks they keep. Keyed
+    without that, the second level would find the first level's `meta.json` and `queries.npz`,
+    take the cached branch, and load the first level's positives, negatives and queries — while
+    recomputing `train` from its own smaller deck set. The run would complete and report a scaling
+    curve in which nothing scaled.
+
+    The subsample *seed* is in the key too: the subsample is redrawn per seed on purpose, so two
+    seeds at the same level are genuinely different deck sets and must not share a directory.
+
+    A `train_subsample` of None reproduces the original name byte-for-byte, so every existing cache
+    directory and embedding file stays reachable.
     """
-    return root / corpus_name / f"split{split_seed}_max{max_distinct}"
+    name = f"split{split_seed}_max{max_distinct}"
+    if train_subsample is not None:
+        name += f"_train{train_subsample}s{subsample_seed}"
+    return root / corpus_name / name
 
 
 def embedding_path(corpus_name: str, arm: str, seed: int, l0: dict, root: Path) -> Path:
     """Where an arm's embeddings live.
 
-    The embedding depends on the mined positives and negatives, which depend on the split and the
-    deck filter — so the basis is in the key, not just the arm and seed. Keyed on (corpus, arm,
-    seed) alone, a rerun after changing the deck filter would silently load a model trained on the
-    old corpus and score it against new queries: nothing errors, the numbers simply describe two
-    corpora at once.
+    The embedding depends on the mined positives and negatives, which depend on the split, the deck
+    filter and the train subsample — so the basis is in the key, not just the arm and seed. Keyed on
+    (corpus, arm, seed) alone, a rerun after changing any of those would silently load a model
+    trained on one basis and score it against another: nothing errors, the numbers simply describe
+    two bases at once.
 
-    Extracted so the diagnostics resolve exactly the files the runner wrote; two constructions of
-    the same name is how they would drift apart.
+    Reads `meta["basis"]`, which `build_layer0` records as the literal directory name it used,
+    rather than rebuilding the name from parts — two constructions of the same name is how they
+    drift apart, and this function must resolve exactly the files the runner wrote. The fallback
+    reconstruction exists only for layer-0 caches written before `basis` was recorded.
     """
-    basis = layer0_dir(corpus_name, l0["meta"]["split_seed"], root,
-                       l0["meta"]["deck_filter"]["max_distinct"]).name
+    meta = l0["meta"]
+    basis = meta.get("basis") or layer0_dir(
+        corpus_name, meta["split_seed"], root, meta["deck_filter"]["max_distinct"],
+        meta.get("train_subsample"), meta.get("subsample_seed")).name
     return root / "emb" / f"{corpus_name}_{basis}_{arm.replace('+', 'plus')}_s{seed}.npy"
+
+
+def query_fingerprint(qs: loo_eval.QuerySet) -> str:
+    """A hash of everything the evaluation is, so "same test set" is checkable rather than assumed.
+
+    The scaling comparison is only meaningful if both levels are scored on a byte-identical test
+    set; with training volume held constant by the positive cap, the test set is the only remaining
+    thing that could move. Subsampling *after* the split is what keeps it fixed, and this is the
+    assertion that the subsampling actually happened in that order.
+
+    Covers the candidate universe as well as the queries: `oid_order` decides what can be ranked,
+    so two runs with identical queries against different pools are not comparable either.
+    """
+    h = hashlib.sha256()
+    h.update("\n".join(qs.oid_order).encode("utf-8"))
+    for arr in (qs.target_row, qs.ctx_flat, qs.ctx_offsets, qs.mask_idx, qs.mask_table):
+        h.update(np.ascontiguousarray(arr).tobytes())
+    h.update("\n".join(qs.deck_ids).encode("utf-8"))
+    return h.hexdigest()
 
 
 def _pairs_to_frame(pairs: list[tuple[str, str]]) -> pd.DataFrame:
     return pd.DataFrame(pairs, columns=["a", "b"]) if pairs else pd.DataFrame(columns=["a", "b"])
 
 
+def subsample_train(train: list, n: int, seed: int) -> list:
+    """Keep `n` train decks, drawn without replacement, in the original order.
+
+    **After the split, never before.** Subsampling the corpus first would redraw the test set at
+    every level and the comparison would be measuring two different evaluations. `corpus.load_*`'s
+    `limit` is doubly wrong for this: it is a head truncation of the source file, not a sample, and
+    it applies before both the plausibility filter and the split.
+
+    Order is preserved rather than permuted so that a level's deck list is a function of the drawn
+    set alone — PPMI is order-independent, but the mined positive list is emitted in matrix order
+    and `build_example_oids` indexes negatives positionally, so a stable order keeps the level
+    reproducible from its own key.
+    """
+    if n >= len(train):
+        return list(train)
+    idx = np.random.default_rng(seed).choice(len(train), size=n, replace=False)
+    return [train[i] for i in sorted(idx)]
+
+
 def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
                  split_seed: int, root: Path, limit: int | None = None,
                  max_positives: int | None = None, max_test_decks: int | None = None,
                  force: bool = False,
-                 max_distinct: int = corpus.MAX_COMMANDER_DISTINCT) -> dict:
+                 max_distinct: int = corpus.MAX_COMMANDER_DISTINCT,
+                 train_subsample: int | None = None, subsample_seed: int | None = None,
+                 reference_dir: Path | None = None) -> dict:
     """Split, PPMI, mined pairs, queries and strata — computed once, reused by every arm.
 
     Cached to disk as well as within a run. `mine_hard_negatives` densifies PPMI rows for 4,000
     anchors and takes minutes; without persistence, splitting the grid across sessions would pay
     that cost again each time, and — worse for correctness — would recompute the pairs every arm is
     supposed to share.
+
+    ## `train_subsample` and why it drags `reference_dir` in with it
+
+    Subsampling train decks is how the scaling sweep varies deck diversity. But the stratum labels
+    are *derived from train appearance counts* (`strata.build`), and so is the popularity baseline.
+    Shrink the training set an order of magnitude and cards pour into the `≤5 appearances` bucket
+    wholesale — so "cold-start recall at 3,142 decks" and "cold-start recall at 39,733 decks" would
+    be measured over **different populations of cards**, and the difference between them would be
+    mostly re-labelling. The comparison would look clean and mean nothing.
+
+    So a subsampled level takes its strata and its train counts from the full level's
+    `strata.parquet` instead of deriving its own: same cards, same buckets, same baseline, and the
+    only thing varying is the model. `reference_dir` is therefore required whenever
+    `train_subsample` is set — not defaulted, because a silent default here reintroduces exactly
+    the bug.
     """
-    d = layer0_dir(corpus_name, split_seed, root, max_distinct)
+    if train_subsample is not None and reference_dir is None:
+        raise ValueError(
+            "train_subsample requires reference_dir: a subsampled level must take its strata and "
+            "popularity baseline from the full level, or the play-count buckets are recomputed on "
+            "the smaller training set and the levels stop being comparable.")
+    # Checked here rather than where it is consumed: everything between this point and the strata
+    # load is PPMI, mining and query construction, which is hours on a full-size corpus. A missing
+    # reference should cost a second, not a night.
+    if reference_dir is not None and not (Path(reference_dir) / "strata.parquet").exists():
+        raise FileNotFoundError(
+            f"{Path(reference_dir) / 'strata.parquet'} is missing — a subsampled level needs the "
+            "full level's strata. Build the full level first; deriving strata here would relabel "
+            "the play-count buckets on the smaller training set and make the levels incomparable.")
+
+    d = layer0_dir(corpus_name, split_seed, root, max_distinct, train_subsample, subsample_seed)
     d.mkdir(parents=True, exist_ok=True)
     cached = (d / "meta.json").exists() and (d / "queries.npz").exists() and not force
 
@@ -110,17 +201,18 @@ def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
     decks, filter_stats = corpus.filter_plausible_decks(decks, max_distinct=max_distinct)
     train, test = corpus.split_by_deck(decks, test_frac=thresholds.T4_TEST_FRAC, seed=split_seed)
     corpus.assert_no_deck_leak(train, test)
+    n_train_available = len(train)
+    if train_subsample is not None:
+        train = subsample_train(train, train_subsample, subsample_seed or split_seed)
 
     pool = loo_eval.commander_legal_pool(cards_df)
     oid_order = list(pool["oracle_id"])
-    train_counts = strata_mod.train_appearance_counts(train)
 
     if cached:
         pos = pd.read_parquet(d / "positives.parquet")
         neg = pd.read_parquet(d / "negatives.parquet")
         positives = list(zip(pos["a"], pos["b"]))
         negatives = list(zip(neg["a"], neg["b"]))
-        strata = pd.read_parquet(d / "strata.parquet")
         z = np.load(d / "queries.npz", allow_pickle=True)
         qs = loo_eval.QuerySet(
             oid_order=oid_order, target_row=z["target_row"], ctx_flat=z["ctx_flat"],
@@ -142,7 +234,6 @@ def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
         negatives, _ = mining.mine_hard_negatives(
             mat, card_index, cards_df, set(), set(), set(map(frozenset, positives)))
         qs = loo_eval.build_queries(test, pool, oid_order, max_decks=max_test_decks)
-        strata = strata_mod.build(train, repr_tables)
 
         meta = {
             "corpus": corpus_name, "split_seed": split_seed,
@@ -157,7 +248,6 @@ def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
         }
         _pairs_to_frame(positives).to_parquet(d / "positives.parquet", index=False)
         _pairs_to_frame(negatives).to_parquet(d / "negatives.parquet", index=False)
-        strata.to_parquet(d / "strata.parquet", index=False)
         np.savez_compressed(
             d / "queries.npz", target_row=qs.target_row, ctx_flat=qs.ctx_flat,
             ctx_offsets=qs.ctx_offsets, deck_ids=np.array(qs.deck_ids, dtype=object),
@@ -166,12 +256,52 @@ def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
             n_dropped_target_ineligible=qs.n_dropped_target_ineligible,
             n_commander_fallback_decks=qs.n_commander_fallback_decks, n_decks=qs.n_decks)
 
+    # ── strata and the popularity baseline ────────────────────────────────────
+    # Both are functions of TRAIN appearance counts, so both move when the train set is subsampled.
+    # A subsampled level borrows the full level's, which is what keeps the play-count buckets — and
+    # therefore the cold-start stratum the whole comparison is read on — the same set of cards at
+    # every level. `train_appearances` rides along in the same parquet, so the labels and the counts
+    # they were derived from cannot disagree.
+    if reference_dir is not None:
+        strata = pd.read_parquet(Path(reference_dir) / "strata.parquet")   # existence checked above
+        train_counts = dict(zip(strata["oracle_id"], strata["train_appearances"]))
+        meta["strata_from"] = str(reference_dir)
+    elif cached:
+        strata = pd.read_parquet(d / "strata.parquet")
+        train_counts = strata_mod.train_appearance_counts(train)
+    else:
+        strata = strata_mod.build(train, repr_tables)
+        strata.to_parquet(d / "strata.parquet", index=False)
+        train_counts = strata_mod.train_appearance_counts(train)
+
     loo_eval.set_popularity(qs, train_counts)
     clean = set(repr_tables["cdl"].query("status == 'clean'")["oracle_id"])
     clean_mask = np.fromiter((o in clean for o in oid_order), dtype=bool, count=len(oid_order))
     meta["n_clean_in_pool"] = int(clean_mask.sum())
     meta["from_cache"] = cached
-    (d / "meta.json").write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    meta["basis"] = d.name
+    meta["train_subsample"] = train_subsample
+    meta["subsample_seed"] = subsample_seed
+    meta["n_train_available"] = n_train_available
+    meta["queries_sha256"] = query_fingerprint(qs)
+
+    # The test set is the one thing a scaling comparison cannot afford to have move. Subsampling
+    # after the split is what holds it fixed; this is the check that it actually did, and it raises
+    # rather than annotating — a level scored on a different evaluation is not a level.
+    if reference_dir is not None:
+        ref_meta_path = Path(reference_dir) / "meta.json"
+        ref_meta = json.loads(ref_meta_path.read_text(encoding="utf-8"))
+        ref_fp = ref_meta.get("queries_sha256")
+        if ref_fp and ref_fp != meta["queries_sha256"]:
+            raise RuntimeError(
+                f"test set differs from the reference level: {meta['queries_sha256'][:12]} vs "
+                f"{ref_fp[:12]} ({ref_meta_path}). Levels must be scored on a byte-identical "
+                "evaluation — check that the subsample is applied after `split_by_deck`, not to "
+                "the corpus before it.")
+
+    # Atomic: rewritten on every call including cache hits, so every parallel worker reading this
+    # directory is also a writer of this file.
+    report.atomic_write_text(d / "meta.json", json.dumps(meta, indent=2, sort_keys=True) + "\n")
 
     return {"train": train, "test": test, "positives": positives, "negatives": negatives,
             "pool": pool, "oid_order": oid_order, "queries": qs, "strata": strata,
@@ -200,8 +330,13 @@ def cached_texts(arm: str, pool: pd.DataFrame, repr_tables: dict, root: Path,
                 json.loads(meta_path.read_text(encoding="utf-8")))
 
     texts, stats = encodings.build_texts(arm, pool, repr_tables)
-    pd.DataFrame({"oracle_id": list(texts), "text": list(texts.values())}).to_parquet(path, index=False)
-    meta_path.write_text(json.dumps(stats, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    # Atomic: parallel shard workers all miss this cache on a cold start and race to create it.
+    # A torn parquet reads back as a shorter card list, so the arm trains on fewer examples with
+    # nothing reporting an error. `--warm` exists so the race should never happen; this is what
+    # makes it harmless when it does.
+    report.atomic_write_parquet(
+        pd.DataFrame({"oracle_id": list(texts), "text": list(texts.values())}), path, index=False)
+    report.atomic_write_text(meta_path, json.dumps(stats, indent=2, sort_keys=True) + "\n")
     return texts, stats
 
 
@@ -274,6 +409,25 @@ def partial_path(corpus_name: str, arm: str, seed: int, findings_dir: Path) -> P
 def _metric(rec: dict, universe: str, scorer: str, key: str):
     u = rec.get(universe)
     return None if not u else u["overall"][scorer].get(key)
+
+
+def completed_seeds(agg: dict, agg_clean: dict) -> int:
+    """Seeds the *ladder* is complete to — the **least** complete arm, not the most.
+
+    Deliberately `min`, and the difference is load-bearing. The grid is written one (arm, seed)
+    partial at a time and `main` skips runs that already exist, so the grid is routinely completed
+    in chunks — an arm at a time, when a whole-grid block is not available. Halfway through, arm A
+    may have 4 seeds while arm C still has 3.
+
+    Under `max` the report would announce "INTERIM — 4 of 5" while every verdict involving C was
+    still computed on 3. A verdict is a comparison between two arms and is only as complete as the
+    weaker one, so the honest headline is the weaker one. Same principle as `assert_arms_rendered`:
+    the artifact must not read as more finished than it is.
+
+    Extracted rather than inlined at both call sites because `render` and `merge_partials` must
+    agree — two constructions of the same number is how they drift apart.
+    """
+    return min((v["n_seeds"] for v in {**agg_clean, **agg}.values()), default=0)
 
 
 def aggregate(records: list[dict], universe: str = "full", scorer: str = "centroid") -> dict:
@@ -444,7 +598,7 @@ def render(records: list[dict], agg: dict, agg_clean: dict, verd: dict, meta: di
     # precisely so that n is not chosen after seeing results; an interim artifact that renders
     # identically to a final one invites exactly that, and these files get cited. Same principle as
     # the completeness guards: the report should not read as more finished than it is.
-    n_seeds = max((v["n_seeds"] for v in {**agg_clean, **agg}.values()), default=0)
+    n_seeds = completed_seeds(agg, agg_clean)
     if not smoke and 0 < n_seeds < thresholds.T4_N_SEEDS:
         banner += (
             f"> **INTERIM — {n_seeds} of {thresholds.T4_N_SEEDS} frozen seeds.** The verdicts below "
@@ -521,32 +675,62 @@ the claim that matters.
 
 # ── merge ─────────────────────────────────────────────────────────────────────
 
-def merge_partials(findings_dir: Path, smoke: bool = False) -> dict:
-    """Combine per-run partials. A duplicate (corpus, arm, seed) is an error, never a silent
-    overwrite — same reasoning as T2's `merge_partials`."""
-    records, seen = [], {}
+def report_name(base: str, corpus_name: str) -> str:
+    """One report per corpus. `casual` keeps the bare name so every existing citation still resolves
+    — `t4_matched_data.reference()` and `t4_diagnostics` both read `t4_representation.json` by that
+    path, and a second corpus must not land on top of it.
+
+    Applies to the replicate floor too: that number is a property of one corpus on one machine's
+    kernels, and running it on cedh must not overwrite a casual measurement (or the reverse) with
+    something that merely shares a filename.
+    """
+    return base if corpus_name == "casual" else f"{base}_{corpus_name}"
+
+
+def merge_partials(findings_dir: Path, smoke: bool = False, corpus: str = "casual") -> dict:
+    """Combine per-run partials **for one corpus**. A duplicate (corpus, arm, seed) is an error,
+    never a silent overwrite — same reasoning as T2's `merge_partials`.
+
+    **The corpus filter is a correctness device, not a convenience.** `aggregate` groups by arm
+    alone, and this glob is `t4_partial_*.json` across the whole findings directory. Without the
+    filter, a single `--corpus cedh` run dropped next to the casual partials would make arm A report
+    `n_seeds=6` as the mean of two corpora, take `layer0_meta` from whichever file sorted first, and
+    lose the INTERIM banner because the seed count now clears the frozen n=5 — a report that reads
+    as final while averaging two corpora under one corpus's deck counts. Nothing would error and
+    every individual number in it would be correct, which is exactly the failure class the arm-D
+    omission belonged to.
+    """
+    records, seen, other = [], {}, {}
     for p in sorted(findings_dir.glob("t4_partial_*.json")):
         rec = json.loads(p.read_text(encoding="utf-8"))
+        if rec["corpus"] != corpus:
+            other[rec["corpus"]] = other.get(rec["corpus"], 0) + 1
+            continue
         key = (rec["corpus"], rec["arm"], rec["seed"])
         if key in seen:
             raise ValueError(f"duplicate run {key} in {p.name} and {seen[key]}")
         seen[key] = p.name
         records.append(rec)
     if not records:
-        raise ValueError(f"no t4_partial_*.json found in {findings_dir}")
+        found = (" Partials present for other corpora: "
+                 + ", ".join(f"{c} ({n})" for c, n in sorted(other.items()))) if other else ""
+        raise ValueError(f"no t4_partial_*.json for corpus {corpus!r} in {findings_dir}.{found}")
 
     agg, agg_clean = aggregate(records, "full"), aggregate(records, "clean_universe")
     verd = verdicts(agg)
     meta = records[0].get("layer0_meta", {})
 
-    payload = report.envelope([config.CARDS_PARQUET], {"merged_from": sorted(seen.values())})
-    n_seeds = max((v["n_seeds"] for v in {**agg_clean, **agg}.values()), default=0)
+    payload = report.envelope([config.CARDS_PARQUET], {"merged_from": sorted(seen.values()),
+                                                       "corpus": corpus})
+    n_seeds = completed_seeds(agg, agg_clean)
     payload.update({"records": records, "aggregate": agg, "aggregate_clean_universe": agg_clean,
                     "verdicts": verd, "layer0_meta": meta, "smoke": smoke,
+                    "corpus": corpus,
+                    "excluded_other_corpora": other,
                     "n_seeds": n_seeds,
                     "frozen_n_seeds": thresholds.T4_N_SEEDS,
                     "is_final": bool(smoke is False and n_seeds >= thresholds.T4_N_SEEDS)})
-    report.write("t4_representation", payload,
+    report.write(report_name("t4_representation", corpus), payload,
                  render(records, agg, agg_clean, verd, meta, smoke), findings_dir=findings_dir)
     return payload
 
@@ -556,7 +740,8 @@ def merge_partials(findings_dir: Path, smoke: bool = False) -> dict:
 def main(corpus_name: str = "casual", arms: tuple[str, ...] = DEFAULT_ARMS,
          seeds: tuple[int, ...] = DEFAULT_SEEDS, split_seed: int = config.SEED,
          smoke: bool = False, force: bool = False, limit: int | None = None,
-         max_test_decks: int | None = None, epochs: int = config.FINETUNE_EPOCHS) -> dict:
+         max_test_decks: int | None = None, epochs: int = config.FINETUNE_EPOCHS,
+         max_positives: int | None = None) -> dict:
     findings_dir = config.FINDINGS_DIR / "smoke" if smoke else config.FINDINGS_DIR
     root = config.RUNS_DIR / ("t4_smoke" if smoke else "t4")
     findings_dir.mkdir(parents=True, exist_ok=True)
@@ -570,7 +755,8 @@ def main(corpus_name: str = "casual", arms: tuple[str, ...] = DEFAULT_ARMS,
           f"upstream {repr_tables['pin']['upstream_parser_rev']}")
 
     l0 = build_layer0(corpus_name, cards_df, repr_tables, split_seed, root,
-                      limit=limit, max_test_decks=max_test_decks, force=force)
+                      limit=limit, max_test_decks=max_test_decks, force=force,
+                      max_positives=max_positives)
     print(f"layer0 {corpus_name}{' (cached)' if l0['meta'].get('from_cache') else ''}: "
           f"{l0['meta']['n_train_decks']:,} train / "
           f"{l0['meta']['n_test_decks']:,} test decks, {l0['meta']['n_positives']:,} positives, "
@@ -598,7 +784,7 @@ def main(corpus_name: str = "casual", arms: tuple[str, ...] = DEFAULT_ARMS,
                   f"(pop {u['overall']['popularity'][f'recall_at_{k}']:.4f}, "
                   f"rand {u['overall']['random'][f'recall_at_{k}']:.6f})")
 
-    return merge_partials(findings_dir, smoke=smoke)
+    return merge_partials(findings_dir, smoke=smoke, corpus=corpus_name)
 
 
 def replicate_floor(arm: str, seed: int, corpus_name: str, l0: dict, cards_df: pd.DataFrame,
@@ -642,6 +828,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--epochs", type=int, default=config.FINETUNE_EPOCHS)
     p.add_argument("--limit", type=int, default=None, help="cap decks loaded from the corpus")
     p.add_argument("--max-test-decks", type=int, default=None)
+    p.add_argument("--max-positives", type=int, default=None,
+                   help="cap on mined positives (default 250,000); part of the layer-0 payload, "
+                        "held identical across every level of a comparison")
     p.add_argument("--smoke", action="store_true", help=f"{SMOKE_DECKS} decks, 1 seed, findings/smoke/")
     p.add_argument("--force", action="store_true", help="retrain and re-evaluate existing runs")
     p.add_argument("--merge", action="store_true", help="merge existing partials and exit")
@@ -654,7 +843,7 @@ if __name__ == "__main__":
     args = parse_args()
     fd = config.FINDINGS_DIR / "smoke" if args.smoke else config.FINDINGS_DIR
     if args.merge:
-        merge_partials(fd, smoke=args.smoke)
+        merge_partials(fd, smoke=args.smoke, corpus=args.corpus)
     elif args.replicate:
         root = config.RUNS_DIR / ("t4_smoke" if args.smoke else "t4")
         cards = corpus.load_cards_parquet()
@@ -667,7 +856,8 @@ if __name__ == "__main__":
         payload = report.envelope([config.CARDS_PARQUET], {"mode": "replicate"})
         payload.update(res)
         d = res["delta"]
-        report.write("t4_replicate_floor", payload, f"""# T4 — same-seed replicate floor
+        report.write(report_name("t4_replicate_floor", args.corpus), payload,
+                     f"""# T4 — same-seed replicate floor
 
 {report.confound_header()}
 Arm **{res['arm']}** trained twice at seed {res['seed']} on **{args.corpus}**, everything else held
@@ -691,4 +881,5 @@ seed sd a null. This number is the floor beneath that: an arm difference near
     else:
         main(corpus_name=args.corpus, arms=tuple(args.arms), seeds=tuple(args.seeds),
              split_seed=args.split_seed, smoke=args.smoke, force=args.force,
-             limit=args.limit, max_test_decks=args.max_test_decks, epochs=args.epochs)
+             limit=args.limit, max_test_decks=args.max_test_decks, epochs=args.epochs,
+             max_positives=args.max_positives)
