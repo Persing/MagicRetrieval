@@ -27,46 +27,69 @@ pods it is a transfer problem plus a risk that two machines build subtly differe
 | Ports | TCP **22** for SSH. Jupyter (8888) is not needed |
 
 **Pick on fp32 throughput, not VRAM or tensor cores.** Two frozen decisions in `finetune.py` decide
-this: `fp16=False`, so the tensor-core specs in the marketing table do not apply; and batch size 32,
+it: `fp16=False`, so the tensor-core numbers in the marketing tables do not apply; and batch size 32,
 which cannot be raised because under `MultipleNegativesRankingLoss` the batch *is* the negative
-sampling. A 22M-parameter 6-layer model at batch 32 is partly clock-bound, so even fp32 TFLOPS
-overstates the spread. Peak VRAM is ~4 GB — 3–4 GB training (512-token attention matrices dominate)
-and 2.03 GB for the eval block `sims = E[flat] @ E.T` at 16,384 × 30,958 × f32. Every card below
-clears it several times over.
+sampling.
 
-| card | $/hr | fp32 | max | TFLOPS/$ | est. shard (vs 71 min on a local 4090) |
-|---|---|---|---|---|---|
-| **RTX 5090** | 0.99 | ~104 | 8 | **105** | ~65 min |
-| **A40** | **0.44** | 37.4 | 10 | 85 | ~130 min |
-| L40S | 0.99 | 91.6 | 7 | 93 | ~70 min |
-| RTX A6000 | 0.53 | 38.7 | 7 | 73 | ~130 min |
-| RTX 4090 | 0.69 | 82.6 | **1 max** | 120 | ~71 min |
-| H100 PCIe | 2.89 | 51.2 | 3 | 18 | ~110 min |
+The job is meaningfully compute-bound, so fp32 TFLOPS predicts relative speed reasonably well. The
+evidence is in the local timings: arm A takes 724 s and B+ takes 1,764 s over identical step counts,
+and the only difference between them is that B+'s sequences are ~2.5× longer. At ~120 ms/step for 96
+sequences (every example is an anchor/positive/negative triple) of up to 512 tokens, that is real
+work at roughly 30% utilization — not launch overhead.
+
+VRAM is not a constraint anywhere: peak is ~4 GB, being 3–4 GB of training (the 512-token attention
+matrices dominate) and 2.03 GB for the eval block `sims = E[flat] @ E.T` at 16,384 × 30,958 × f32.
+
+| card | $/hr | fp32 | max | est. shard (vs 71 min on a local 4090) |
+|---|---|---|---|---|
+| **RTX 5090** | 0.99 | ~104 | 8 | ~56 min |
+| A40 | 0.44 | 37.4 | 10 | ~157 min |
+| L40S | 0.99 | 91.6 | 7 | ~64 min |
+| RTX A6000 | 0.53 | 38.7 | 7 | ~152 min |
+| RTX 4090 | 0.69 | 82.6 | **1 max** | 71 min |
+| H100 PCIe | 2.89 | 51.2 | 3 | ~115 min |
 
 **Do not rent an H100/B200/H200**, whatever the "Recommended" tab says — those are the template's
 compatibility filters, not this workload's. On fp32 an H100 PCIe is *slower than a 4090* at 4× the
-price. Clear the filter banner to see consumer cards at all.
+price; its strength is FP8/BF16 tensor cores, which `fp16=False` forbids. Clear the filter banner to
+see consumer cards at all.
 
-The 4090 is the most efficient card here but capped at **1 max**, so matching the local card is not
-available for a multi-GPU plan. That is fine: §5 measures the replicate floor on the pod, so the
-pod's own noise floor is what the +0.005 gate gets read against. The hard requirement is only that
-**all 18 runs use the same card model**, since they share one ladder's seed sd.
+The 4090 is efficient but capped at **1 max**, so matching the local card is unavailable for a
+multi-GPU plan. That is fine — §5 measures the replicate floor on the pod, so the pod's own noise
+floor is what the +0.005 gate gets read against. The only hard requirement is that **all 18 runs use
+the same card model**, since they share one ladder's seed sd.
 
-**Estimated totals** (warm-up + replicate floor + `ceil(6/NGPU)` waves):
+**Estimated totals** (bootstrap + warm-up + replicate floor + `ceil(6/NGPU)` waves + merge):
 
-| config | wall clock | cost |
-|---|---|---|
-| A40 × 2 | ~7.6 h | **~$6.70** |
-| RTX 5090 × 3 | ~3.3 h | ~$9.80 |
-| A40 × 4 | ~5.8 h | ~$10.20 |
-| RTX 5090 × 6 | ~2.2 h | ~$13.00 |
+| config | waves | wall clock | cost |
+|---|---|---|---|
+| **RTX 5090 × 3** | 2 | **~3.2 h** | **~$9.50** |
+| RTX 5090 × 2 | 3 | ~4.1 h | ~$8.20 |
+| RTX 5090 × 1 | 6 | ~6.9 h | ~$6.85 |
+| A40 × 3 | 2 | ~7.1 h | ~$9.35 |
+| A40 × 2 | 3 | ~9.7 h | ~$8.50 |
+| A40 × 6 | 1 | ~4.5 h | ~$11.75 |
 
-More GPUs stop paying because §4's warm-up is single-threaded and bills every card you rented.
-Workers are restartable, so a preempted pod costs one unit, not the run.
+**RTX 5090 × 3 is the pick**: six shards is exactly two waves, and the 5090 is 2.25× the hourly rate
+for ~2.8× the throughput — so it is ~20% cheaper *per unit of work* while finishing in less than half
+A40 × 3's time for the same money. Choose A40 only to minimise hourly burn on a walk-away run.
 
-**Before committing to a wave plan, let §5 tell you the real number.** The replicate floor trains
-arm A twice — 724 s per run on a local 4090. Whatever it takes on the pod is the measured scaling
-factor for that card, and the shard estimates above are only estimates.
+Do not go above 3. There are only six shards, and §4's warm-up is single-threaded while billing every
+card rented — at 6 × 5090 that is ~$4.45 of idle billing to save 56 minutes. Workers are restartable,
+so a preempted pod costs one unit, not the run.
+
+Two cautions:
+
+- The 5090 is Blackwell (sm_120). torch 2.13 supports it and §3's `uv run pytest` exercises CUDA
+  directly (`test_loo_eval` runs `index_reduce` on GPU), so a missing-kernel problem surfaces at the
+  gate before anything is spent. If it does, fall back to A40 × 3 for the same money.
+- **Do not enable TF32** to wake up the A40's or H100's tensor cores. It would roughly double the
+  A40, but it changes training numerics, it is not what the casual runs used, and it is an unfrozen
+  change to the recipe mid-branch. Saving $3 on a $10 job is not worth an unexplained discrepancy.
+
+The shard column above is an estimate. §5 turns it into a measurement — arm A is 724 s per run on a
+local 4090, so whatever it takes on the pod is the real scaling factor for that card, known before
+the fan-out rather than after.
 
 ## 2. Bootstrap — everything durable on `/workspace`
 
