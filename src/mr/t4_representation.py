@@ -454,6 +454,14 @@ The clean-parse column re-scores **every** arm with candidates and targets restr
 for the other cards, so ranking it against the full pool would compare a model that knows a third
 of the corpus against models that know all of it.
 
+> **Arm D is confounded and its number is not a clean read on CDL.** D trains only on mined pairs
+> whose *both* ends parse cleanly, which is 28,215 pairs against 234,752 for every other arm —
+> **12% of the training data**. Its deficit therefore mixes representation with training-set size,
+> and the two cannot be separated: the restriction is structural, since the missing pairs involve
+> cards D has no text for at all. This is a flaw in the arm as specified, not in the run. Treat
+> `D − C` as uninterpretable, and use the parse-status stratification below — which holds the model
+> fixed and varies only which cards are being scored — for anything D was meant to answer.
+
 ## Gates
 
 | comparison | question | gap | pooled seed sd | gate | verdict |
