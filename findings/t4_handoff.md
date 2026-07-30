@@ -1,11 +1,11 @@
 # T4 — handoff
 
 Operational state for whoever picks this up. Written 2026-07-30, branch
-`t4-representation-ablation`, HEAD `1f53df7`, 155 tests passing (`uv run pytest`; 5 more behind
-`-m slow`).
+`t4-representation-ablation`, 205 tests passing (`uv run pytest`; 5 more behind `-m slow`).
 
 Findings live in `findings/`. This file is the map and the landmine list, not a results document —
-read `t4_representation.md` for the ladder and `t4_conclusion.md` when it exists.
+read `t4_representation.md` for the ladder and `t4_conclusion.md` for the write-up.
+`RUNPOD.md` is the runbook for Phase 4 on rented GPUs.
 
 ---
 
@@ -54,33 +54,50 @@ and delivers. What fails is *richer structured representation*, not the encoder.
 
 ## What is open
 
-**Phase 3 — scaling test (the live question).** Representation is not the constraint; whether
-*signal* is has not been tested. Both sweeps, arms **A and B+** (not A alone — the arms are
-stratum-dependent with opposite signs, and whether the cold-start structure penalty shrinks with
-more decks is the decision-relevant question).
+**Both casual sweeps are dropped.** Recorded here as a deliberate pre-run scope reduction with its
+reason, not silently omitted.
 
-- Deck sweep, 3 levels: 786 / 1,571 / 3,142 train decks.
-- Positive sweep, 4 levels at fixed decks: 62.5k / 125k / 250k / **450k**.
-  **Only 450,038 positives exist on filtered casual** — 250k/500k/1M is not runnable. Extending
-  *down* gives a 7.2× range and retires the 250k cap, an unexamined memory workaround since T2.
+- *Positive sweep* — superseded by D4, which ran it wider and de-skewed: `B+_random` (8,702) →
+  `B+_full` (234,593) is **27×** against the sweep's 7.2×, same corpus and test set. It also
+  retires the 250k cap directly: 1.8× headroom at **0.00389/e-fold** is worth ~**+0.0023**. The one
+  thing the sweep would add — whether the slope flattens at high volume — only strengthens that if
+  true.
+- *Deck sweep* — **kinked, therefore misspecified.** Measured: 786 train decks mine **168,786**
+  positives (cap does not bind), 3,142 mine 450,038 and draw 250,000 (it does). So levels 1→2 vary
+  example volume and 2→3 do not, and one OLS slope on log(decks) across that is fitting two
+  different regimes. If it is ever revived, regress on log(**realized examples**) and do not fit a
+  single slope across the kink. The harness supports it: `--train-subsample` with a reference level.
 
-Non-negotiables: test set fixed across every level (assert `QuerySet` hashes byte-identical);
-criteria **frozen in `THRESHOLDS.md` before the first run** — OLS slope on log(level) with
-bootstrap CI excluding zero plus a ≥ +0.010 magnitude gate between extremes, separate constants
-per sweep since one has 3 levels and one has 4; evaluate on the **cold-start stratum** as well as
-the aggregate; extrapolate with explicit bands only — 3 levels at 3 seeds cannot distinguish
-log-linear from saturating.
+**Phase 4 — cedh transfer. This is now the whole scaling test, and a better one than planned.**
+A/B+/C × 3 seeds at full size (46,745 decks, ~39,733 train) *and* a 3,142-deck **train** subsample
+**resampled per seed** (a fixed subsample conflates subsample identity with corpus effect).
 
-**Phase 4 — cedh transfer.** A/B+/C × 3 seeds at full size (46,745 decks) *and* a ~3,142-deck
-subsample **resampled per seed** (a fixed subsample conflates subsample identity with corpus
-effect). cedh needs no deck filter (p50 98, max 99) — a useful control on the filter itself. Note
-its played vocabulary is far narrower than the 30,958-card retrieval pool.
+*Expected but **not yet measured**:* the cap binds at both levels, holding example volume constant
+while decks vary ~12.6×, which makes the pure-volume null **exactly 0.0000** and the comparison a
+clean diversity isolation. `mr.t4_scaling --preflight` is what settles it, and the frozen rule needs
+no amendment either way — the prediction is a function of the realized example ratio, so if the cap
+turns out not to bind the null simply stops being zero. Order: pre-flight, freeze the point
+predictions from its ratios, then run the grid. Frozen rule in `THRESHOLDS.md` under "T4 scaling".
 
-**Phase 5 — seeds 45/46.** ~2.5h, unattended, last. Removes the INTERIM banner. Low information;
-run it because the write-up is what this branch is judged on.
+Non-negotiables, all now enforced in code rather than by discipline: the subsample is applied
+**after** `split_by_deck`; the test set is asserted byte-identical by fingerprint; strata and the
+popularity baseline are loaded from the full level so the cold-start bucket holds the same cards at
+both levels; the layer-0 cache key and the embedding path both carry the subsample.
 
-**Phase 6 — `findings/t4_conclusion.md`.** Order: the dose-response; the premise that survives;
-the metric verdict; stop-CDL; then caveats weighted honestly.
+cedh needs no deck filter (p50 98, max 99) — a useful control on the filter itself. Its played
+vocabulary is far narrower than the 30,958-card retrieval pool.
+
+**Phase 5 — seeds 45/46.** ~3.3h total, but chunkable: `main` skips runs whose partial exists, so
+`--seeds 45 --arms A B B_type D` (~40 min), then `--arms B+` (~29 min), then `--arms C` (~29 min).
+Removes the INTERIM banner. **Must run on the same GPU as seeds 42/43/44** — the pooled seed sd is
+the denominator of the null rule, and splitting seeds across hardware adds a term no seed controls.
+Must also finish before any cedh partial is written.
+
+**Phase 6 — `findings/t4_conclusion.md`. Done, and it is a renderer** (`mr.t4_conclusion`), not a
+hand-written file: every number is read from the frozen findings JSONs, so Phase 5 and Phase 4
+refresh it by re-running rather than by anyone remembering to. Two guards, both on rendered text —
+an incomplete ladder must carry the INTERIM banner, and each closed question must appear with its
+figure.
 
 ---
 
@@ -107,7 +124,19 @@ and score them against new queries — no error, numbers describing two corpora 
 
 **Diagnostic partials must stay outside `t4_partial_*.json`.** `merge_partials` globs that prefix;
 a match becomes a seventh arm, vanishes from the ladder order, and trips `assert_arms_rendered`,
-halting the frozen report. Use the `t4_matched_partial_*` shape. Tested end-to-end.
+halting the frozen report. Use the `t4_matched_partial_*` / `t4_scaling_partial_*` shape. Tested
+end-to-end.
+
+**`merge_partials` is corpus-scoped, and had to become so.** It groups by *arm* alone, so before
+the fix a single `--corpus cedh` run dropped beside the casual partials would have reported arm A at
+`n_seeds=6` as the mean of two corpora, taken `layer0_meta` from casual, and **lost the INTERIM
+banner** because the count cleared n=5 — a report reading as final while averaging two corpora under
+one corpus's deck counts. It now takes `corpus=` and writes `t4_representation_<corpus>` for
+anything but casual. Tested.
+
+**The INTERIM seed count is the `min` across arms, not the `max`.** Chunked completion makes the
+grid ragged on purpose; under `max`, arm A reaching n=5 while C sat at 4 would have dropped the
+banner off an unfinished ladder. A verdict is only as complete as its weaker arm.
 
 **New `T4_*` constants must be added to `check_in_sync`'s `expected` dict**, or they are frozen in
 code and unfrozen in the record. A meta-test enforces it.
@@ -146,12 +175,24 @@ probe processes and produced a badly wrong cost estimate.
 ## Commands
 
 ```bash
-uv run pytest                                    # 155; add -m slow for the 5 training tests
+uv run pytest                                    # 205; add -m slow for the 5 training tests
 uv run python -m mr.t4_representation --merge    # re-render the frozen ladder from partials
+uv run python -m mr.t4_conclusion                # re-render the conclusion from the findings
 uv run python -m mr.t4_staple_reread             # free, ~2 min
 uv run python -m mr.t4_diagnostics               # free, ~3 min
 uv run python -m mr.t4_matched_data              # ~8 min GPU
-uv run python -m mr.t4_representation --corpus casual --seeds 45 46   # ~2.5h, completes n=5
+
+# Phase 5, chunked to stay inside a ~1h sustained-load budget. Resumes for free: `main` skips any
+# (arm, seed) whose partial exists, and layer 0 is cached.
+uv run python -m mr.t4_representation --corpus casual --seeds 45 --arms A B B_type D   # ~40 min
+uv run python -m mr.t4_representation --corpus casual --seeds 45 --arms B+             # ~29 min
+uv run python -m mr.t4_representation --corpus casual --seeds 45 --arms C              # ~29 min
+#   ... repeat for --seeds 46, then --merge and re-run t4_conclusion
+
+# Phase 4. Pre-flight first: counts only, no training, no recall number — safe to run before the
+# point predictions are frozen, and its output is what they get frozen from.
+uv run python -m mr.t4_scaling --preflight --corpus cedh
+uv run python -m mr.t4_scaling --corpus cedh
 ```
 
 Costs measured on a 4090 at 250k positives: A ~724s/seed, B ~748s, B_type ~885s, B+ ~1,764s,
