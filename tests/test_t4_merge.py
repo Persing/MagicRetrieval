@@ -143,6 +143,40 @@ def test_arm_D_still_appears_in_the_report(tmp_path):
     assert "—" in drow, "D's full-universe cell must be marked inapplicable, not blank"
 
 
+def test_report_refuses_to_render_with_an_arm_missing(tmp_path):
+    """The guard must fire on the rendered TEXT, not on the aggregate dict.
+
+    The arm-D bug passed every check on the intermediate data — the clean-universe aggregate had
+    D in it and every number was correct. What was wrong was the table, which is the only artifact
+    anyone reads. So this test asserts the failure mode directly: a row-set that omits an arm which
+    ran must raise, regardless of what the aggregates contain.
+    """
+    recs = [_rec("A", 42, 0.5), _rec("C", 42, 0.5)]
+    with pytest.raises(T.ReportIncomplete, match=r"\['C'\]"):
+        T.assert_arms_rendered(recs, "| A | 1 | 0.5000 | 0.0000 | 0.5000 |")
+
+
+def test_report_guard_ignores_skipped_arms(tmp_path):
+    """An arm that produced no result is reported in its own section, not the arms table, so it
+    must not trip the guard."""
+    d = _rec("D", 42, 0.5)
+    d["skipped"] = "no training pair has text under this arm"
+    T.assert_arms_rendered([_rec("A", 42, 0.5), d], "| A | 1 | 0.5000 | 0.0000 | 0.5000 |")
+
+
+def test_full_merge_passes_the_arm_guard(tmp_path):
+    """End-to-end: a real merge of all six arms, including D with no full-universe number, must
+    render every one of them and therefore not raise."""
+    recs = [_rec(a, 42, 0.5) for a in ("A", "B", "B_type", "B+", "C")]
+    d = _rec("D", 42, 0.5, clean_recall=0.61)
+    d["full"] = None
+    _write(tmp_path, recs + [d])
+    T.merge_partials(tmp_path)
+    md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
+    for arm in ("A", "B", "B_type", "B+", "C", "D"):
+        assert any(ln.startswith(f"| {arm} |") for ln in md.splitlines()), f"{arm} missing"
+
+
 def test_merge_writes_both_findings_files(tmp_path):
     _write(tmp_path, [_rec(a, 42, 0.5) for a in ("A", "B", "B_type", "B+", "C")])
     payload = T.merge_partials(tmp_path, smoke=True)

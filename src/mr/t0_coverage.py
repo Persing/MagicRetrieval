@@ -166,6 +166,28 @@ def analyze(parsed: pd.DataFrame, decks: list[corpus.Deck]) -> dict:
     }
 
 
+class ReportIncomplete(RuntimeError):
+    """A report was about to be written that omits a corpus which actually ran."""
+
+
+def assert_corpora_rendered(results: dict[str, dict], md: str) -> None:
+    """Every corpus with a result must have a row in the verdict table.
+
+    T0's structure already makes this hard to violate — `main` assigns `results[name]`
+    unconditionally, with no skip path — so this is insurance rather than a fix. It is here
+    because the same class of defect did bite twice elsewhere: arm D vanished from T4's arms table,
+    and T2's scope paragraph asserted "2c/2d were not run" directly above four 2c/2d result rows.
+    Both read as complete. These files are the record and get cited long after the run, so the
+    invariant is asserted rather than left to hold by accident.
+    """
+    missing = [name for name in results if f"| {name} |" not in md]
+    if missing:
+        raise ReportIncomplete(
+            f"corpora {missing} produced results but have no row in the verdict table. "
+            "Refusing to write a report that reads as complete."
+        )
+
+
 def render(results: dict[str, dict]) -> str:
     t = thresholds
     lines = [
@@ -190,6 +212,59 @@ def render(results: dict[str, dict]) -> str:
             f"**{report.pct(r['appearance_coverage'])}** | {report.pct(r['guarded_coverage'])} | "
             f"{report.pct(r['guard_drop'])} | **{r['verdict']}** |"
         )
+
+    filtered = {n: r for n, r in results.items() if "unfiltered_basis" in r}
+    if filtered:
+        rows = "\n".join(
+            f"| {n} | {r['unfiltered_basis']['n_decks']:,} → {r['n_decks']:,} | "
+            f"{report.pct(r['unfiltered_basis']['appearance_coverage'])} → "
+            f"**{report.pct(r['appearance_coverage'])}** | "
+            f"{report.pct(r['appearance_coverage'] - r['unfiltered_basis']['appearance_coverage'])} | "
+            f"{r['unfiltered_basis']['verdict']} → **{r['verdict']}** |"
+            for n, r in filtered.items())
+        any_stats = next(iter(filtered.values()))["deck_filter"]
+        lines += [
+            "",
+            "## Basis change — deck-size filter",
+            "",
+            f"Decks with more than **{any_stats['max_distinct']} distinct cards** are excluded. A "
+            "legal Commander deck is exactly 100 cards, and duplicate basic lands collapse to one "
+            "oracle_id, so a count above 100 is definitionally impossible — those entries are "
+            "Archidekt lists carrying maybeboards, sideboards or whole collections, verified "
+            "against the raw census as genuinely long lists rather than a name-resolution "
+            "artifact. See `findings/t4_corpus_deck_sizes.md`.",
+            "",
+            "This matters for T0 specifically because the headline number is **appearance-"
+            "weighted**: a 1,947-card entry contributes 1,947 appearances, so the distortion lands "
+            "directly on the metric being gated.",
+            "",
+            "| Corpus | Decks (before → after) | Appearance cov. | Δ | Verdict |",
+            "|---|---|---|---|---|",
+            rows,
+            "",
+            "The filtered figures above are the honest ones. The prior basis is retained in the "
+            "JSON under `unfiltered_basis` — the point of recomputing is to correct a number, not "
+            "to erase where it came from.",
+            "",
+            "**Two changes are stacked in this file; do not attribute the whole move to the "
+            "filter.** The vendored parser was also refreshed (T4 phase 0, which added the clause "
+            "modules and fixed parenthesis handling in the canonicalizer), and that alone raises "
+            "clean coverage. Both sides of the table above use the *same* parser, so the Δ column "
+            "isolates the filter — but a reader comparing against previously published T0 numbers "
+            "is seeing parser and basis together. On casual the split is roughly +1.0pp from the "
+            "parser and +1.6pp from the filter. The parser build is pinned in the envelope.",
+            "",
+            "The filter is a near-no-op outside casual: cedh keeps 99.9% of decks and precon 100%, "
+            "because those corpora are already legal Commander lists. This is an Archidekt census "
+            "problem specifically — the same corpus the standing confound above flags as the most "
+            "EDHREC-derived.",
+            "",
+            "**T2 is deliberately not re-run on this basis.** Its question was whether leakage is "
+            "fixable, every arm shared the contamination equally, and T4 trains fresh models "
+            "regardless; T4's decision rules are all within-T4 comparisons, so internal validity "
+            "is what matters and the basis change does not threaten it. The change is documented "
+            "rather than propagated.",
+        ]
 
     for name, r in results.items():
         lines += [
@@ -262,10 +337,13 @@ def render(results: dict[str, dict]) -> str:
         "card pool — the latter counts cards no deck plays, which is not what the 32% reference "
         "figure is about.",
     ]
-    return "\n".join(lines) + "\n"
+    md = "\n".join(lines) + "\n"
+    assert_corpora_rendered(results, md)
+    return md
 
 
-def main(corpora: list[str], limit: int | None, findings_dir: Path | None = None) -> dict:
+def main(corpora: list[str], limit: int | None, findings_dir: Path | None = None,
+         deck_filter: bool = False) -> dict:
     if not cdl_adapter.available():
         raise cdl_adapter.ParserUnavailable(
             "T0 needs the CDL parser. Set MR_CDL_PARSER=/path/to/PikeOfCardsParser "
@@ -282,8 +360,25 @@ def main(corpora: list[str], limit: int | None, findings_dir: Path | None = None
 
     results: dict[str, dict] = {}
     for name in corpora:
-        decks = corpus.load_corpus(name, limit=limit)
+        all_decks = corpus.load_corpus(name, limit=limit)
+        if deck_filter:
+            decks, filter_stats = corpus.filter_plausible_decks(all_decks)
+        else:
+            decks, filter_stats = all_decks, None
         r = analyze(parsed, decks)
+        if filter_stats is not None:
+            # Both bases in one file. The filtered figure is the honest one — appearance weighting
+            # is exactly what the oversized entries distort — but dropping the prior basis would
+            # make this report incomparable with the T0 numbers already in circulation, and the
+            # point of recomputing is to correct a number, not to erase where it came from.
+            prior = analyze(parsed, all_decks)
+            prior.pop("_failures", None)
+            r["deck_filter"] = filter_stats
+            r["unfiltered_basis"] = {
+                k: prior[k] for k in ("n_decks", "n_cards_in_corpus", "distinct_coverage_in_corpus",
+                                      "appearance_coverage", "encoded_coverage", "guarded_coverage",
+                                      "guard_drop", "verdict")
+            }
         failures = r.pop("_failures")
         with (out_dir / f"t0_failures_{name}.csv").open("w", newline="") as fh:
             w = csv.writer(fh)
@@ -296,7 +391,8 @@ def main(corpora: list[str], limit: int | None, findings_dir: Path | None = None
 
     payload = report.envelope(
         [config.CARDS_PARQUET, config.CENSUS_JSONL, config.DECKS_COMBINED, config.PRECON_BACKUP],
-        {"corpora": corpora, "limit": limit, "parser": parser_desc},
+        {"corpora": corpora, "limit": limit, "parser": parser_desc,
+         "deck_filter": corpus.MAX_COMMANDER_DISTINCT if deck_filter else None},
     )
     payload["results"] = results
     report.write("t0_coverage", payload, render(results), findings_dir=out_dir)
@@ -305,6 +401,9 @@ def main(corpora: list[str], limit: int | None, findings_dir: Path | None = None
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--deck-filter", action="store_true",
+                   help=f"exclude decks with >{corpus.MAX_COMMANDER_DISTINCT} distinct cards "
+                        "(definitionally not legal Commander decks); reports both bases")
     p.add_argument("--corpus", nargs="+", default=["casual", "cedh"], choices=list(config.CORPORA))
     p.add_argument("--limit", type=int, default=None, help="cap decks per corpus")
     p.add_argument("--smoke", action="store_true", help="200-deck subsample, writes to findings/smoke/")
@@ -317,7 +416,11 @@ if __name__ == "__main__":
         args.corpus,
         limit=200 if args.smoke else args.limit,
         findings_dir=config.FINDINGS_DIR / "smoke" if args.smoke else None,
+        deck_filter=args.deck_filter,
     )
     for corpus_name, result in res.items():
+        prior = result.get("unfiltered_basis")
+        delta = (f"  (was {prior['appearance_coverage']:.3f} on {prior['n_decks']:,} decks, "
+                 f"{prior['verdict']})" if prior else "")
         print(f"{corpus_name}: appearance={result['appearance_coverage']:.3f} "
-              f"guarded={result['guarded_coverage']:.3f} → {result['verdict']}")
+              f"guarded={result['guarded_coverage']:.3f} → {result['verdict']}{delta}")

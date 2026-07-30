@@ -53,8 +53,16 @@ SMOKE_DECKS = 200
 
 # ── layer 0: everything that must be identical across arms ───────────────────
 
-def layer0_dir(corpus_name: str, split_seed: int, root: Path) -> Path:
-    return root / corpus_name / f"split{split_seed}"
+def layer0_dir(corpus_name: str, split_seed: int, root: Path,
+               max_distinct: int = corpus.MAX_COMMANDER_DISTINCT) -> Path:
+    """The deck filter is part of the cache key, not just recorded in the payload.
+
+    Otherwise a cache built on the unfiltered corpus would be silently reused against filtered
+    train decks — mixing queries drawn from decks that are no longer in the training set. That is
+    exactly the class of silent inconsistency the arm-D bug belonged to: nothing errors, the
+    numbers just quietly describe two different corpora at once.
+    """
+    return root / corpus_name / f"split{split_seed}_max{max_distinct}"
 
 
 def _pairs_to_frame(pairs: list[tuple[str, str]]) -> pd.DataFrame:
@@ -64,7 +72,8 @@ def _pairs_to_frame(pairs: list[tuple[str, str]]) -> pd.DataFrame:
 def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
                  split_seed: int, root: Path, limit: int | None = None,
                  max_positives: int | None = None, max_test_decks: int | None = None,
-                 force: bool = False) -> dict:
+                 force: bool = False,
+                 max_distinct: int = corpus.MAX_COMMANDER_DISTINCT) -> dict:
     """Split, PPMI, mined pairs, queries and strata — computed once, reused by every arm.
 
     Cached to disk as well as within a run. `mine_hard_negatives` densifies PPMI rows for 4,000
@@ -72,11 +81,16 @@ def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
     that cost again each time, and — worse for correctness — would recompute the pairs every arm is
     supposed to share.
     """
-    d = layer0_dir(corpus_name, split_seed, root)
+    d = layer0_dir(corpus_name, split_seed, root, max_distinct)
     d.mkdir(parents=True, exist_ok=True)
     cached = (d / "meta.json").exists() and (d / "queries.npz").exists() and not force
 
     decks = corpus.load_corpus(corpus_name, limit=limit)
+    # Filter BEFORE the split, so train and test share one basis and the drop cannot correlate
+    # with which side a deck landed on. Arm-independent and applied before any arm is named, so it
+    # cannot bias the comparison between arms — but it does move T4's corpus off the basis T0 and
+    # T2 measured, which is recorded in `meta` and reported rather than left implicit.
+    decks, filter_stats = corpus.filter_plausible_decks(decks, max_distinct=max_distinct)
     train, test = corpus.split_by_deck(decks, test_frac=thresholds.T4_TEST_FRAC, seed=split_seed)
     corpus.assert_no_deck_leak(train, test)
 
@@ -115,6 +129,7 @@ def build_layer0(corpus_name: str, cards_df: pd.DataFrame, repr_tables: dict,
 
         meta = {
             "corpus": corpus_name, "split_seed": split_seed,
+            "deck_filter": filter_stats,
             "n_decks": len(decks), "n_train_decks": len(train), "n_test_decks": len(test),
             "n_ppmi_vocab": len(card_index), "n_positives": len(positives),
             "n_negatives": len(negatives), "n_pool": len(oid_order),
@@ -176,9 +191,16 @@ def cached_texts(arm: str, pool: pd.DataFrame, repr_tables: dict, root: Path,
 def run_one(arm: str, seed: int, corpus_name: str, l0: dict, cards_df: pd.DataFrame,
             repr_tables: dict, root: Path, epochs: int = config.FINETUNE_EPOCHS,
             force: bool = False) -> dict:
+    # The embedding depends on the mined positives and negatives, which depend on the split and the
+    # deck filter — so the basis has to be in the cache key. Keyed on (corpus, arm, seed) alone, a
+    # rerun after changing the deck filter would silently load a model trained on the old corpus
+    # and report it against new queries. Same class as the arm-D omission: nothing errors, the
+    # numbers simply describe two different corpora at once.
     emb_dir = root / "emb"
     emb_dir.mkdir(parents=True, exist_ok=True)
-    emb_path = emb_dir / f"{corpus_name}_{arm.replace('+', 'plus')}_s{seed}.npy"
+    basis = layer0_dir(corpus_name, l0["meta"]["split_seed"], root,
+                       l0["meta"]["deck_filter"]["max_distinct"]).name
+    emb_path = emb_dir / f"{corpus_name}_{basis}_{arm.replace('+', 'plus')}_s{seed}.npy"
 
     texts, text_stats = cached_texts(arm, l0["pool"], repr_tables, root, force=force)
 
@@ -286,6 +308,33 @@ def verdicts(agg: dict) -> dict:
 
 # ── report ────────────────────────────────────────────────────────────────────
 
+class ReportIncomplete(RuntimeError):
+    """A report was about to be written that omits an arm which actually ran."""
+
+
+def assert_arms_rendered(records: list[dict], rows: str) -> None:
+    """Every arm with a result must appear in the arms table. Raise rather than write.
+
+    This is a louder guard than it looks, because of what it is guarding against. A slow eval
+    announces itself; a report that *reads as complete* while silently dropping an arm does not,
+    and these files are the record — they get read, cited and pasted into write-ups long after the
+    run. Arm D was dropped exactly this way: the table iterated the full-universe aggregate, D has
+    no full-universe number by construction, and the row vanished directly beneath prose saying D
+    appears in the clean-parse column. Nothing errored and every number present was correct.
+
+    So the check is on the *rendered text*, not on the intermediate dict. Verifying the aggregate
+    would have passed while the table was still wrong — the bug lived in the rendering, which is
+    the only artifact anyone actually reads.
+    """
+    ran = {r["arm"] for r in records if not r.get("skipped")}
+    missing = sorted(a for a in ran if not any(ln.startswith(f"| {a} |") for ln in rows.splitlines()))
+    if missing:
+        raise ReportIncomplete(
+            f"arms {missing} produced results but have no row in the report table. "
+            f"Refusing to write a report that reads as complete. Arms with results: {sorted(ran)}."
+        )
+
+
 def _render_strata(records: list[dict], k: int, scorer: str = "centroid") -> str:
     """One table per stratification, arms across the columns.
 
@@ -348,6 +397,7 @@ def render(records: list[dict], agg: dict, agg_clean: dict, verd: dict, meta: di
     # Union of both universes, in ladder order, so D is present rather than silently absent.
     order = [a for a in encodings.ALL_ARMS if a in agg or a in agg_clean]
     rows = "\n".join(_arow(a) for a in order)
+    assert_arms_rendered(records, rows)
     def _vrow(name: str, d: dict) -> str:
         gate = "—" if d["gate"] is None else f"{d['gate']:+.2f}"
         sd = "—" if d["pooled_sd"] != d["pooled_sd"] else f"{d['pooled_sd']:.4f}"

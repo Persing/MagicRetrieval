@@ -17,7 +17,7 @@
 
 ## Scope of this run
 
-**Partial ladder — 4/7 rungs run, stopped deliberately after 2b.** Missing: 2a/precon, 2b/casual, 2b/cedh. 2c/2d (negative supervision, wired to the loss and mined-phenotype pairs respectively) were not run — the decision rules below that depend on them are unresolved, not failed. Re-run with `--arms 2c 2d` to complete the ladder.
+**Partial ladder — 4/7 rungs run.** Present: 2c/casual, 2c/cedh, 2d/casual, 2d/cedh. Missing: 2a/precon, 2b/casual, 2b/cedh. The decision rules below that depend on 2a, 2b are unresolved, not failed. Re-run with `--arms 2a 2b` to complete the ladder, then `--merge`.
 
 ## Ladder results
 
@@ -32,13 +32,9 @@
 
 ## Decision rules
 
-- **2d passes** *(unresolved — needs 2d)* → leakage was a training deficiency; branch is healthy, raw text is a viable fallback tier. Check PHENOTYPE_FIT before believing it.
-- **2d fails, 2b > 2a** *(unresolved — needs 2d)* → corpus was the driver; investigate mining quality. *(2b > 2a already holds on the curated metric for casual (+0.169 > +0.148) but not cedh (+0.117 < +0.148) — mixed on that reading alone; both no-negative arms show the same narrow-effect pattern on the broader mined-holdout metric, which weakens with corpus size rather than strengthening.)*
-- **2c > 2b materially** *(unresolved — needs 2c)* → negative supervision was the missing piece — MagicSpike's Gate 2 conclusion needs amending.
-- **2d fails outright** *(unresolved — needs 2d)* → surface text is structurally load-bearing; canonicalized CDL becomes required, raising T4's stakes.
+- **2d passes** → leakage was a training deficiency; branch is healthy, raw text is a viable fallback tier. Check PHENOTYPE_FIT before believing it.
+- **2d fails, 2b > 2a** → corpus was the driver; investigate mining quality. *(2b > 2a already holds on the curated metric for casual (+0.169 > +0.148) but not cedh (+0.117 < +0.148) — mixed on that reading alone; both no-negative arms show the same narrow-effect pattern on the broader mined-holdout metric, which weakens with corpus size rather than strengthening.)*
+- **2c > 2b materially** → negative supervision was the missing piece — MagicSpike's Gate 2 conclusion needs amending.
+- **2d fails outright** → surface text is structurally load-bearing; canonicalized CDL becomes required, raising T4's stakes.
 
 Every arm is scored against the SAME frozen k=50 clustering (`artifacts/cluster_assignments.parquet`) and against an embedding-independent colour×CMC×type stratum control, so the baseline cannot move with the thing being measured.
-
-## Interim read (2a/2b only, stopped here deliberately)
-
-On the curated substitute metric alone, leakage looks fixed: all three completed arms clear the +0.05 lift floor with CIs excluding zero, a qualitatively different result from the original −0.031 (0.717 vs 0.748). But the narrow-effect pattern is consistent across every arm — including 2b, which already has the broad corpus — so corpus breadth alone is not what's driving it. Whether wiring hard negatives (2c) or mined phenotype pairs (2d) changes that pattern is exactly what the deferred rungs would answer, and is not decided by this run.

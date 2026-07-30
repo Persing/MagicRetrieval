@@ -6,7 +6,10 @@ test. `split_by_deck` and `temporal_split` must never let a deck_id land on both
 
 import pytest
 
-from mr.corpus import Deck, assert_no_deck_leak, split_by_deck, temporal_split
+from mr.corpus import (
+    MAX_COMMANDER_DISTINCT, Deck, assert_no_deck_leak, filter_plausible_decks, split_by_deck,
+    temporal_split,
+)
 
 
 def _decks(n: int, dated: bool = False) -> list[Deck]:
@@ -81,3 +84,59 @@ def test_appearance_counts_and_staples():
     staples = identify_staples(decks, threshold=0.5)
     assert "shared_card" in staples
     assert "card0" not in staples
+
+
+# ── deck plausibility ─────────────────────────────────────────────────────────
+
+def _sized(deck_id: str, n: int) -> Deck:
+    return Deck(deck_id=deck_id, commander="c", oracle_ids=tuple(f"{deck_id}_c{i}" for i in range(n)))
+
+
+def test_over_legal_decks_are_dropped():
+    """>100 distinct oracle_ids is definitionally impossible for a legal Commander deck — the deck
+    is 100 cards and duplicate basics collapse — so this is a definitional bound, not a tuned one."""
+    decks = [_sized("ok", 99), _sized("exact", 100), _sized("big", 101), _sized("huge", 1947)]
+    kept, stats = filter_plausible_decks(decks)
+    assert {d.deck_id for d in kept} == {"ok", "exact"}
+    assert stats["n_dropped_too_large"] == 2
+    assert stats["largest_dropped"] == 1947
+
+
+def test_filter_is_off_by_default_at_the_low_end():
+    """The sub-40 stub tail contributes ~0.6% of PPMI pairs, so excluding it buys little and costs
+    an arbitrary parameter. Available, but not on by default."""
+    kept, _ = filter_plausible_decks([_sized("stub", 1)])
+    assert len(kept) == 1
+    kept, stats = filter_plausible_decks([_sized("stub", 1)], min_distinct=40)
+    assert kept == [] and stats["n_dropped_too_small"] == 1
+
+
+def test_dropped_ppmi_share_exceeds_dropped_deck_share():
+    """The reason the filter matters at all: co-occurrence pairs grow quadratically with deck size,
+    so oversized entries dominate PPMI far beyond their headcount. One oversized deck among nine
+    normal ones is 10% of decks but a majority of the pairs."""
+    decks = [_sized(f"d{i}", 100) for i in range(9)] + [_sized("huge", 1000)]
+    _, stats = filter_plausible_decks(decks)
+    assert stats["n_dropped_too_large"] == 1
+    assert stats["kept_share"] == pytest.approx(0.9)
+    assert stats["dropped_ppmi_pair_share"] > 0.9
+
+
+def test_loaders_are_not_filtered_implicitly():
+    """T0/T1/T2 recorded their numbers on the unfiltered basis. If `load_corpus` silently changed
+    what it returns, those findings would stop being reproducible from their own inputs."""
+    import inspect
+
+    from mr import corpus as C
+    for fn in (C.load_casual, C.load_cedh, C.load_precon, C.load_corpus):
+        assert "filter_plausible_decks" not in inspect.getsource(fn)
+
+
+def test_filter_preserves_deck_objects_untouched():
+    decks = [_sized("ok", 99)]
+    kept, _ = filter_plausible_decks(decks)
+    assert kept[0] is decks[0]
+
+
+def test_max_commander_distinct_is_one_hundred():
+    assert MAX_COMMANDER_DISTINCT == 100

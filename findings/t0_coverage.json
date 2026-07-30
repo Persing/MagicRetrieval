@@ -1,62 +1,73 @@
 {
   "git_dirty": true,
-  "git_rev": null,
+  "git_rev": "61396aa",
   "inputs": {
-    "/Users/nickpersing/PycharmProjects/MagicSpike/archidekt_census_popular.jsonl": {
-      "bytes": 28416697,
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\archidekt_census_popular.jsonl": {
+      "bytes": 28421697,
       "exists": true,
-      "mtime": 1781370215,
-      "sha256": "267d9797ecb73c7f39b2ba704ba7c0583c3eb0a3a1b1f1d2374ad732f4e26766"
+      "mtime": 1785027795,
+      "sha256": "11d2c80dca3d1849b41a4dca17a26765999258ee562370be7b564f9a1108e639"
     },
-    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/backup_precon_only": {
-      "bytes": 85441549,
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\backup_precon_only": {
+      "bytes": 383579,
       "exists": true,
-      "file_count": 13,
+      "file_count": 1,
       "is_dir": true
     },
-    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/cards.parquet": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
       "bytes": 5093341,
       "exists": true,
-      "mtime": 1780248285,
+      "mtime": 1785027795,
       "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
     },
-    "/Users/nickpersing/PycharmProjects/MagicSpike/artifacts/decks_combined.parquet": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\decks_combined.parquet": {
       "bytes": 14636160,
       "exists": true,
-      "mtime": 1780148806,
+      "mtime": 1785027795,
       "sha256": "4bfec438d7ec52ea63469c3b08178aaa567215410a5f28133bee3d4f3d144164"
     }
   },
   "results": {
     "casual": {
-      "appearance_coverage": 0.4321853166676843,
-      "distinct_coverage_all_cards": 0.31819206855449245,
-      "distinct_coverage_in_corpus": 0.29934112646121147,
-      "encoded_coverage": 0.9574759915218017,
+      "appearance_coverage": 0.4587576594459308,
+      "deck_filter": {
+        "dropped_ppmi_pair_share": 0.6048897013385997,
+        "kept_share": 0.7420714572460859,
+        "largest_dropped": 1947,
+        "max_distinct": 100,
+        "min_distinct": 0,
+        "n_dropped_too_large": 1285,
+        "n_dropped_too_small": 0,
+        "n_input": 4982,
+        "n_kept": 3697
+      },
+      "distinct_coverage_all_cards": 0.3426758158564479,
+      "distinct_coverage_in_corpus": 0.31546231546231546,
+      "encoded_coverage": 0.9604657518483358,
       "exclusion_reasons": {
-        "digital": 5848,
-        "multi_faced": 13059,
-        "set_type": 594
+        "digital": 3178,
+        "multi_faced": 7488,
+        "set_type": 328
       },
       "gap_categories": {
-        "ADDL_COST": 3084,
-        "ALT_COST": 1435,
-        "ETB replacement": 12145,
-        "UNKNOWN_KEYWORD": 4091,
-        "create token pattern unmatched": 2650,
-        "damage pattern unmatched": 2500,
-        "effect not matched": 119705,
-        "event not matched": 33996,
-        "mana side effect": 3635,
-        "replacement": 4543,
-        "replacement (instead)": 4783,
-        "static pattern unmatched": 44598
+        "ADDL_COST": 1898,
+        "ALT_COST": 762,
+        "ETB replacement": 7348,
+        "UNKNOWN_KEYWORD": 2797,
+        "create token pattern unmatched": 1558,
+        "damage pattern unmatched": 1531,
+        "effect not matched": 67817,
+        "event not matched": 20007,
+        "mana side effect": 2167,
+        "replacement": 2472,
+        "replacement (instead)": 2840,
+        "static pattern unmatched": 26045
       },
-      "guard_drop": 0.06332419005171153,
-      "guarded_coverage": 0.36886112661597276,
-      "n_cards_in_corpus": 24762,
+      "guard_drop": 0.06474612589527157,
+      "guarded_coverage": 0.3940115335506592,
+      "n_cards_in_corpus": 21421,
       "n_cards_parsed": 31041,
-      "n_decks": 4982,
+      "n_decks": 3697,
       "n_staples": 3,
       "staple_names": [
         "Arcane Signet",
@@ -65,9 +76,9 @@
       ],
       "status_share": {
         "clean": {
-          "appearances": 198195,
-          "n_cards": 7042,
-          "share": 0.4321853166676843
+          "appearances": 127575,
+          "n_cards": 6496,
+          "share": 0.4587576594459308
         },
         "crash": {
           "appearances": 0,
@@ -75,86 +86,107 @@
           "share": 0.0
         },
         "excluded": {
-          "appearances": 19501,
-          "n_cards": 1441,
-          "share": 0.042524008478198295
+          "appearances": 10994,
+          "n_cards": 1179,
+          "share": 0.039534248151664224
         },
         "gap": {
-          "appearances": 240892,
-          "n_cards": 15042,
-          "share": 0.5252906748541174
+          "appearances": 139519,
+          "n_cards": 12917,
+          "share": 0.501708092402405
         }
       },
       "strata": {
         "all": {
-          "coverage": 0.4321853166676843,
-          "covered": 198195,
-          "total": 458588
+          "coverage": 0.4587576594459308,
+          "covered": 127575,
+          "total": 278088
         },
         "non_land": {
-          "coverage": 0.38096849449231346,
-          "covered": 138479,
-          "total": 363492
+          "coverage": 0.40774515584932053,
+          "covered": 89202,
+          "total": 218769
         },
         "non_land_non_staple": {
-          "coverage": 0.36886112661597276,
-          "covered": 131506,
-          "total": 356519
+          "coverage": 0.3940115335506592,
+          "covered": 84244,
+          "total": 213811
         },
         "non_staple": {
-          "coverage": 0.4188784767243861,
-          "covered": 187694,
-          "total": 448087
+          "coverage": 0.44393460792463285,
+          "covered": 120162,
+          "total": 270675
         }
       },
       "top_breakouts": {
         "top_100": {
-          "appearance_coverage": 0.8527281215644342,
-          "distinct_coverage": 0.8085106382978723,
+          "appearance_coverage": 0.8747214372688217,
+          "distinct_coverage": 0.8297872340425532,
           "n_cards": 94
         },
         "top_2000": {
-          "appearance_coverage": 0.5520067739204064,
-          "distinct_coverage": 0.40948058497226425,
+          "appearance_coverage": 0.5770354704794268,
+          "distinct_coverage": 0.4331820474029249,
           "n_cards": 1983
         },
         "top_500": {
-          "appearance_coverage": 0.6960946167256591,
-          "distinct_coverage": 0.5873983739837398,
-          "n_cards": 492
+          "appearance_coverage": 0.7189885152186228,
+          "distinct_coverage": 0.6166328600405679,
+          "n_cards": 493
         }
+      },
+      "unfiltered_basis": {
+        "appearance_coverage": 0.4423687492913029,
+        "distinct_coverage_in_corpus": 0.3200850159404888,
+        "encoded_coverage": 0.9574759915218017,
+        "guard_drop": 0.06175789825671568,
+        "guarded_coverage": 0.3806108510345872,
+        "n_cards_in_corpus": 24762,
+        "n_decks": 4982,
+        "verdict": "FAIL"
       },
       "verdict": "FAIL"
     },
     "cedh": {
-      "appearance_coverage": 0.48297018794456137,
-      "distinct_coverage_all_cards": 0.31819206855449245,
-      "distinct_coverage_in_corpus": 0.2960750853242321,
-      "encoded_coverage": 0.8937929418201593,
+      "appearance_coverage": 0.48551999276639196,
+      "deck_filter": {
+        "dropped_ppmi_pair_share": 0.0014434943351738037,
+        "kept_share": 0.9988674729689303,
+        "largest_dropped": 304,
+        "max_distinct": 100,
+        "min_distinct": 0,
+        "n_dropped_too_large": 53,
+        "n_dropped_too_small": 0,
+        "n_input": 46798,
+        "n_kept": 46745
+      },
+      "distinct_coverage_all_cards": 0.3426758158564479,
+      "distinct_coverage_in_corpus": 0.3105909220667999,
+      "encoded_coverage": 0.8937945346562602,
       "exclusion_reasons": {
-        "digital": 408404,
-        "multi_faced": 68281,
-        "set_type": 5496
+        "digital": 407876,
+        "multi_faced": 68211,
+        "set_type": 5490
       },
       "gap_categories": {
-        "ADDL_COST": 27722,
-        "ALT_COST": 103181,
-        "ETB replacement": 113165,
-        "UNKNOWN_KEYWORD": 11965,
-        "create token pattern unmatched": 5412,
-        "damage pattern unmatched": 46094,
-        "effect not matched": 923096,
-        "event not matched": 153250,
-        "mana side effect": 9773,
-        "replacement": 50885,
-        "replacement (instead)": 21412,
-        "static pattern unmatched": 393998
+        "ADDL_COST": 27696,
+        "ALT_COST": 103088,
+        "ETB replacement": 113025,
+        "UNKNOWN_KEYWORD": 14792,
+        "create token pattern unmatched": 5409,
+        "damage pattern unmatched": 46046,
+        "effect not matched": 909752,
+        "event not matched": 151410,
+        "mana side effect": 8797,
+        "replacement": 50753,
+        "replacement (instead)": 21370,
+        "static pattern unmatched": 393945
       },
-      "guard_drop": 0.06219545155224776,
-      "guarded_coverage": 0.4207747363923136,
-      "n_cards_in_corpus": 10569,
+      "guard_drop": 0.06086738758055893,
+      "guarded_coverage": 0.42465260518583303,
+      "n_cards_in_corpus": 10526,
       "n_cards_parsed": 31041,
-      "n_decks": 46798,
+      "n_decks": 46745,
       "n_staples": 39,
       "staple_names": [
         "Ancient Tomb",
@@ -199,9 +231,9 @@
       ],
       "status_share": {
         "clean": {
-          "appearances": 2192689,
-          "n_cards": 3123,
-          "share": 0.48297018794456137
+          "appearances": 2201537,
+          "n_cards": 3264,
+          "share": 0.48551999276639196
         },
         "crash": {
           "appearances": 0,
@@ -209,84 +241,105 @@
           "share": 0.0
         },
         "excluded": {
-          "appearances": 482181,
-          "n_cards": 597,
-          "share": 0.10620705817984061
+          "appearances": 481577,
+          "n_cards": 595,
+          "share": 0.10620546534373973
         },
         "gap": {
-          "appearances": 1865139,
-          "n_cards": 6828,
-          "share": 0.410822753875598
+          "appearances": 1851276,
+          "n_cards": 6650,
+          "share": 0.40827454188986834
         }
       },
       "strata": {
         "all": {
-          "coverage": 0.48297018794456137,
-          "covered": 2192689,
-          "total": 4540009
+          "coverage": 0.48551999276639196,
+          "covered": 2201537,
+          "total": 4534390
         },
         "non_land": {
-          "coverage": 0.4586283535397158,
-          "covered": 1523928,
-          "total": 3322795
+          "coverage": 0.46160287661652233,
+          "covered": 1531885,
+          "total": 3318621
         },
         "non_land_non_staple": {
-          "coverage": 0.4207747363923136,
-          "covered": 1071380,
-          "total": 2546208
+          "coverage": 0.42465260518583303,
+          "covered": 1079861,
+          "total": 2542928
         },
         "non_staple": {
-          "coverage": 0.40205524569624956,
-          "covered": 1282980,
-          "total": 3191054
+          "coverage": 0.40567532017651753,
+          "covered": 1292884,
+          "total": 3186992
         }
       },
       "top_breakouts": {
         "top_100": {
-          "appearance_coverage": 0.5789640053477908,
+          "appearance_coverage": 0.5789684452429292,
           "distinct_coverage": 0.54,
           "n_cards": 100
         },
         "top_2000": {
-          "appearance_coverage": 0.48588161720797735,
-          "distinct_coverage": 0.32814070351758795,
+          "appearance_coverage": 0.48820225701802894,
+          "distinct_coverage": 0.33819095477386935,
           "n_cards": 1990
         },
         "top_500": {
-          "appearance_coverage": 0.507453995780393,
-          "distinct_coverage": 0.4166666666666667,
+          "appearance_coverage": 0.50821592149897,
+          "distinct_coverage": 0.4186991869918699,
           "n_cards": 492
         }
+      },
+      "unfiltered_basis": {
+        "appearance_coverage": 0.4855109318065228,
+        "distinct_coverage_in_corpus": 0.3107698141827835,
+        "encoded_coverage": 0.8937929418201593,
+        "guard_drop": 0.06085316621942233,
+        "guarded_coverage": 0.4246577655871005,
+        "n_cards_in_corpus": 10569,
+        "n_decks": 46798,
+        "verdict": "FAIL"
       },
       "verdict": "FAIL"
     },
     "precon": {
-      "appearance_coverage": 0.46992176962503374,
-      "distinct_coverage_all_cards": 0.31819206855449245,
-      "distinct_coverage_in_corpus": 0.3228048010107391,
-      "encoded_coverage": 0.9900863231723765,
+      "appearance_coverage": 0.4813612069548745,
+      "deck_filter": {
+        "dropped_ppmi_pair_share": 0.0,
+        "kept_share": 1.0,
+        "largest_dropped": null,
+        "max_distinct": 100,
+        "min_distinct": 0,
+        "n_dropped_too_large": 0,
+        "n_dropped_too_small": 0,
+        "n_input": 224,
+        "n_kept": 224
+      },
+      "distinct_coverage_all_cards": 0.3426758158564479,
+      "distinct_coverage_in_corpus": 0.3368220742150333,
+      "encoded_coverage": 0.9900548000811853,
       "exclusion_reasons": {
         "digital": 58,
         "multi_faced": 88,
         "set_type": 1
       },
       "gap_categories": {
-        "ADDL_COST": 60,
+        "ADDL_COST": 59,
         "ALT_COST": 34,
         "ETB replacement": 277,
-        "UNKNOWN_KEYWORD": 142,
-        "create token pattern unmatched": 94,
+        "UNKNOWN_KEYWORD": 159,
+        "create token pattern unmatched": 96,
         "damage pattern unmatched": 67,
-        "effect not matched": 4262,
-        "event not matched": 999,
-        "mana side effect": 160,
-        "replacement": 170,
+        "effect not matched": 4089,
+        "event not matched": 972,
+        "mana side effect": 155,
+        "replacement": 168,
         "replacement (instead)": 75,
-        "static pattern unmatched": 1293
+        "static pattern unmatched": 1286
       },
-      "guard_drop": 0.09242952328032839,
-      "guarded_coverage": 0.37749224634470535,
-      "n_cards_in_corpus": 6332,
+      "guard_drop": 0.0903196143491155,
+      "guarded_coverage": 0.391041592605759,
+      "n_cards_in_corpus": 6306,
       "n_cards_parsed": 31041,
       "n_decks": 224,
       "n_staples": 3,
@@ -297,9 +350,9 @@
       ],
       "status_share": {
         "clean": {
-          "appearances": 6968,
-          "n_cards": 2044,
-          "share": 0.46992176962503374
+          "appearances": 7115,
+          "n_cards": 2124,
+          "share": 0.4813612069548745
         },
         "crash": {
           "appearances": 0,
@@ -309,52 +362,62 @@
         "excluded": {
           "appearances": 147,
           "n_cards": 111,
-          "share": 0.009913676827623416
+          "share": 0.009945199918814695
         },
         "gap": {
-          "appearances": 7713,
-          "n_cards": 4177,
-          "share": 0.5201645535473428
+          "appearances": 7519,
+          "n_cards": 4071,
+          "share": 0.5086935931263108
         }
       },
       "strata": {
         "all": {
-          "coverage": 0.46992176962503374,
-          "covered": 6968,
-          "total": 14828
+          "coverage": 0.4813612069548745,
+          "covered": 7115,
+          "total": 14781
         },
         "non_land": {
-          "coverage": 0.3925637699956766,
-          "covered": 4540,
-          "total": 11565
+          "coverage": 0.40582726326742974,
+          "covered": 4680,
+          "total": 11532
         },
         "non_land_non_staple": {
-          "coverage": 0.37749224634470535,
-          "covered": 4260,
-          "total": 11285
+          "coverage": 0.391041592605759,
+          "covered": 4400,
+          "total": 11252
         },
         "non_staple": {
-          "coverage": 0.4539012019731814,
-          "covered": 6533,
-          "total": 14393
+          "coverage": 0.465635020214694,
+          "covered": 6680,
+          "total": 14346
         }
       },
       "top_breakouts": {
         "top_100": {
-          "appearance_coverage": 0.8153735632183908,
-          "distinct_coverage": 0.75,
+          "appearance_coverage": 0.8199137311286844,
+          "distinct_coverage": 0.76,
           "n_cards": 100
         },
         "top_2000": {
-          "appearance_coverage": 0.5656380486811284,
-          "distinct_coverage": 0.417,
+          "appearance_coverage": 0.573265306122449,
+          "distinct_coverage": 0.4265,
           "n_cards": 2000
         },
         "top_500": {
-          "appearance_coverage": 0.7017055342847198,
-          "distinct_coverage": 0.598,
+          "appearance_coverage": 0.7083042568039079,
+          "distinct_coverage": 0.61,
           "n_cards": 500
         }
+      },
+      "unfiltered_basis": {
+        "appearance_coverage": 0.4813612069548745,
+        "distinct_coverage_in_corpus": 0.3368220742150333,
+        "encoded_coverage": 0.9900548000811853,
+        "guard_drop": 0.0903196143491155,
+        "guarded_coverage": 0.391041592605759,
+        "n_cards_in_corpus": 6306,
+        "n_decks": 224,
+        "verdict": "FAIL"
       },
       "verdict": "FAIL"
     }
@@ -365,8 +428,9 @@
       "cedh",
       "precon"
     ],
+    "deck_filter": 100,
     "limit": null,
-    "parser": "PileOfCardsParser@/Users/nickpersing/PycharmProjects/PileOfCardsParser"
+    "parser": "pile_of_cards_parser@C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\pile_of_cards_parser"
   },
   "thresholds": {
     "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
@@ -388,6 +452,22 @@
       "ci": 0.95,
       "generalization_ratio": 0.5,
       "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
     }
   }
 }

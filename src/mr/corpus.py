@@ -219,6 +219,65 @@ def load_corpus(name: str, limit: int | None = None) -> list[Deck]:
     raise ValueError(f"unknown corpus {name!r}; expected one of {config.CORPORA}")
 
 
+# ── Deck plausibility ─────────────────────────────────────────────────────────
+
+# A legal Commander deck is exactly 100 cards, so the number of DISTINCT oracle_ids in one can
+# never exceed 100 — and is usually 80-99, because duplicate basic lands collapse to a single
+# oracle_id. That makes this a definitional bound, not a tuned parameter.
+MAX_COMMANDER_DISTINCT = 100
+
+
+def filter_plausible_decks(
+    decks: list[Deck], max_distinct: int = MAX_COMMANDER_DISTINCT, min_distinct: int = 0
+) -> tuple[list[Deck], dict]:
+    """Drop entries that cannot be Commander decks. Returns (kept, stats).
+
+    The Archidekt casual census carries lists of up to 1,947 distinct cards — verified against the
+    raw source as genuinely long lists, not a name-resolution artifact, i.e. maybeboards, sideboards
+    and whole collections. Because co-occurrence pairs grow quadratically with deck size, the 21%
+    of casual entries above 100 cards contribute 56.5% of all PPMI pairs: the majority of that
+    corpus's training signal comes from things that are not decks. See
+    `findings/t4_corpus_deck_sizes.md`.
+
+    Not applied inside the loaders. T0/T1/T2's recorded numbers were produced on the unfiltered
+    basis, and silently changing what `load_corpus` returns would make those findings
+    irreproducible from their own inputs. Callers opt in, and the drop counts below are meant to be
+    reported rather than swallowed.
+
+    `min_distinct` defaults to 0: the sub-40 stub tail is real (79 entries under 10 cards, some
+    commander-only shells) but contributes ~0.6% of PPMI pairs, so excluding it buys little and
+    costs an arbitrary parameter. Available for callers who want it.
+    """
+    kept, dropped_big, dropped_small = [], [], []
+    for d in decks:
+        n = len(set(d.oracle_ids))
+        if n > max_distinct:
+            dropped_big.append(n)
+        elif n < min_distinct:
+            dropped_small.append(n)
+        else:
+            kept.append(d)
+
+    def _pairs(sizes) -> int:
+        return sum(n * (n - 1) // 2 for n in sizes)
+
+    all_sizes = [len(set(d.oracle_ids)) for d in decks]
+    total_pairs = _pairs(all_sizes)
+    return kept, {
+        "max_distinct": max_distinct,
+        "min_distinct": min_distinct,
+        "n_input": len(decks),
+        "n_kept": len(kept),
+        "n_dropped_too_large": len(dropped_big),
+        "n_dropped_too_small": len(dropped_small),
+        "kept_share": len(kept) / len(decks) if decks else 0.0,
+        # The headline: oversized entries dominate co-occurrence far beyond their headcount.
+        "dropped_ppmi_pair_share": (
+            (_pairs(dropped_big) + _pairs(dropped_small)) / total_pairs if total_pairs else 0.0),
+        "largest_dropped": max(dropped_big) if dropped_big else None,
+    }
+
+
 # ── Splits ────────────────────────────────────────────────────────────────────
 
 def split_by_deck(

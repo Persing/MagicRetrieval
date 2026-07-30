@@ -353,14 +353,16 @@ def render(results: list[dict], harness: dict) -> str:
     expected = {("2a", "precon")} | {(a, c) for a in ("2b", "2c", "2d") for c in ("casual", "cedh")}
     missing = sorted(expected - ran)
     if missing:
+        missing_arms = sorted({a for a, _ in missing})
         lines += [
             "## Scope of this run",
             "",
-            f"**Partial ladder — {len(ran)}/{len(expected)} rungs run, stopped deliberately "
-            "after 2b.** Missing: " + ", ".join(f"{a}/{c}" for a, c in missing) + ". 2c/2d "
-            "(negative supervision, wired to the loss and mined-phenotype pairs respectively) "
-            "were not run — the decision rules below that depend on them are unresolved, not "
-            "failed. Re-run with `--arms 2c 2d` to complete the ladder.",
+            f"**Partial ladder — {len(ran)}/{len(expected)} rungs run.** "
+            "Present: " + ", ".join(f"{a}/{c}" for a, c in sorted(ran)) + ". "
+            "Missing: " + ", ".join(f"{a}/{c}" for a, c in missing) + ". "
+            f"The decision rules below that depend on {', '.join(missing_arms)} are unresolved, "
+            "not failed. Re-run with `--arms " + " ".join(missing_arms) + "` to complete the "
+            "ladder, then `--merge`.",
             "",
         ]
     lines += [
@@ -396,8 +398,14 @@ def render(results: list[dict], harness: dict) -> str:
             "broader, noisier relation than true functional substitution — but it changes what "
             "a bare PASS is actually claiming, so it's called out rather than left implicit.",
         ]
-    unresolved_tag = " *(unresolved — needs 2d)*" if missing else ""
-    unresolved_tag_2c = " *(unresolved — needs 2c)*" if missing else ""
+    # Tag a rule unresolved only when the arm THAT RULE needs is actually absent. Keying every tag
+    # off "is anything missing" produced a committed report whose decision rules read
+    # "(unresolved — needs 2d)" directly beneath a table of 2d results: the run was missing 2a/2b,
+    # not 2d. Same failure class as an arm silently dropped from a table — the file reads as
+    # coherent and asserts the opposite of its own data.
+    ran_arms = {a for a, _ in ran}
+    unresolved_tag = "" if "2d" in ran_arms else " *(unresolved — needs 2d)*"
+    unresolved_tag_2c = "" if "2c" in ran_arms else " *(unresolved — needs 2c)*"
     lines += [
         "",
         "## Decision rules",
@@ -419,7 +427,9 @@ def render(results: list[dict], harness: dict) -> str:
         "colour×CMC×type stratum control, so the baseline cannot move with the thing being "
         "measured.",
     ]
-    if missing:
+    # This narrative is specifically about a 2a/2b-only run. Emitting it whenever *anything* was
+    # missing put an "Interim read (2a/2b only)" section on a file containing no 2a or 2b data.
+    if ran_arms == {"2a", "2b"}:
         lines += [
             "",
             "## Interim read (2a/2b only, stopped here deliberately)",
@@ -432,7 +442,30 @@ def render(results: list[dict], harness: dict) -> str:
             "mined phenotype pairs (2d) changes that pattern is exactly what the deferred rungs "
             "would answer, and is not decided by this run.",
         ]
-    return "\n".join(lines) + "\n"
+
+    md = "\n".join(lines) + "\n"
+    assert_rungs_rendered(results, md)
+    return md
+
+
+class ReportIncomplete(RuntimeError):
+    """A report was about to be written that omits a rung which actually ran."""
+
+
+def assert_rungs_rendered(results: list[dict], md: str) -> None:
+    """Every rung with a result must have a row in the rendered table.
+
+    Checked on the rendered text rather than on `results`, because the failure mode this guards
+    lives in the rendering: the numbers can all be present and correct while the table that
+    everyone actually reads is missing a row.
+    """
+    missing = [f"{r['arm']}/{r['corpus']}" for r in results
+               if f"| {r['arm']} | {r['corpus']} |" not in md]
+    if missing:
+        raise ReportIncomplete(
+            f"rungs {missing} produced results but have no row in the ladder table. "
+            "Refusing to write a report that reads as complete."
+        )
 
 
 def _build_harness(results: list[dict]) -> dict:
