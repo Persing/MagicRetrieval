@@ -60,43 +60,48 @@ work at roughly 30% utilization — not launch overhead.
 VRAM is not a constraint anywhere: peak is ~4 GB, being 3–4 GB of training (the 512-token attention
 matrices dominate) and 2.03 GB for the eval block `sims = E[flat] @ E.T` at 16,384 × 30,958 × f32.
 
-| card | $/hr | fp32 | max | est. shard (vs 71 min on a local 4090) |
-|---|---|---|---|---|
-| **RTX 5090** | 0.99 | ~104 | 8 | ~56 min |
-| A40 | 0.44 | 37.4 | 10 | ~157 min |
-| L40S | 0.99 | 91.6 | 7 | ~64 min |
-| RTX A6000 | 0.53 | 38.7 | 7 | ~152 min |
-| RTX 4090 | 0.69 | 82.6 | **1 max** | 71 min |
-| H100 PCIe | 2.89 | 51.2 | 3 | ~115 min |
+Prices below are **community cloud**, queried live via `list-gpu-types`. The web console's default
+view shows *secure* pricing, which is 1.4–2× higher for the same card — check both. Community is
+third-party hosted rather than datacenter-grade, which is an acceptable trade here because workers
+are restartable and a lost unit costs ~25 minutes.
+
+| card | community $/hr | secure $/hr | max | stock | fp32 | est. shard (vs 71 min on a local 4090) |
+|---|---|---|---|---|---|---|
+| **RTX 4090** | **0.34** | 0.69 | 8 | **LOW** | 82.6 | 71 min |
+| **RTX 5090** | 0.69 | 0.99 | 8 | **HIGH** | ~104 | ~56 min |
+| A40 | 0.35 (1 max) | 0.44 | 1 / 10 secure | HIGH | 37.4 | ~157 min |
+| L40S | — | 0.99 | 7 | MED | 91.6 | ~64 min |
+| H100 PCIe | — | 2.89 | 3 | LOW | 51.2 | ~115 min |
 
 **Do not rent an H100/B200/H200**, whatever the "Recommended" tab says — those are the template's
 compatibility filters, not this workload's. On fp32 an H100 PCIe is *slower than a 4090* at 4× the
 price; its strength is FP8/BF16 tensor cores, which `fp16=False` forbids. Clear the filter banner to
 see consumer cards at all.
 
-The 4090 is efficient but capped at **1 max**, so matching the local card is unavailable for a
-multi-GPU plan. That is fine — §5 measures the replicate floor on the pod, so the pod's own noise
-floor is what the +0.005 gate gets read against. The only hard requirement is that **all 18 runs use
-the same card model**, since they share one ladder's seed sd.
+The only hard requirement is that **all 18 runs use the same card model**, since they share one
+ladder's seed sd. Matching the local 4090 is a bonus rather than a requirement — §5 measures the
+replicate floor on the pod, so the pod's own noise floor is what the +0.005 gate gets read against.
 
 **Estimated totals** (bootstrap + warm-up + replicate floor + `ceil(6/NGPU)` waves + merge):
 
 | config | waves | wall clock | cost |
 |---|---|---|---|
-| **RTX 5090 × 3** | 2 | **~3.2 h** | **~$9.50** |
-| RTX 5090 × 2 | 3 | ~4.1 h | ~$8.20 |
-| RTX 5090 × 1 | 6 | ~6.9 h | ~$6.85 |
-| A40 × 3 | 2 | ~7.1 h | ~$9.35 |
-| A40 × 2 | 3 | ~9.7 h | ~$8.50 |
-| A40 × 6 | 1 | ~4.5 h | ~$11.75 |
+| **RTX 4090 × 3, community** | 2 | ~3.7 h | **~$3.77** |
+| **RTX 5090 × 3, community** | 2 | **~3.2 h** | ~$6.62 |
+| RTX 5090 × 2, community | 3 | ~4.1 h | ~$5.70 |
+| A40 × 3, secure | 2 | ~7.1 h | ~$9.37 |
 
-**RTX 5090 × 3 is the pick**: six shards is exactly two waves, and the 5090 is 2.25× the hourly rate
-for ~2.8× the throughput — so it is ~20% cheaper *per unit of work* while finishing in less than half
-A40 × 3's time for the same money. Choose A40 only to minimise hourly burn on a walk-away run.
+**Try RTX 4090 × 3 on community first.** At $0.34/hr it is the most cost-efficient card available
+by a wide margin, and it matches the local hardware, which makes the replicate floor directly
+comparable. Its stock is LOW, so it may simply not be gettable — check with `list-gpu-types` or
+`get-gpu-type` for per-datacenter availability before committing.
+
+**Fall back to RTX 5090 × 3 on community**, which is HIGH stock and still finishes in ~3.2 h. A40 is
+third on both axes now: it is effectively secure-only for multi-GPU (community caps at 1), so it
+costs more per hour *and* takes twice as long as the 5090.
 
 Do not go above 3. There are only six shards, and §4's warm-up is single-threaded while billing every
-card rented — at 6 × 5090 that is ~$4.45 of idle billing to save 56 minutes. Workers are restartable,
-so a preempted pod costs one unit, not the run.
+card rented. Workers are restartable, so a lost pod costs one unit, not the run.
 
 Two cautions:
 
