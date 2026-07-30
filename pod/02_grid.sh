@@ -9,8 +9,18 @@
 set -euo pipefail
 
 CORPUS="${CORPUS:-cedh}"
-NGPU="${NGPU:-$(nvidia-smi -L 2>/dev/null | wc -l)}"
+VISIBLE=$(nvidia-smi -L 2>/dev/null | wc -l)
+NGPU="${NGPU:-$VISIBLE}"
 [ "${NGPU:-0}" -ge 1 ] || { echo "FATAL: set NGPU" >&2; exit 1; }
+
+# Clamp to what actually exists. NGPU is baked into the pod's start command, and pod args are
+# immutable — so a pod resized from 3 GPUs to 1 (to fit on a host with little free capacity) would
+# still hand workers CUDA_VISIBLE_DEVICES=1 and =2 for devices that are not there. Every worker
+# after the first would die on an invalid device rather than on anything informative.
+if [ "$VISIBLE" -ge 1 ] && [ "$NGPU" -gt "$VISIBLE" ]; then
+    echo "NGPU=$NGPU but only $VISIBLE GPU(s) visible — clamping to $VISIBLE"
+    NGPU="$VISIBLE"
+fi
 
 cd "$(dirname "$0")/.."
 mkdir -p logs
