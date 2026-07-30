@@ -2,6 +2,8 @@
 
 import math
 
+import pytest
+
 from mr import thresholds as T
 
 
@@ -64,3 +66,52 @@ def test_t4_pair_verdict_boundaries():
 def test_pooled_sd_matches_the_textbook_formula():
     assert math.isclose(T.pooled_sd(0.02, 5, 0.04, 5), math.sqrt((4 * 0.0004 + 4 * 0.0016) / 8))
     assert math.isnan(T.pooled_sd(0.02, 1, 0.04, 5))
+
+
+# ── T4 scaling ────────────────────────────────────────────────────────────────
+
+def test_equal_example_counts_predict_exactly_zero():
+    """The whole design rests on this. Where the 250k positive cap binds at both levels the example
+    ratio is 1, so the pure-volume null is 0.0000 and the comparison isolates deck diversity."""
+    assert T.t4_scaling_prediction(250_000, 250_000) == 0.0
+
+
+def test_prediction_is_driven_by_examples_not_decks():
+    """The naive expectation — deck count carries pair count — predicted ~+0.0104 for a ~12.6x deck
+    range. That holds only if examples actually scale with decks, which the cap prevents."""
+    assert T.t4_scaling_prediction(19_800, 250_000) == pytest.approx(0.0099, abs=5e-5)
+    with pytest.raises(ValueError):
+        T.t4_scaling_prediction(0, 250_000)
+
+
+def test_all_three_conditions_are_required_for_a_diversity_verdict():
+    """Each condition alone can be satisfied while the claim is still not supported, so each one is
+    checked separately rather than trusting a single composite number."""
+    assert T.t4_scaling_verdict(0.0120, 0.0, 0.0080, 0.0160, 0.0015) == "DIVERSITY_BEYOND_VOLUME"
+    # significant and large, but inside the seed noise — the standing null rule still vetoes
+    assert T.t4_scaling_verdict(0.0120, 0.0, 0.0080, 0.0160, 0.0200) == "UNDERPOWERED"
+    # significant and outside seed noise, but below the magnitude gate
+    assert T.t4_scaling_verdict(0.0030, 0.0, 0.0010, 0.0050, 0.0005) == "UNDERPOWERED"
+
+
+def test_ci_containing_the_prediction_means_decks_are_a_volume_proxy():
+    assert T.t4_scaling_verdict(0.0030, 0.0, -0.0010, 0.0070, 0.0015) == "VOLUME_PROXY"
+    # and against a NONZERO prediction, matching it is the same verdict
+    assert T.t4_scaling_verdict(0.0099, 0.0099, 0.0060, 0.0140, 0.0015) == "VOLUME_PROXY"
+
+
+def test_landing_below_the_volume_null_is_its_own_named_outcome():
+    """Folding this into UNDERPOWERED would hide a real result about the slope."""
+    assert T.t4_scaling_verdict(-0.0100, 0.0, -0.0140, -0.0060, 0.0015) == "BELOW_VOLUME_NULL"
+
+
+def test_too_few_seeds_cannot_produce_a_verdict():
+    assert T.t4_scaling_verdict(0.0120, 0.0, 0.0080, 0.0160, float("nan")) == "UNDERPOWERED"
+
+
+def test_scaling_block_is_embedded_in_every_findings_json():
+    """A number is never readable without its rule — `as_dict` is what every report embeds."""
+    d = T.as_dict()["t4_scaling"]
+    assert d["min_lift"] == T.T4_SCALING_MIN_LIFT
+    assert d["slope_per_efold"] == T.T4_SCALING_SLOPE_PER_EFOLD
+    assert "n_training_examples" in d["prediction_rule"]

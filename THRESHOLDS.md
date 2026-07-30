@@ -113,6 +113,61 @@ representation. +0.01 for `B − A` is lower because segmentation is nearly free
 is higher because that stratum is the entire reason a text-side encoder exists, and the aggregate
 can hide it.
 
+## T4 scaling — does deck diversity buy anything beyond pair volume?
+
+**Frozen 2026-07-30, before the pre-flight and before any training run.** Representation is not the
+constraint; whether *signal* is has not been tested. Arms **A / B+ / C**, **3 seeds per level**, on
+**cedh**: a **3,142 train decks** subsample — resampled per seed, so subsample identity does not
+masquerade as a corpus effect — against the full ~39,733.
+
+**Why the point predictions are not written here yet, and why that is not a loophole.** The
+prediction is a function of realized `n_training_examples` per level, which a counts-only pre-flight
+measures. That pass produces no recall number and cannot: it stops before any model is trained. So
+the rule below is committed first, the two measured ratios are committed second, and neither commit
+can have been informed by an outcome. Freezing an arithmetic result that depends on an unmeasured
+input would be the loophole; freezing the arithmetic is not.
+
+**The rule.** `predicted = 0.00389 × ln(realized n_training_examples ratio)`.
+
+The slope is D4's de-skewed pure-volume measurement: `(0.0937 − 0.0809) / ln(234,593 / 8,702)`,
+`B+_random → B+_full`, encoding held constant and free of the clean-clean skew in arm D's slice.
+
+**The naive expectation this replaces, recorded because it was wrong.** Deck count was expected to
+carry pair count, making a ~12.6× deck range a ~12.6× pair range and predicting ~+0.0104. The 250k
+positive cap falsifies that wherever it binds. Where it binds at *both* levels the example ratio is
+1 and the predicted volume effect is exactly **0.0000** — which is not a weaker test but a stronger
+one: volume is then held constant by construction and the comparison isolates diversity.
+
+| condition | meaning |
+|---|---|
+| excess over the prediction **≥ +0.005** | magnitude gate |
+| paired query-bootstrap **95% CI** excluding the prediction, **10,000** resamples | not noise |
+| gap exceeds the pooled seed sd | T4's standing null rule, unchanged |
+
+All three → **DIVERSITY_BEYOND_VOLUME**. CI containing the prediction → **VOLUME_PROXY**: decks are
+a pair-volume proxy and nothing more. CI entirely below it → **BELOW_VOLUME_NULL**, a named outcome
+rather than a flavour of underpowered, because landing below what volume alone predicts is a real
+result about the slope. Anything else → **UNDERPOWERED**.
+
+Evaluated on the **cold-start stratum and the aggregate**, both always reported.
+
+*Anchor:* +0.005 is what ~1.3 e-folds of pure extra volume buys at the slope above, so a smaller
+effect is not distinguishable from data the corpus could have supplied with no extra deck diversity.
+A null of 0.0000 with no magnitude floor would let seed noise at n=3 read as a finding. The gate is
+deliberately one number, not one per stratum: a flat +0.005 is 8.2% of the casual aggregate base
+rate (0.0608) but 3.5% of the cold-start base rate (0.1415), so cold-start faces the easier relative
+bar. That asymmetry is recorded rather than tuned away — splitting it would mean choosing two
+numbers with an anchor for neither.
+
+The **CI is over queries, not seeds**. Both levels are scored on a byte-identical test set, so the
+per-query difference is paired and ~10⁵ of them carry an interval that 3 seeds cannot. Seeds keep
+their separate job, the null rule, so neither statistic does the other's work.
+
+**One thing this design does not claim.** Where the cap binds equally, the two levels draw 250k
+positives from *different-sized pools*, so pair composition shifts even at constant count. That
+shift is the diversity intervention, correctly isolated — but it is diversity-of-pairs, not deck
+diversity holding the pairs themselves fixed.
+
 ---
 
 ## Standing confound — recorded, not solved

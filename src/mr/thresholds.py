@@ -7,6 +7,8 @@ drift. Every findings JSON embeds `as_dict()` so a number is never readable with
 
 from __future__ import annotations
 
+import math
+
 from .config import REPO_ROOT
 
 # ── T0 ────────────────────────────────────────────────────────────────────────
@@ -66,6 +68,81 @@ T4_GATE_COLDSTART = 0.03        # best arm - A, on the low-play stratum specific
 # seeing results is choosing a stopping rule from the data. With n=3 the sample sd is itself so
 # noisy that the null rule below becomes unstable, which defeats its purpose.
 
+# ── T4 scaling — the cedh deck-diversity test ─────────────────────────────────
+# Frozen before the pre-flight, which is why the *rule* is here and the point predictions are not:
+# the prediction is a function of a quantity (realized training examples per level) that is measured
+# by a counts-only pass producing no recall number. Writing the rule first and the arithmetic second
+# is what makes this a pre-registration rather than a description.
+T4_SCALING_ARMS = ("A", "B+", "C")
+T4_SCALING_N_SEEDS = 3
+T4_SCALING_CEDH_SUBSAMPLE = 3142   # cedh TRAIN decks in the low level, resampled per seed
+
+# D4's de-skewed pure-volume slope: (0.0937 - 0.0809) / ln(234593 / 8702) = 0.0128 / 3.2949.
+# B+_random -> B+_full, so it is encoding-constant and free of the clean-clean skew in D's slice.
+T4_SCALING_SLOPE_PER_EFOLD = 0.00389
+
+T4_SCALING_MIN_LIFT = 0.005        # magnitude gate on the excess over the volume null
+T4_SCALING_BOOTSTRAP_N = 10_000
+T4_SCALING_CI = 0.95
+
+# Why a magnitude gate exists at all: where the 250k positive cap binds equally at both levels, the
+# example ratio is 1 and the predicted volume effect is exactly 0.0000. A null of zero with no
+# magnitude floor would let seed noise at n=3 read as a diversity effect.
+#
+# +0.005 is chosen against the slope above — it is what ~1.3 e-folds of pure extra volume would
+# buy, so an effect smaller than that is not distinguishable from data the corpus could have
+# supplied without any extra deck diversity. Note the deliberate asymmetry it creates: a flat
+# +0.005 is 8.2% of the casual aggregate base rate (0.0608) but 3.5% of the cold-start base rate
+# (0.1415), so cold-start — the stratum the mechanism claim is about — faces the easier relative
+# bar. Recorded rather than tuned away: splitting the gate per stratum would mean choosing two
+# numbers instead of one, with no anchor for either.
+
+
+def t4_scaling_prediction(examples_low: int, examples_high: int) -> float:
+    """The pure-volume null: what more training examples ALONE would buy between two levels.
+
+    Deliberately a function of realized `n_training_examples`, not of deck count. The naive
+    expectation was that pairs scale with decks, which would make a ~12.6x deck range a ~12.6x pair
+    range and predict ~+0.0104. The 250k positive cap falsifies that wherever it binds — and where
+    it binds equally at both levels this returns 0.0000, which is the correct null and turns the
+    comparison into a clean diversity isolation at matched volume.
+    """
+    if examples_low <= 0 or examples_high <= 0:
+        raise ValueError("training-example counts must be positive to form a ratio")
+    return T4_SCALING_SLOPE_PER_EFOLD * math.log(examples_high / examples_low)
+
+
+def t4_scaling_verdict(observed: float, predicted: float, ci_low: float, ci_high: float,
+                       pooled_sd: float) -> str:
+    """DIVERSITY_BEYOND_VOLUME / VOLUME_PROXY / BELOW_VOLUME_NULL / UNDERPOWERED.
+
+    `observed` is the high-level minus low-level gap; `ci_low`/`ci_high` bound it via the paired
+    query bootstrap; `pooled_sd` is the seed sd, carrying T4's standing null rule unchanged.
+
+    The CI is over **queries, not seeds**. Both levels are scored on a byte-identical test set, so
+    the per-query difference is paired and ~10^5 of them carry an interval that 3 seeds cannot.
+    Seeds keep their own separate job — the null rule — so neither statistic is doing the other's
+    work and neither was picked after the fact.
+
+    `BELOW_VOLUME_NULL` is a named outcome rather than a flavour of UNDERPOWERED: landing
+    significantly *below* what volume alone predicts is a real result about the slope, and folding
+    it into "not enough power" would hide it.
+    """
+    if pooled_sd != pooled_sd:                       # nan — too few seeds to have an opinion
+        return "UNDERPOWERED"
+    if ci_low != ci_low or ci_high != ci_high:
+        # No interval means the "CI excludes the prediction" condition is not met — it is not
+        # waived. A verdict resting on two of three frozen conditions is not the frozen rule.
+        return "UNDERPOWERED"
+    if ci_high < predicted:
+        return "BELOW_VOLUME_NULL"
+    if ci_low <= predicted <= ci_high:
+        return "VOLUME_PROXY"
+    if observed - predicted >= T4_SCALING_MIN_LIFT and abs(observed) > pooled_sd:
+        return "DIVERSITY_BEYOND_VOLUME"
+    return "UNDERPOWERED"
+
+
 CONFOUND_NOTE = (
     "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is "
     "not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual "
@@ -99,6 +176,20 @@ def as_dict() -> dict:
             "gate_b_minus_a": T4_GATE_B_MINUS_A,
             "gate_coldstart": T4_GATE_COLDSTART,
             "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+        },
+        "t4_scaling": {
+            "arms": list(T4_SCALING_ARMS),
+            "n_seeds": T4_SCALING_N_SEEDS,
+            "cedh_subsample": T4_SCALING_CEDH_SUBSAMPLE,
+            "slope_per_efold": T4_SCALING_SLOPE_PER_EFOLD,
+            "min_lift": T4_SCALING_MIN_LIFT,
+            "bootstrap_n": T4_SCALING_BOOTSTRAP_N,
+            "ci": T4_SCALING_CI,
+            "prediction_rule": ("predicted = slope_per_efold * ln(realized n_training_examples "
+                                "ratio); 0.0000 when the positive cap binds equally at both levels"),
+            "decision_rule": ("DIVERSITY_BEYOND_VOLUME requires all three: excess over the "
+                              "prediction >= min_lift, paired query-bootstrap CI excluding the "
+                              "prediction, and the gap exceeding the pooled seed sd"),
         },
         "confound_note": CONFOUND_NOTE,
     }
@@ -196,6 +287,13 @@ def check_in_sync() -> list[str]:
         "T4_GATE_BPLUS_MINUS_B": "≥ +0.02",
         "T4_GATE_B_MINUS_A": "≥ +0.01",
         "T4_GATE_COLDSTART": "≥ +0.03",
+        "T4_SCALING_ARMS": "A / B+ / C",
+        "T4_SCALING_N_SEEDS": "3 seeds per level",
+        "T4_SCALING_CEDH_SUBSAMPLE": "3,142 train decks",
+        "T4_SCALING_SLOPE_PER_EFOLD": "0.00389",
+        "T4_SCALING_MIN_LIFT": "≥ +0.005",
+        "T4_SCALING_BOOTSTRAP_N": "10,000",
+        "T4_SCALING_CI": "95% CI",
     }
     return [f"{name} ({text!r}) not found in THRESHOLDS.md"
             for name, text in expected.items() if text not in md]
