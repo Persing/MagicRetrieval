@@ -1,0 +1,17 @@
+{
+  "B+_matched": {
+    "n_examples": 8702,
+    "n_queries": 18703,
+    "recall_at_10": 0.019836389883975833,
+    "recall_at_50": 0.07522857295621023
+  },
+  "B+_random": {
+    "n_examples": 8702,
+    "n_queries": 18703,
+    "recall_at_10": 0.022349355718333956,
+    "recall_at_50": 0.08624284874084372
+  },
+  "n_full_examples": 234593,
+  "n_matched_examples": 8702,
+  "seed": 43
+}

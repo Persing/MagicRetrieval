@@ -115,7 +115,7 @@
   },
   "frozen_n_seeds": 5,
   "git_dirty": true,
-  "git_rev": "fcf95f3",
+  "git_rev": "96a101d",
   "inputs": {
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
       "bytes": 5093341,
