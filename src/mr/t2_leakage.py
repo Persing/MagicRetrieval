@@ -226,7 +226,10 @@ def run_arm(
         negatives = (negatives or []) + extra_neg
         extra_pos_used, extra_neg_used = len(extra_pos), len(extra_neg)
 
-    embeddings = finetune.finetune(train_positives, negatives, texts_by_oid, oid_order, epochs=epochs)
+    # T2 is a single-seed test and stays on config.SEED. The keyword is now required precisely so
+    # that this call site had to be visited when the seeded trainer path landed (see finetune.py).
+    embeddings = finetune.finetune(train_positives, negatives, texts_by_oid, oid_order,
+                                   seed=config.SEED, epochs=epochs)
     oid_to_row = {oid: i for i, oid in enumerate(oid_order)}
 
     vocab = set(oid_to_row)

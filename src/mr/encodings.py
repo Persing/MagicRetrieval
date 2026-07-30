@@ -329,14 +329,20 @@ def build_texts(
     texts: dict[str, str] = {}
     n_cdl_used = n_cdl_fallback = n_canon_failed = n_empty_body = n_misaligned = 0
 
+    # Deferred to call time, not module scope: `finetune` pulls in torch, and `encodings` is meant
+    # to stay importable (and testable) without it.
+    t2_card_text = None
+    if arm == "A_t2":
+        from . import finetune
+        t2_card_text = finetune.card_text
+
     for row in cards_df.drop_duplicates("oracle_id").itertuples(index=False):
         oid = row.oracle_id
         h = head(row)
 
         if arm == "A_t2":
             # T2's frozen encoding, reproduced exactly: type line + raw oracle text, no head.
-            from . import finetune
-            texts[oid] = finetune.card_text(row.oracle_text, row.type_line)
+            texts[oid] = t2_card_text(row.oracle_text, row.type_line)
             continue
 
         raw = row.oracle_text if isinstance(row.oracle_text, str) else ""

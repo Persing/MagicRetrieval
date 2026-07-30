@@ -37,3 +37,8 @@ packages = ["src/mr"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+# `slow` tests really do train a model. They are the only check that the training seed reaches
+# the trainer, so they are not optional — they are just kept out of the default fast loop.
+# Run them with:  uv run pytest -m slow
+markers = ["slow: trains a real model; excluded from the default run"]
+addopts = "-m 'not slow'"

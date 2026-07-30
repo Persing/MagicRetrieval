@@ -1,0 +1,197 @@
+{
+  "casual": {
+    "cuts": {
+      "0-100": {
+        "cardslots_share": 0.6074445384411419,
+        "deck_share": 0.7420714572460859,
+        "decks_kept": 3697,
+        "max_context": 100,
+        "ppmi_pair_share": 0.3951102986614003
+      },
+      "0-1000000000": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 4982,
+        "max_context": 1947,
+        "ppmi_pair_share": 1.0
+      },
+      "0-105": {
+        "cardslots_share": 0.6582869312322968,
+        "deck_share": 0.7892412685668406,
+        "decks_kept": 3932,
+        "max_context": 105,
+        "ppmi_pair_share": 0.43544532912591444
+      },
+      "40-100": {
+        "cardslots_share": 0.5937848541858693,
+        "deck_share": 0.6722199919710959,
+        "decks_kept": 3349,
+        "max_context": 100,
+        "ppmi_pair_share": 0.3926041972820477
+      },
+      "40-105": {
+        "cardslots_share": 0.6446272469770241,
+        "deck_share": 0.7193898032918506,
+        "decks_kept": 3584,
+        "max_context": 105,
+        "ppmi_pair_share": 0.4329392277465618
+      },
+      "60-105": {
+        "cardslots_share": 0.6298501243702572,
+        "deck_share": 0.6914893617021277,
+        "decks_kept": 3445,
+        "max_context": 105,
+        "ppmi_pair_share": 0.4271714498173251
+      }
+    },
+    "max": 1947,
+    "n_decks": 4982,
+    "over_100": {
+      "deck_share": 0.2579285427539141,
+      "decks": 1285,
+      "ppmi_pair_share": 0.6048897013385997
+    },
+    "percentiles": {
+      "p1": 5.0,
+      "p10": 61.0,
+      "p25": 79.0,
+      "p5": 26.0,
+      "p50": 90.0,
+      "p75": 101.0,
+      "p90": 130.0,
+      "p95": 166.0,
+      "p99": 270.7599999999984
+    },
+    "under_40": {
+      "deck_share": 0.06985146527498996,
+      "decks": 348,
+      "ppmi_pair_share": 0.0025061013793526116
+    }
+  },
+  "cedh": {
+    "cuts": {
+      "0-100": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 6000,
+        "max_context": 99,
+        "ppmi_pair_share": 1.0
+      },
+      "0-1000000000": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 6000,
+        "max_context": 99,
+        "ppmi_pair_share": 1.0
+      },
+      "0-105": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 6000,
+        "max_context": 99,
+        "ppmi_pair_share": 1.0
+      },
+      "40-100": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 6000,
+        "max_context": 99,
+        "ppmi_pair_share": 1.0
+      },
+      "40-105": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 6000,
+        "max_context": 99,
+        "ppmi_pair_share": 1.0
+      },
+      "60-105": {
+        "cardslots_share": 1.0,
+        "deck_share": 1.0,
+        "decks_kept": 6000,
+        "max_context": 99,
+        "ppmi_pair_share": 1.0
+      }
+    },
+    "max": 99,
+    "n_decks": 6000,
+    "over_100": {
+      "deck_share": 0.0,
+      "decks": 0,
+      "ppmi_pair_share": 0.0
+    },
+    "percentiles": {
+      "p1": 91.0,
+      "p10": 98.0,
+      "p25": 98.0,
+      "p5": 95.0,
+      "p50": 98.0,
+      "p75": 99.0,
+      "p90": 99.0,
+      "p95": 99.0,
+      "p99": 99.0
+    },
+    "under_40": {
+      "deck_share": 0.0,
+      "decks": 0,
+      "ppmi_pair_share": 0.0
+    }
+  },
+  "git_dirty": true,
+  "git_rev": "720daa2",
+  "inputs": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\archidekt_census_popular.jsonl": {
+      "bytes": 28421697,
+      "exists": true,
+      "mtime": 1785027795,
+      "sha256": "11d2c80dca3d1849b41a4dca17a26765999258ee562370be7b564f9a1108e639"
+    },
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\decks_combined.parquet": {
+      "bytes": 14636160,
+      "exists": true,
+      "mtime": 1785027795,
+      "sha256": "4bfec438d7ec52ea63469c3b08178aaa567215410a5f28133bee3d4f3d144164"
+    }
+  },
+  "run_args": {
+    "analysis": "deck_sizes"
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
+    }
+  }
+}
