@@ -34,6 +34,29 @@ for i in $(seq 1 30); do
 done
 nvidia-smi || echo "!! nvidia-smi is not working in this container"
 
+# `nvidia-smi` working while `cuInit` fails is the signature of a missing /dev/nvidia-uvm node.
+# Enumeration goes through the driver's management interface, which needs only /dev/nvidiactl and
+# /dev/nvidia<N>; creating a CUDA context additionally needs the UVM device, which some container
+# runtimes do not inject. So torch reports device_count=3 and is_available()=False at the same time.
+echo "--- /dev/nvidia* ---"
+ls -l /dev/nvidia* 2>&1 || echo "(no /dev/nvidia* nodes at all)"
+if [ ! -e /dev/nvidia-uvm ]; then
+    echo "/dev/nvidia-uvm MISSING — attempting to create it"
+    if command -v nvidia-modprobe >/dev/null 2>&1; then
+        nvidia-modprobe -u -c=0 && echo "nvidia-modprobe -u -c=0 ok" || echo "nvidia-modprobe failed"
+    else
+        # Fall back to creating the nodes by hand. 510 is the documented major for nvidia-uvm.
+        major=$(grep -w nvidia-uvm /proc/devices | awk '{print $1}')
+        if [ -n "$major" ]; then
+            mknod -m 666 /dev/nvidia-uvm c "$major" 0 2>&1 && echo "created /dev/nvidia-uvm"
+            mknod -m 666 /dev/nvidia-uvm-tools c "$major" 1 2>&1 || true
+        else
+            echo "nvidia-uvm not in /proc/devices — the kernel module is not loaded on the host"
+        fi
+    fi
+    ls -l /dev/nvidia-uvm* 2>&1 || echo "still missing after the attempt"
+fi
+
 uv run python - <<'PY'
 import os, sys, torch
 print(f"torch {torch.__version__}  built against CUDA {torch.version.cuda}")
