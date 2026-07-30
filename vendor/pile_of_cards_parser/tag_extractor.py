@@ -162,6 +162,14 @@ _TARGET_TYPE_MAP = [
     # see the priority check in _target_type) maps to CARD.
 ]
 
+# Basic land names, for the "<name> card" -> ['CARD', 'LAND'] compound in
+# _target_type -- not in _TARGET_TYPE_MAP since these are proper names, not
+# the generic supertype noun 'land' that map already matches.
+_BASIC_LAND_TYPE = {
+    'plains': 'LAND', 'island': 'LAND', 'swamp': 'LAND',
+    'mountain': 'LAND', 'forest': 'LAND',
+}
+
 def _collect_types(text):
     """All _TARGET_TYPE_MAP matches in `text`, for COMPOUND-type collection
     (a single object's multiple simultaneous types, e.g. "artifact
@@ -1035,23 +1043,52 @@ def _target_type(text):
     if re.search(r'\bany target\b', tl):
         return 'ANY'
     # 'X card(s)' where X is a type-adjective -- the object IS a card (in a
-    # zone), 'creature'/'artifact'/etc. only restricts which cards, doesn't
-    # change the object's own type (Victimize: 'target creature cards' ->
-    # CARD, not CREATURE; contrast Citadel Siege: 'target creature' (no
-    # 'card' suffix) -> CREATURE, an on-battlefield object).
-    # Basic land names (Plains/Island/Swamp/Mountain/Forest) count as the
-    # same "type-adjective before card(s)" shape as the generic supertypes
-    # above -- Farseek's "a Plains, Island, Swamp, or Mountain card" is
-    # still CARD, not a battlefield object, same as "creature card" is
-    # (found via corpus spot-check of top-played Commander staples).
-    # 'legendary' is a supertype, not a card TYPE, but the same reasoning
-    # applies -- The Day of the Doctor's "...until you exile a legendary
-    # card" is still CARD (gold-backed; was one of tag_extractor's 12
-    # known fails, but a plain local miss, not the cross-clause boundary
-    # the other 11 shared -- see known-issues #8's handoff note).
-    if re.search(r'\b(creature|artifact|land|instant|sorcery|planeswalker|enchantment'
-                 r'|plains|island|swamp|mountain|forest|legendary)\s+cards?\b', tl):
-        return 'CARD'
+    # zone), compounded with the type-adjective's own value per
+    # compound_target_type (Cemetery Recruitment: 'target creature card' ->
+    # ['CARD','CREATURE'], not CARD alone; contrast Citadel Siege: 'target
+    # creature' (no 'card' suffix) -> CREATURE, an on-battlefield object,
+    # a genuinely different, non-compound case).
+    # REVERSED 2026-07-29 from the original CARD-only policy (Victimize's
+    # gold entry updated to match) -- Tier-D oracle cluster spot-check
+    # (clause_pipeline_known_issues.md) found this dropped either the
+    # card-ness or the type-specificity across 5 corpus clusters / ~1,000+
+    # sampled clause instances (Cemetery Recruitment, Sister Hospitaller,
+    # Sanguine Indulgence, etc.), the same synergy-signal loss
+    # compound_target_type was introduced to fix for on-battlefield
+    # objects. User confirmed treating "creature card" the same as an
+    # on-battlefield "artifact creature token" rather than keeping the
+    # zone-vs-battlefield distinction the original policy drew.
+    # Basic land names (Plains/Island/Swamp/Mountain/Forest) map to LAND
+    # for the same compounding, via _BASIC_LAND_TYPE (not in
+    # _TARGET_TYPE_MAP, which only has the generic supertype noun 'land').
+    # 'legendary' is a supertype with no target_type value of its own
+    # (The Day of the Doctor's "...until you exile a legendary card" has
+    # nothing to compound CARD with) -- stays bare CARD, unchanged.
+    # 'permanent' was missing from this alternation entirely before this
+    # pass (Karn's Temporal Sundering/Sevinne's Reclamation's "target
+    # permanent card" fell through to the later 'target X' authoritative-
+    # noun check instead, losing CARD entirely rather than losing the
+    # type specificity) -- added so it goes through the same compounding
+    # path as every other type-adjective here.
+    # 'instant'/'sorcery' stay matched here (unchanged from before) but
+    # still compound to nothing -- INSTANT/SORCERY have never existed as
+    # target_type values anywhere in this codebase (checked before this
+    # pass), so adding them would be new VOCABULARY growth, a separate
+    # decision from this pass's combination-only compounding fix. "target
+    # instant or sorcery card" (Stormchaser's Talent) stays bare CARD,
+    # logged as an open question in clause_pipeline_known_issues.md, not
+    # silently expanded into here.
+    m = re.search(r'\b(creature|artifact|land|instant|sorcery|planeswalker|enchantment'
+                  r'|permanent|plains|island|swamp|mountain|forest|legendary)\s+cards?\b', tl)
+    if m:
+        word = m.group(1)
+        companion = _BASIC_LAND_TYPE.get(word)
+        if companion is None:
+            for pat, val in _TARGET_TYPE_MAP:
+                if pat.fullmatch(word) or pat.fullmatch(word + 's'):
+                    companion = val
+                    break
+        return ['CARD', companion] if companion else 'CARD'
     # The noun immediately after 'target' is authoritative when present --
     # checked BEFORE the whole-text scan, so a later, unrelated noun
     # (Inscription of Insight: "Target player creates ... creature token")

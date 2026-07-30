@@ -82,13 +82,13 @@
       "n_over_512": 0,
       "n_span_clause_misaligned": 0,
       "n_texts": 31041,
-      "share_over_256": 0.01939370509970684,
+      "share_over_256": 0.019780290583421924,
       "share_over_512": 0.0,
-      "tokens_max": 436,
-      "tokens_mean": 114.89562191939693,
+      "tokens_max": 440,
+      "tokens_mean": 115.06607390225831,
       "tokens_p50": 105,
-      "tokens_p90": 191,
-      "tokens_p99": 280
+      "tokens_p90": 192,
+      "tokens_p99": 281
     },
     "B_type": {
       "arm": "B_type",
@@ -118,13 +118,13 @@
       "n_over_512": 0,
       "n_span_clause_misaligned": 0,
       "n_texts": 31041,
-      "share_over_256": 0.017718501336941465,
+      "share_over_256": 0.018040655906704037,
       "share_over_512": 0.0,
-      "tokens_max": 436,
-      "tokens_mean": 105.26996552946103,
+      "tokens_max": 440,
+      "tokens_mean": 105.39605682806611,
       "tokens_p50": 92,
-      "tokens_p90": 185,
-      "tokens_p99": 277
+      "tokens_p90": 186,
+      "tokens_p99": 278
     },
     "D": {
       "arm": "D",
@@ -176,11 +176,11 @@
       },
       "non_space": {
         "max": 0.1188118811881188,
-        "mean": 0.01868161916838662,
-        "p90": 0.030534351145038167,
-        "p99": 0.0547945205479452,
-        "share_over_1pct": 0.8417254598756483,
-        "share_zero": 0.06253020199091525
+        "mean": 0.018428439327614655,
+        "p90": 0.030120481927710843,
+        "p99": 0.05454545454545454,
+        "share_over_1pct": 0.8344769820559904,
+        "share_zero": 0.06259463290486776
       }
     },
     "B_type": {
@@ -203,7 +203,7 @@
     }
   },
   "git_dirty": true,
-  "git_rev": "c0bebf0",
+  "git_rev": "93f454e",
   "inputs": {
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
       "bytes": 5093341,
@@ -242,7 +242,7 @@
       "A_raw",
       "A_t2"
     ],
-    "parser_pin": "91341a572dec79a07fa6a0dfe6589cd2581621aa2be3c30c6af9bab321862719"
+    "parser_pin": "2f61bf8d0f71a57303b2256a17304f95ee13fc912ce0018de4c553a3dd4537e0"
   },
   "thresholds": {
     "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
@@ -264,6 +264,22 @@
       "ci": 0.95,
       "generalization_ratio": 0.5,
       "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
     }
   }
 }

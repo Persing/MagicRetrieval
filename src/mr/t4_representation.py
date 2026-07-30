@@ -410,6 +410,21 @@ def render(records: list[dict], agg: dict, agg_clean: dict, verd: dict, meta: di
               "the harness runs end-to-end, not to rank arms. Every verdict below is arithmetic on "
               "a sample far too small to mean anything.\n\n" if smoke else "")
 
+    # A run short of the frozen seed count must say so on its face. THRESHOLDS.md fixes n=5
+    # precisely so that n is not chosen after seeing results; an interim artifact that renders
+    # identically to a final one invites exactly that, and these files get cited. Same principle as
+    # the completeness guards: the report should not read as more finished than it is.
+    n_seeds = max((v["n_seeds"] for v in {**agg_clean, **agg}.values()), default=0)
+    if not smoke and 0 < n_seeds < thresholds.T4_N_SEEDS:
+        banner += (
+            f"> **INTERIM — {n_seeds} of {thresholds.T4_N_SEEDS} frozen seeds.** The verdicts below "
+            f"are computed on {n_seeds} seeds and are **not final**. `THRESHOLDS.md` fixes "
+            f"n={thresholds.T4_N_SEEDS} so that n is not chosen after seeing results, and at n=3 "
+            "the sample sd is itself noisy enough to make the null rule unstable. Read this pass "
+            "for harness sanity and for whether the seed spread looks plausible — not for whether "
+            f"an arm won. Complete with `--seeds "
+            f"{' '.join(str(s) for s in DEFAULT_SEEDS[n_seeds:])}` and re-merge.\n\n")
+
     # An arm that produced no result must be visible. Absent from the table and absent from the
     # page are the same thing to a reader, and one of them is a missing measurement.
     skipped = [r for r in records if r.get("skipped")]
@@ -480,8 +495,12 @@ def merge_partials(findings_dir: Path, smoke: bool = False) -> dict:
     meta = records[0].get("layer0_meta", {})
 
     payload = report.envelope([config.CARDS_PARQUET], {"merged_from": sorted(seen.values())})
+    n_seeds = max((v["n_seeds"] for v in {**agg_clean, **agg}.values()), default=0)
     payload.update({"records": records, "aggregate": agg, "aggregate_clean_universe": agg_clean,
-                    "verdicts": verd, "layer0_meta": meta, "smoke": smoke})
+                    "verdicts": verd, "layer0_meta": meta, "smoke": smoke,
+                    "n_seeds": n_seeds,
+                    "frozen_n_seeds": thresholds.T4_N_SEEDS,
+                    "is_final": bool(smoke is False and n_seeds >= thresholds.T4_N_SEEDS)})
     report.write("t4_representation", payload,
                  render(records, agg, agg_clean, verd, meta, smoke), findings_dir=findings_dir)
     return payload

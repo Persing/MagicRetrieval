@@ -184,3 +184,23 @@ def test_merge_writes_both_findings_files(tmp_path):
     md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
     assert "SMOKE RUN" in md, "a smoke run must say so in the report, not just in the JSON"
     assert payload["thresholds"]["t4"]["gate_c_minus_bplus"] == thresholds.T4_GATE_C_MINUS_BPLUS
+
+
+def test_interim_run_declares_itself_non_final(tmp_path):
+    """A 3-of-5-seed pass must not render as a finished result. n=5 is frozen so that n is not
+    chosen after seeing results; an interim artifact that looks identical to a final one is how
+    that discipline quietly gets lost."""
+    _write(tmp_path, [_rec(a, s, 0.5) for a in ("A", "B") for s in (42, 43, 44)])
+    payload = T.merge_partials(tmp_path)
+    md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
+    assert "INTERIM" in md and "not final" in md
+    assert payload["is_final"] is False
+    assert payload["n_seeds"] == 3 and payload["frozen_n_seeds"] == 5
+
+
+def test_full_seed_run_is_marked_final(tmp_path):
+    _write(tmp_path, [_rec(a, s, 0.5) for a in ("A", "B") for s in (42, 43, 44, 45, 46)])
+    payload = T.merge_partials(tmp_path)
+    md = (tmp_path / "t4_representation.md").read_text(encoding="utf-8")
+    assert "INTERIM" not in md
+    assert payload["is_final"] is True
