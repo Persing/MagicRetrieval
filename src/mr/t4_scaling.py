@@ -284,8 +284,22 @@ def paired_bootstrap(hits_high: np.ndarray, hits_low: np.ndarray, n_queries: int
         raise ValueError(f"paired vectors are {len(d)} long but the query set is {n_queries} — "
                          "the levels were not scored on the same evaluation")
     rng = np.random.default_rng(seed)
-    idx = rng.integers(0, n_queries, size=(n_boot, n_queries))
-    means = d[idx].mean(axis=1)
+    # Drawn in chunks, not as one (n_boot, n_queries) block. At cedh's 675,233 queries and 10,000
+    # resamples that block is ~54 GB of int64, and `d[idx]` is another 54 GB of float64 — it only
+    # completed on the pod because that machine had the RAM, and it OOMs on a workstation. Since the
+    # merge is supposed to be runnable off-pod (it needs no GPU), that was a portability bug.
+    #
+    # Chunking is exactly reproducible: `default_rng` fills row-major, so N sequential draws of
+    # (chunk, n_queries) consume the same stream in the same order as one draw of
+    # (n_boot, n_queries). The intervals are identical, not merely equivalent.
+    per_chunk = max(1, int(32_000_000 // max(1, n_queries)))
+    means = np.empty(n_boot, dtype=float)
+    done = 0
+    while done < n_boot:
+        take = min(per_chunk, n_boot - done)
+        idx = rng.integers(0, n_queries, size=(take, n_queries))
+        means[done:done + take] = d[idx].mean(axis=1)
+        done += take
     lo, hi = (1 - ci) / 2, 1 - (1 - ci) / 2
     return {"observed": float(d.mean()),
             "ci_low": float(np.quantile(means, lo)), "ci_high": float(np.quantile(means, hi)),
@@ -464,6 +478,8 @@ def render(records: list[dict], res: dict, pre: dict | None, meta: dict, corpus_
     verdict_rows = "\n".join(vlines)
 
     ratios = ", ".join(f"{arm} {a['example_ratio']:.2f}x" for arm, a in sorted(res.items()))
+    cold_expect = (thresholds.T4_COLDSTART_MAX_COUNT * thresholds.T4_SCALING_CEDH_SUBSAMPLE
+                   / max(1, meta.get("n_train_available", 1)))
     deck_ratio = (meta.get("n_train_available", 0) / thresholds.T4_SCALING_CEDH_SUBSAMPLE
                   if meta.get("n_train_available") else float("nan"))
 
@@ -525,14 +541,31 @@ the two hit vectors are paired by construction rather than by coincidence.
 
 ## What this does not license
 
-Where the cap binds equally, the two levels draw {min(r['layer0_meta']['n_positives'] for r in records):,}
-positives from **different-sized pools**, so pair composition shifts even at constant count. That
-shift is the diversity intervention, correctly isolated — but it is diversity *of pairs*, not deck
-diversity holding the pairs themselves fixed. The distinction is not rhetorical: it is the
-difference between "more decks give better pairs" and "more decks give more contexts per card".
+**Volume is not matched.** {"The cap binds nowhere here, so the" if not all_bound else "Even with the cap binding, the"} two levels differ in training examples as well as
+decks ({ratios}), and the volume null above is what the frozen slope says those extra examples buy.
+An excess over it is therefore diversity evidence **conditional on D4's slope transferring from
+casual to cedh**. The matched-volume design this was meant to be would not have needed that
+assumption.
 
-cedh's played vocabulary is far narrower than the {meta.get('n_pool', 0):,}-card retrieval pool, so
-absolute recall here is not comparable to casual's.
+**The cold-start stratum is frozen at full-level counts**, which is what makes the two levels
+comparable — same cards, same queries — but it has a consequence. `near_zero ∪ low` means at most
+{thresholds.T4_COLDSTART_MAX_COUNT} appearances among {meta.get('n_train_available', 0):,} train
+decks; in a {thresholds.T4_SCALING_CEDH_SUBSAMPLE:,}-deck subsample those same cards expect at most {cold_expect:.2f} appearances.
+So most are not *rare* at the low level, they are **absent**. Part of the cold-start
+effect is therefore "a few exposures versus none", which is neither deck diversity nor something the
+pair-count null models. Read the cold-start rows with that in mind.
+
+**A gap smaller than the pooled seed sd is a null under T4's standing rule**, and
+`t4_scaling_verdict` checks the CI branches before that condition — so a `VOLUME_PROXY` or
+`BELOW_VOLUME_NULL` row whose gap sits inside its seed sd is a null result, not a finding. The query
+bootstrap is tight because it resamples ~10^5 paired queries; it does not capture training variance,
+which the seed sd does. Compare the two columns before reading any row as a result. This is a
+limitation of the frozen rule, recorded rather than repaired: the rule was fixed before the run and
+is not being edited after seeing the numbers.
+
+cedh's played vocabulary is far narrower than the {meta.get('n_pool', 0):,}-card retrieval pool
+(PPMI vocabulary {meta.get('n_ppmi_vocab', 0):,}), so absolute recall here is not comparable to
+casual's.
 """
 
 
