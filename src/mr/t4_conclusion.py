@@ -39,6 +39,10 @@ SOURCES = {
     "t4_diagnostics": "uv run python -m mr.t4_diagnostics",
 }
 
+# Optional because the conclusion has to render before Phase 4 exists — a missing scaling result is
+# a section that says so, not a crash. Everything in SOURCES is required; this is not.
+OPTIONAL_SOURCES = {"t4_scaling": "uv run python -m mr.t4_scaling --merge --corpus cedh"}
+
 LADDER = tuple(a for a in encodings.ALL_ARMS if a != "D")  # D has no full-universe number
 
 
@@ -56,12 +60,17 @@ def load(findings_dir: Path | None = None) -> dict[str, dict]:
         if not p.exists():
             raise FileNotFoundError(f"{p} is missing — produce it with:  {cmd}")
         out[name] = json.loads(p.read_text(encoding="utf-8"))
+    for name in OPTIONAL_SOURCES:
+        p = d / f"{name}.json"
+        if p.exists():
+            out[name] = json.loads(p.read_text(encoding="utf-8"))
     return out
 
 
 def source_paths(findings_dir: Path | None = None) -> list[Path]:
     d = findings_dir or config.FINDINGS_DIR
-    return [d / f"{n}.json" for n in SOURCES]
+    return [d / f"{n}.json" for n in list(SOURCES) + list(OPTIONAL_SOURCES)
+            if (d / f"{n}.json").exists()]
 
 
 # ── per-seed extraction ───────────────────────────────────────────────────────
@@ -343,6 +352,7 @@ share. It moves clean-parse cards out to let gap cards in; the slots are conserv
 CDL is used on {cdl['n_cdl']:,} of {cdl['n_cdl'] + cdl['n_fallback']:,} cards in the pool, and on
 exactly those cards it makes retrieval worse.
 
+{scaling_section(src, cdl)}
 ## Caveats, weighted
 
 - **The EDHREC confound above is the largest one and is not solved.** Absolute numbers do not mean
@@ -370,6 +380,95 @@ exactly those cards it makes retrieval worse.
         "corpus": meta.get("corpus"),
     }
     return md, payload
+
+
+def scaling_section(src: dict, cdl: dict) -> str:
+    """The cedh diversity test, and what it composes with D4 into.
+
+    Absent until Phase 4 runs, so the section says that rather than being silently omitted — a
+    conclusion missing a section it should have reads the same as one that never needed it.
+    """
+    sc = src.get("t4_scaling")
+    if not sc:
+        return ("\n## 5. Does more data help? — **not yet run**\n\n"
+                "`findings/t4_scaling.json` is absent, so the volume-versus-diversity decomposition "
+                "below is missing its second half. Produce it with "
+                "`uv run python -m mr.t4_scaling --merge --corpus cedh`.\n")
+
+    res, meta = sc["analysis"], sc["layer0_meta"]
+    rows = []
+    for arm in sorted(res):
+        a = res[arm]
+        for name in ("cold_start", "aggregate"):
+            u = a["universes"].get(name)
+            if not u:
+                continue
+            b = u["bootstrap"]
+            ci = f"[{b['ci_low']:+.4f}, {b['ci_high']:+.4f}]" if b else "—"
+            # Surfaced next to the verdict because T4's standing null rule is checked LAST inside
+            # `t4_scaling_verdict`, after the CI branches — so a row can carry a decisive-sounding
+            # label while its gap sits inside the training noise. The reader needs both columns.
+            inside = abs(u["observed"]) < u["pooled_sd"]
+            note = " ⚠︎ inside seed sd" if inside else ""
+            rows.append(f"| {arm} | {name.replace('_', '-')} | {u['observed']:+.4f} "
+                        f"| {u['predicted']:+.4f} | {ci} | {u['pooled_sd']:.4f} "
+                        f"| **{u['verdict']}**{note} |")
+
+    cold = {arm: res[arm]["universes"]["cold_start"] for arm in res
+            if "cold_start" in res[arm]["universes"]}
+    best = max(cold.values(), key=lambda u: u["observed"]) if cold else None
+    ratio = next(iter(res.values()))["example_ratio"]
+    pred = next(iter(res.values()))["predicted"]
+    deck_ratio = meta.get("n_train_available", 0) / max(1, thresholds.T4_SCALING_CEDH_SUBSAMPLE)
+    fold = best["observed"] / pred if best and pred else float("nan")
+
+    return f"""
+## 5. Does more data help? Volume and diversity, separated
+
+Two experiments, each holding one thing fixed.
+
+| | decks | training examples | effect |
+|---|---|---|---|
+| **D4** (`t4_matched_data`, casual) | fixed | **{cdl['matched_ratio']:.0f}×** | volume: `B+ full − B+_random` = **{cdl['volume_effect'] + cdl['skew_effect']:+.4f}** |
+| **cedh scaling** (`t4_scaling`) | **{deck_ratio:.1f}×** | {ratio:.2f}× | diversity: see below |
+
+The cedh test compares {thresholds.T4_SCALING_CEDH_SUBSAMPLE:,} train decks against
+{meta.get('n_train_available', 0):,}, resampled per seed, on a byte-identical test set of
+{meta.get('n_queries', 0):,} queries. Its **volume null of {pred:+.4f}** is what D4's slope says the
+extra examples alone buy — pre-registered in `THRESHOLDS.md` from counts measured before any model
+trained.
+
+| arm | universe | observed | volume null | 95% CI | pooled seed sd | verdict |
+|---|---|---|---|---|---|---|
+{chr(10).join(rows)}
+
+**On the cold-start stratum every arm beats the volume null by roughly {fold:.0f}×.** More decks buy
+something on the tail that more pairs do not explain. On the aggregate nothing survives: every gap
+there is smaller than its own pooled seed sd, so by T4's standing null rule those rows are **null**
+regardless of the label — the query bootstrap is tight because it resamples ~10⁵ paired queries, and
+it does not see training variance. That the frozen rule prints a decisive label anyway is a
+limitation of the rule, recorded rather than repaired after the fact.
+
+**Three caveats, all load-bearing.** Volume is *not* matched ({ratio:.2f}× examples), so an excess
+over the null is diversity evidence conditional on D4's slope transferring from casual to cedh. The
+cold-start stratum is frozen at full-level counts, so cards with ≤{thresholds.T4_COLDSTART_MAX_COUNT}
+appearances in {meta.get('n_train_available', 0):,} decks expect ≤{thresholds.T4_COLDSTART_MAX_COUNT * thresholds.T4_SCALING_CEDH_SUBSAMPLE / max(1, meta.get('n_train_available', 1)):.2f}
+in the subsample and are mostly **absent** rather than rare — part of the effect is "a few exposures
+versus none". And `max_sim` runs the *opposite* direction to `centroid` on the aggregate; both
+aggregators were frozen up front so that gets reported rather than chosen between.
+
+## 6. What to do with all of it
+
+Ranked by what the evidence actually supports:
+
+1. **Do not spend on richer representation.** Every gate failed, the dose-response is monotonically
+   *against* structure on cold-start, and CDL specifically makes retrieval worse.
+2. **Do spend on more, more diverse decks** — that is the only intervention here that moved the
+   cold-start number, and it moved it by ~{fold:.0f}× what extra training pairs alone would.
+3. **Ship popularity for staples and arm A for the tail**, split on play count. Popularity wins the
+   aggregate outright and scores exactly 0.0000 off it; arm A is the plainest arm and the best of
+   them where popularity cannot reach.
+"""
 
 
 REQUIRED = ("c_minus_bplus", "non_staple", "dialect_gap_C", "encoding_effect")

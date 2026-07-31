@@ -17,12 +17,12 @@ held-out decks, primary metric recall@50, deck-level split. Corpus **casual**,
 
 | arm | seeds | recall@50 mean | sd | recall@50, clean-parse universe |
 |---|---|---|---|---|
-| A | 3 | 0.0608 | 0.0007 | 0.0900 |
-| B | 3 | 0.0584 | 0.0010 | 0.0868 |
-| B_type | 3 | 0.0616 | 0.0015 | 0.0923 |
-| B+ | 3 | 0.0624 | 0.0008 | 0.0937 |
+| A | 4 | 0.0607 | 0.0006 | 0.0896 |
+| B | 4 | 0.0584 | 0.0009 | 0.0868 |
+| B_type | 4 | 0.0613 | 0.0013 | 0.0912 |
+| B+ | 4 | 0.0628 | 0.0010 | 0.0953 |
 | C | 3 | 0.0535 | 0.0006 | 0.0743 |
-| D | 3 | — | — | 0.0315 |
+| D | 4 | — | — | 0.0314 |
 
 The clean-parse column re-scores **every** arm with candidates and targets restricted to the
 10,628 cards CDL parses cleanly. Arm D appears only there: it has no text
@@ -48,10 +48,10 @@ of the corpus against models that know all of it.
 
 | comparison | question | gap | pooled seed sd | gate | verdict |
 |---|---|---|---|---|---|
-| C - B+ | does CDL justify continued development? | -0.0089 | 0.0007 | +0.02 | **BELOW_GATE** |
-| B+ - B | does clause tagging beat plain segmentation? | +0.0040 | 0.0009 | +0.02 | **BELOW_GATE** |
-| B - A | does segmentation alone buy anything? | -0.0024 | 0.0009 | +0.01 | **BELOW_GATE** |
-| B+ - B_type | do tags help despite their error rate? | +0.0008 | 0.0012 | — | **NULL** |
+| C - B+ | does CDL justify continued development? | -0.0093 | 0.0009 | +0.02 | **BELOW_GATE** |
+| B+ - B | does clause tagging beat plain segmentation? | +0.0044 | 0.0009 | +0.02 | **BELOW_GATE** |
+| B - A | does segmentation alone buy anything? | -0.0023 | 0.0007 | +0.01 | **BELOW_GATE** |
+| B+ - B_type | do tags help despite their error rate? | +0.0015 | 0.0012 | — | **REAL_GAP** |
 
 **The null rule is checked first and can veto a gap that clears its gate:** a difference smaller
 than the pooled seed standard deviation is a null result, not a small win. Frozen in
@@ -64,28 +64,28 @@ than the pooled seed standard deviation is a null result, not a small win. Froze
 
 | stratum | n | A | B | B+ | B_type | C | popularity | random |
 |---|---|---|---|---|---|---|---|---|
-| clean | 18,703 | 0.0517 | 0.0492 | 0.0580 | 0.0539 | 0.0364 | 0.3369 | 0.0024 |
-| excluded | 1,786 | 0.0780 | 0.0780 | 0.0808 | 0.0838 | 0.0803 | 0.0157 | 0.0028 |
-| gap | 19,968 | 0.0677 | 0.0652 | 0.0649 | 0.0668 | 0.0672 | 0.0493 | 0.0031 |
+| clean | 18,703 | 0.0516 | 0.0493 | 0.0584 | 0.0531 | 0.0364 | 0.3369 | 0.0024 |
+| excluded | 1,786 | 0.0788 | 0.0788 | 0.0812 | 0.0833 | 0.0803 | 0.0157 | 0.0028 |
+| gap | 19,968 | 0.0676 | 0.0651 | 0.0653 | 0.0671 | 0.0672 | 0.0493 | 0.0031 |
 
 ### by play_bucket
 
 | stratum | n | A | B | B+ | B_type | C | popularity | random |
 |---|---|---|---|---|---|---|---|---|
-| high | 11,283 | 0.0196 | 0.0165 | 0.0344 | 0.0253 | 0.0118 | 0.6481 | 0.0000 |
-| low | 5,083 | 0.1451 | 0.1409 | 0.1351 | 0.1413 | 0.1298 | 0.0000 | 0.0043 |
-| mid | 23,210 | 0.0601 | 0.0581 | 0.0577 | 0.0595 | 0.0547 | 0.0000 | 0.0038 |
-| near_zero | 881 | 0.1211 | 0.1252 | 0.1245 | 0.1199 | 0.1162 | 0.0000 | 0.0011 |
+| high | 11,283 | 0.0189 | 0.0167 | 0.0355 | 0.0239 | 0.0118 | 0.6481 | 0.0000 |
+| low | 5,083 | 0.1445 | 0.1412 | 0.1359 | 0.1421 | 0.1298 | 0.0000 | 0.0043 |
+| mid | 23,210 | 0.0603 | 0.0579 | 0.0578 | 0.0596 | 0.0547 | 0.0000 | 0.0038 |
+| near_zero | 881 | 0.1234 | 0.1263 | 0.1220 | 0.1200 | 0.1162 | 0.0000 | 0.0011 |
 
 ### by unusual_bucket
 
 | stratum | n | A | B | B+ | B_type | C | popularity | random |
 |---|---|---|---|---|---|---|---|---|
-| common | 19,734 | 0.0624 | 0.0602 | 0.0698 | 0.0654 | 0.0528 | 0.1709 | 0.0032 |
-| rare | 11,361 | 0.0542 | 0.0511 | 0.0516 | 0.0524 | 0.0499 | 0.2193 | 0.0030 |
-| unknown | 165 | 0.0586 | 0.0384 | 0.0424 | 0.0404 | 0.0444 | 0.0000 | 0.0061 |
-| very_common | 4,857 | 0.0651 | 0.0620 | 0.0579 | 0.0671 | 0.0560 | 0.2314 | 0.0012 |
-| very_rare | 4,340 | 0.0660 | 0.0660 | 0.0625 | 0.0629 | 0.0639 | 0.0751 | 0.0018 |
+| common | 19,734 | 0.0625 | 0.0603 | 0.0700 | 0.0648 | 0.0528 | 0.1709 | 0.0032 |
+| rare | 11,361 | 0.0540 | 0.0514 | 0.0529 | 0.0525 | 0.0499 | 0.2193 | 0.0030 |
+| unknown | 165 | 0.0576 | 0.0379 | 0.0424 | 0.0394 | 0.0444 | 0.0000 | 0.0061 |
+| very_common | 4,857 | 0.0652 | 0.0620 | 0.0578 | 0.0669 | 0.0560 | 0.2314 | 0.0012 |
+| very_rare | 4,340 | 0.0651 | 0.0646 | 0.0626 | 0.0632 | 0.0639 | 0.0751 | 0.0018 |
 
 Read these before the aggregate. Arms tying overall while separating on the low-play stratum is
 itself the finding — that stratum is the cold-start proxy and the entire reason a text-side encoder

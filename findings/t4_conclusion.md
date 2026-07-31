@@ -20,11 +20,11 @@ not a flat null, and the shape of it is the finding.
 
 | arm | seeds | recall@50 | gated cold-start | sd | vs A (paired) | pooled sd | null rule |
 |---|---|---|---|---|---|---|---|
-| A | 3 | 0.0608 | 0.1415 | 0.0004 | — | — | — |
-| B | 3 | 0.0584 | 0.1386 | 0.0048 | -0.0029 | 0.0034 | **NULL** |
-| B_type | 3 | 0.0616 | 0.1382 | 0.0013 | -0.0034 | 0.0010 | **REAL_GAP** |
-| B+ | 3 | 0.0624 | 0.1335 | 0.0019 | -0.0080 | 0.0014 | **REAL_GAP** |
-| C | 3 | 0.0535 | 0.1278 | 0.0017 | -0.0137 | 0.0012 | **REAL_GAP** |
+| A | 4 | 0.0607 | 0.1413 | 0.0005 | — | — | — |
+| B | 4 | 0.0584 | 0.1390 | 0.0040 | -0.0023 | 0.0028 | **NULL** |
+| B_type | 4 | 0.0613 | 0.1388 | 0.0017 | -0.0025 | 0.0013 | **REAL_GAP** |
+| B+ | 4 | 0.0628 | 0.1339 | 0.0017 | -0.0075 | 0.0013 | **REAL_GAP** |
+| C | 3 | 0.0535 | 0.1278 | 0.0017 | -0.0137 | 0.0011 | **REAL_GAP** |
 
 Cold-start is the gated `near_zero ∪ low` stratum — at most
 5 appearances across *training* decks — 5,964 targets.
@@ -34,7 +34,7 @@ is measured against the pooled seed sd and is the one that counts.
 
 The arms are ordered by how much structure they carry, and the cold-start column falls
 monotonically along that ordering. On the high-play bucket (11,283 targets) the sign
-flips: `B+ − A` = **+0.0148** paired across 3 seeds.
+flips: `B+ − A` = **+0.0166** paired across 4 seeds.
 
 **Reading: structure trades generalization for memorization.** Added structure raises
 representational distinctiveness, which pays where dense co-occurrence makes memorizing a card's
@@ -44,7 +44,7 @@ got a negative number instead.
 
 ## 2. The premise that survives
 
-Cold-start recall lands at 0.1278–0.1415: about
+Cold-start recall lands at 0.1278–0.1413: about
 2.0× the aggregate, **33× random** (0.003856), against
 a popularity baseline of **exactly 0.0000**.
 
@@ -55,7 +55,7 @@ for the tail.
 ## 3. The metric verdict
 
 Popularity alone scores **0.1808** on the aggregate, beating every arm
-(best: B+ at 0.0624). It reaches
+(best: B+ at 0.0628). It reaches
 0.6481 on high-play cards and 0.0000 off them.
 
 A global frequency ranking returns the same top-50 for every query, so **aggregate recall@50 on
@@ -69,7 +69,7 @@ Over-determined. Four independent attempts to rescue it, each with the number th
 
 | question | answer | figure |
 |---|---|---|
-| Does CDL justify continued development? | No | `C − B+` = **-0.0089**, pooled seed sd 0.0007, gate +0.02 → **BELOW_GATE** |
+| Does CDL justify continued development? | No | `C − B+` = **-0.0093**, pooled seed sd 0.0009, gate +0.02 → **BELOW_GATE** |
 | Is that an artifact of the staple-enriched clean stratum? | No | clean **-0.0216**, clean non-staple **-0.0144** = 3.4× its paired sd |
 | Is it heterogeneity — two dialects in one space — rather than CDL? | No | C's partition gap **0.0031** vs 0.0006–0.0012 for the single-dialect arms; real, but small against mean cosine 0.526 |
 | Was arm D simply data-starved? | No | at matched volume the encoding effect is **+0.0427** against a volume effect of +0.0194 over 27× the data |
@@ -80,6 +80,58 @@ share. It moves clean-parse cards out to let gap cards in; the slots are conserv
 
 CDL is used on 10,628 of 30,958 cards in the pool, and on
 exactly those cards it makes retrieval worse.
+
+
+## 5. Does more data help? Volume and diversity, separated
+
+Two experiments, each holding one thing fixed.
+
+| | decks | training examples | effect |
+|---|---|---|---|
+| **D4** (`t4_matched_data`, casual) | fixed | **27×** | volume: `B+ full − B+_random` = **+0.0128** |
+| **cedh scaling** (`t4_scaling`) | **12.6×** | 2.97× | diversity: see below |
+
+The cedh test compares 3,142 train decks against
+39,733, resampled per seed, on a byte-identical test set of
+675,233 queries. Its **volume null of +0.0042** is what D4's slope says the
+extra examples alone buy — pre-registered in `THRESHOLDS.md` from counts measured before any model
+trained.
+
+| arm | universe | observed | volume null | 95% CI | pooled seed sd | verdict |
+|---|---|---|---|---|---|---|
+| A | cold-start | +0.0410 | +0.0042 | [+0.0320, +0.0503] | 0.0074 | **DIVERSITY_BEYOND_VOLUME** |
+| A | aggregate | +0.0022 | +0.0042 | [+0.0020, +0.0024] | 0.0041 | **BELOW_VOLUME_NULL** ⚠︎ inside seed sd |
+| B+ | cold-start | +0.0440 | +0.0042 | [+0.0350, +0.0533] | 0.0131 | **DIVERSITY_BEYOND_VOLUME** |
+| B+ | aggregate | -0.0038 | +0.0042 | [-0.0040, -0.0036] | 0.0076 | **BELOW_VOLUME_NULL** ⚠︎ inside seed sd |
+| C | cold-start | +0.0360 | +0.0042 | [+0.0276, +0.0449] | 0.0096 | **DIVERSITY_BEYOND_VOLUME** |
+| C | aggregate | -0.0025 | +0.0042 | [-0.0027, -0.0024] | 0.0052 | **BELOW_VOLUME_NULL** ⚠︎ inside seed sd |
+
+**On the cold-start stratum every arm beats the volume null by roughly 10×.** More decks buy
+something on the tail that more pairs do not explain. On the aggregate nothing survives: every gap
+there is smaller than its own pooled seed sd, so by T4's standing null rule those rows are **null**
+regardless of the label — the query bootstrap is tight because it resamples ~10⁵ paired queries, and
+it does not see training variance. That the frozen rule prints a decisive label anyway is a
+limitation of the rule, recorded rather than repaired after the fact.
+
+**Three caveats, all load-bearing.** Volume is *not* matched (2.97× examples), so an excess
+over the null is diversity evidence conditional on D4's slope transferring from casual to cedh. The
+cold-start stratum is frozen at full-level counts, so cards with ≤5
+appearances in 39,733 decks expect ≤0.40
+in the subsample and are mostly **absent** rather than rare — part of the effect is "a few exposures
+versus none". And `max_sim` runs the *opposite* direction to `centroid` on the aggregate; both
+aggregators were frozen up front so that gets reported rather than chosen between.
+
+## 6. What to do with all of it
+
+Ranked by what the evidence actually supports:
+
+1. **Do not spend on richer representation.** Every gate failed, the dose-response is monotonically
+   *against* structure on cold-start, and CDL specifically makes retrieval worse.
+2. **Do spend on more, more diverse decks** — that is the only intervention here that moved the
+   cold-start number, and it moved it by ~10× what extra training pairs alone would.
+3. **Ship popularity for staples and arm A for the tail**, split on play count. Popularity wins the
+   aggregate outright and scores exactly 0.0000 off it; arm A is the plainest arm and the best of
+   them where popularity cannot reach.
 
 ## Caveats, weighted
 

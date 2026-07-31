@@ -25,11 +25,11 @@
     },
     "baseline_clean_share": 0.3983867521367521,
     "c_minus_bplus": {
-      "gap": -0.00885714050308558,
+      "gap": -0.009271160326601899,
       "gate": 0.02,
-      "paired_mean_gap": -0.008857140503085581,
-      "paired_sd": 0.00129250446764035,
-      "pooled_sd": 0.0006679090466725269,
+      "paired_mean_gap": null,
+      "paired_sd": null,
+      "pooled_sd": 0.0008765111464986485,
       "question": "does CDL justify continued development?",
       "verdict": "BELOW_GATE"
     },
@@ -63,82 +63,82 @@
   "dose_response": [
     {
       "aggregate": {
-        "mean": 0.06079706025327302,
-        "n_seeds": 3,
-        "sd": 0.0006997016996007979
+        "mean": 0.06070024964777418,
+        "n_seeds": 4,
+        "sd": 0.0006032225838204665
       },
       "arm": "A",
       "coldstart": {
-        "mean": 0.14151576123407109,
-        "n_seeds": 3,
-        "sd": 0.0004436202734850044
+        "mean": 0.14134808853118713,
+        "n_seeds": 4,
+        "sd": 0.0004936150718940182
       },
-      "pooled_sd": 0.0004436202734850044,
+      "pooled_sd": 0.0004936150718940182,
       "verdict": "\u2014",
       "vs_A": {
         "mean": 0.0,
-        "n_seeds": 3,
+        "n_seeds": 4,
         "sd": 0.0
       }
     },
     {
       "aggregate": {
         "mean": 0.05838297451615295,
-        "n_seeds": 3,
-        "sd": 0.0010437151707105026
+        "n_seeds": 4,
+        "sd": 0.0008521898683475232
       },
       "arm": "B",
       "coldstart": {
-        "mean": 0.13860943438408227,
-        "n_seeds": 3,
-        "sd": 0.0047936019768369245
+        "mean": 0.13900067069081154,
+        "n_seeds": 4,
+        "sd": 0.0039914086902206845
       },
-      "pooled_sd": 0.0034040724771501104,
+      "pooled_sd": 0.0028438529472856132,
       "verdict": "NULL",
       "vs_A": {
-        "mean": -0.0029063268499888253,
-        "n_seeds": 3,
-        "sd": 0.005179793089245543
+        "mean": -0.002347417840375593,
+        "n_seeds": 4,
+        "sd": 0.004374511944857921
       }
     },
     {
       "aggregate": {
-        "mean": 0.06156330589679578,
-        "n_seeds": 3,
-        "sd": 0.0014814760624842548
+        "mean": 0.06132436908322417,
+        "n_seeds": 4,
+        "sd": 0.0013005937436397737
       },
       "arm": "B_type",
       "coldstart": {
-        "mean": 0.1381623071763917,
-        "n_seeds": 3,
-        "sd": 0.0013413816230717635
+        "mean": 0.1388329979879276,
+        "n_seeds": 4,
+        "sd": 0.0017317162290218715
       },
-      "pooled_sd": 0.0009990254265436762,
+      "pooled_sd": 0.0012732825564380178,
       "verdict": "REAL_GAP",
       "vs_A": {
-        "mean": -0.003353454057679404,
-        "n_seeds": 3,
-        "sd": 0.0009335620997367579
+        "mean": -0.002515090543259553,
+        "n_seeds": 4,
+        "sd": 0.0018418574841587367
       }
     },
     {
       "aggregate": {
-        "mean": 0.062387225943594436,
-        "n_seeds": 3,
-        "sd": 0.0007674407245351889
+        "mean": 0.06280124576711076,
+        "n_seeds": 4,
+        "sd": 0.0010384089596628186
       },
       "arm": "B+",
       "coldstart": {
-        "mean": 0.13352336239660184,
-        "n_seeds": 3,
-        "sd": 0.001906854695867639
+        "mean": 0.13388665325285043,
+        "n_seeds": 4,
+        "sd": 0.001718133931247412
       },
-      "pooled_sd": 0.0013843579338811507,
+      "pooled_sd": 0.0012640490585623294,
       "verdict": "REAL_GAP",
       "vs_A": {
-        "mean": -0.007992398837469264,
-        "n_seeds": 3,
-        "sd": 0.0022887989301859125
+        "mean": -0.007461435278336689,
+        "n_seeds": 4,
+        "sd": 0.0021494393609467186
       }
     },
     {
@@ -153,7 +153,7 @@
         "n_seeds": 3,
         "sd": 0.0016513846079470348
       },
-      "pooled_sd": 0.0012091050554875892,
+      "pooled_sd": 0.0011122148861017437,
       "verdict": "REAL_GAP",
       "vs_A": {
         "mean": -0.013749161636485577,
@@ -163,11 +163,11 @@
     }
   ],
   "git_dirty": true,
-  "git_rev": "fd1469e",
+  "git_rev": "d5ca318",
   "highplay_flip": {
-    "mean": 0.014830571065614936,
-    "n_seeds": 3,
-    "sd": 0.0035895620662516627
+    "mean": 0.016617920765753788,
+    "n_seeds": 4,
+    "sd": 0.004622601686712189
   },
   "inputs": {
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_diagnostics.json": {
@@ -183,10 +183,16 @@
       "sha256": "78e9b62976c4dc156681989ab6371489b78100305107daafae80f125a5c94559"
     },
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_representation.json": {
-      "bytes": 439462,
+      "bytes": 558750,
       "exists": true,
-      "mtime": 1785424508,
-      "sha256": "abeb27373e186610dc12c699a31ea3db81d34fb226edd855a6b4a467ae75be50"
+      "mtime": 1785460927,
+      "sha256": "abf778df5210ea1cd77f246c72aa6741ccd9e6fbe735a5eb2477e705818ede07"
+    },
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_scaling.json": {
+      "bytes": 2610105,
+      "exists": true,
+      "mtime": 1785457295,
+      "sha256": "65491836f9ea892a8677689d17dc563a006e73a988cf5df81db1bb169bf9630d"
     },
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_staple_reread.json": {
       "bytes": 8706,
