@@ -174,6 +174,16 @@ a point estimate with no interval, and must be reported that way until the merge
    B+ 0.1670 vs 0.1479). Both aggregators were frozen up front precisely so this is reported rather
    than chosen between.
 
+**Before the "diversity" label ships, run `mr.t4_coverage_probe`.** The PPMI vocabulary is 4,821
+cards at the subsample level against 10,133 at full, so ~5,300 cards go from *zero* mined positives
+to some — and cold-start cards are exactly the marginal ones crossing that line. That **coverage**
+mechanism predicts a tail-concentrated gain and a flat aggregate, which is precisely what was
+observed, so the result does not by itself distinguish it from **diversity**. The two imply opposite
+actions: coverage says fix the mining (cheap, immediate), diversity says buy more decks (expensive,
+slow). The probe splits cold-start queries by whether the target was in the subsample's vocabulary
+and separates them. It needs no GPU and no pod — vendored corpus plus the committed partials, with
+the query fingerprint proving index alignment. ~3 min CPU.
+
 **To finish it.** Either recover the pod (retry `start-pod`; reducing it to 1 GPU in the console
 makes the host far likelier to fit it — `02_grid.sh` now clamps `NGPU` to the visible device count,
 and the pod re-syncs the repo on start, so a resized pod works), or re-run. A re-run costs ~$4.65 on

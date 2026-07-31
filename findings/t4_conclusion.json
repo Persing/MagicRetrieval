@@ -25,11 +25,11 @@
     },
     "baseline_clean_share": 0.3983867521367521,
     "c_minus_bplus": {
-      "gap": -0.009271160326601899,
+      "gap": -0.009382801492943127,
       "gate": 0.02,
       "paired_mean_gap": null,
       "paired_sd": null,
-      "pooled_sd": 0.0008765111464986485,
+      "pooled_sd": 0.0007812594417609937,
       "question": "does CDL justify continued development?",
       "verdict": "BELOW_GATE"
     },
@@ -63,111 +63,111 @@
   "dose_response": [
     {
       "aggregate": {
-        "mean": 0.06070024964777418,
-        "n_seeds": 4,
-        "sd": 0.0006032225838204665
+        "mean": 0.06077563833205626,
+        "n_seeds": 5,
+        "sd": 0.0005489311275671965
       },
       "arm": "A",
       "coldstart": {
         "mean": 0.14134808853118713,
-        "n_seeds": 4,
-        "sd": 0.0004936150718940182
+        "n_seeds": 5,
+        "sd": 0.0004274831919511018
       },
-      "pooled_sd": 0.0004936150718940182,
+      "pooled_sd": 0.0004274831919511018,
       "verdict": "\u2014",
       "vs_A": {
         "mean": 0.0,
-        "n_seeds": 4,
+        "n_seeds": 5,
         "sd": 0.0
       }
     },
     {
       "aggregate": {
-        "mean": 0.05838297451615295,
-        "n_seeds": 4,
-        "sd": 0.0008521898683475232
+        "mean": 0.05873890797636997,
+        "n_seeds": 5,
+        "sd": 0.0010854095168626155
       },
       "arm": "B",
       "coldstart": {
-        "mean": 0.13900067069081154,
-        "n_seeds": 4,
-        "sd": 0.0039914086902206845
+        "mean": 0.13943661971830984,
+        "n_seeds": 5,
+        "sd": 0.0035914851067713714
       },
-      "pooled_sd": 0.0028438529472856132,
+      "pooled_sd": 0.0025574897019891665,
       "verdict": "NULL",
       "vs_A": {
-        "mean": -0.002347417840375593,
-        "n_seeds": 4,
-        "sd": 0.004374511944857921
+        "mean": -0.0019114688128772706,
+        "n_seeds": 5,
+        "sd": 0.003911844045927974
       }
     },
     {
       "aggregate": {
-        "mean": 0.06132436908322417,
-        "n_seeds": 4,
-        "sd": 0.0013005937436397737
+        "mean": 0.06112168475171169,
+        "n_seeds": 5,
+        "sd": 0.0012141098614620815
       },
       "arm": "B_type",
       "coldstart": {
-        "mean": 0.1388329979879276,
-        "n_seeds": 4,
-        "sd": 0.0017317162290218715
+        "mean": 0.13890006706908115,
+        "n_seeds": 5,
+        "sd": 0.0015071901444831798
       },
-      "pooled_sd": 0.0012732825564380178,
+      "pooled_sd": 0.0011077824721099198,
       "verdict": "REAL_GAP",
       "vs_A": {
-        "mean": -0.002515090543259553,
-        "n_seeds": 4,
-        "sd": 0.0018418574841587367
+        "mean": -0.0024480214621059706,
+        "n_seeds": 5,
+        "sd": 0.001602130004774142
       }
     },
     {
       "aggregate": {
-        "mean": 0.06280124576711076,
-        "n_seeds": 4,
-        "sd": 0.0010384089596628186
+        "mean": 0.06294584373532393,
+        "n_seeds": 5,
+        "sd": 0.000955647810486629
       },
       "arm": "B+",
       "coldstart": {
-        "mean": 0.13388665325285043,
-        "n_seeds": 4,
-        "sd": 0.001718133931247412
+        "mean": 0.13340040241448692,
+        "n_seeds": 5,
+        "sd": 0.0018428748040287108
       },
-      "pooled_sd": 0.0012640490585623294,
+      "pooled_sd": 0.0013377087543117452,
       "verdict": "REAL_GAP",
       "vs_A": {
-        "mean": -0.007461435278336689,
-        "n_seeds": 4,
-        "sd": 0.0021494393609467186
+        "mean": -0.007947686116700204,
+        "n_seeds": 5,
+        "sd": 0.0021557519717807006
       }
     },
     {
       "aggregate": {
-        "mean": 0.05353008544050886,
-        "n_seeds": 3,
-        "sd": 0.0005506720653700456
+        "mean": 0.0535630422423808,
+        "n_seeds": 4,
+        "sd": 0.0004544275727525582
       },
       "arm": "C",
       "coldstart": {
-        "mean": 0.12776659959758552,
-        "n_seeds": 3,
-        "sd": 0.0016513846079470348
+        "mean": 0.12868879946344736,
+        "n_seeds": 4,
+        "sd": 0.0022847008088497348
       },
-      "pooled_sd": 0.0011122148861017437,
+      "pooled_sd": 0.001530197973908638,
       "verdict": "REAL_GAP",
       "vs_A": {
-        "mean": -0.013749161636485577,
-        "n_seeds": 3,
-        "sd": 0.001452088202187197
+        "mean": -0.01265928906773977,
+        "n_seeds": 4,
+        "sd": 0.0024813294076037502
       }
     }
   ],
   "git_dirty": true,
-  "git_rev": "d5ca318",
+  "git_rev": "6310977",
   "highplay_flip": {
-    "mean": 0.016617920765753788,
-    "n_seeds": 4,
-    "sd": 0.004622601686712189
+    "mean": 0.01675086413187982,
+    "n_seeds": 5,
+    "sd": 0.004014312451526461
   },
   "inputs": {
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_diagnostics.json": {
@@ -183,10 +183,10 @@
       "sha256": "78e9b62976c4dc156681989ab6371489b78100305107daafae80f125a5c94559"
     },
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_representation.json": {
-      "bytes": 558750,
+      "bytes": 704853,
       "exists": true,
-      "mtime": 1785460927,
-      "sha256": "abf778df5210ea1cd77f246c72aa6741ccd9e6fbe735a5eb2477e705818ede07"
+      "mtime": 1785469029,
+      "sha256": "54e4a78392c57510b36ba28216ecad738249271bc80402c7b22b2bf354805f93"
     },
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_scaling.json": {
       "bytes": 2610105,
@@ -202,7 +202,7 @@
     }
   },
   "ladder_is_final": false,
-  "ladder_n_seeds": 3,
+  "ladder_n_seeds": 4,
   "run_args": {
     "sources": [
       "t4_diagnostics",

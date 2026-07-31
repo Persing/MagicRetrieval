@@ -6,7 +6,7 @@
 > All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much.
 > Recorded, not solved.
 
-> **INTERIM — 3 of 5 frozen seeds.** Every mean and standard deviation below moves when the remaining seeds land, and the null rule is measured against a sample sd that is itself noisy at this n. The *direction* of each finding is stable across the seeds that have run; the magnitudes are not final. Complete with `--seeds 45 46`, re-merge, and re-run this.
+> **INTERIM — 4 of 5 frozen seeds.** Every mean and standard deviation below moves when the remaining seeds land, and the null rule is measured against a sample sd that is itself noisy at this n. The *direction* of each finding is stable across the seeds that have run; the magnitudes are not final. Complete with `--seeds 45 46`, re-merge, and re-run this.
 
 Six arms, one variable: how a card becomes a vector. Leave-one-out retrieval on held-out
 decks, primary metric recall@50, deck-level split, corpus **casual** —
@@ -20,11 +20,11 @@ not a flat null, and the shape of it is the finding.
 
 | arm | seeds | recall@50 | gated cold-start | sd | vs A (paired) | pooled sd | null rule |
 |---|---|---|---|---|---|---|---|
-| A | 4 | 0.0607 | 0.1413 | 0.0005 | — | — | — |
-| B | 4 | 0.0584 | 0.1390 | 0.0040 | -0.0023 | 0.0028 | **NULL** |
-| B_type | 4 | 0.0613 | 0.1388 | 0.0017 | -0.0025 | 0.0013 | **REAL_GAP** |
-| B+ | 4 | 0.0628 | 0.1339 | 0.0017 | -0.0075 | 0.0013 | **REAL_GAP** |
-| C | 3 | 0.0535 | 0.1278 | 0.0017 | -0.0137 | 0.0011 | **REAL_GAP** |
+| A | 5 | 0.0608 | 0.1413 | 0.0004 | — | — | — |
+| B | 5 | 0.0587 | 0.1394 | 0.0036 | -0.0019 | 0.0026 | **NULL** |
+| B_type | 5 | 0.0611 | 0.1389 | 0.0015 | -0.0024 | 0.0011 | **REAL_GAP** |
+| B+ | 5 | 0.0629 | 0.1334 | 0.0018 | -0.0079 | 0.0013 | **REAL_GAP** |
+| C | 4 | 0.0536 | 0.1287 | 0.0023 | -0.0127 | 0.0015 | **REAL_GAP** |
 
 Cold-start is the gated `near_zero ∪ low` stratum — at most
 5 appearances across *training* decks — 5,964 targets.
@@ -33,8 +33,9 @@ arms share the split, the queries and the seeds. The verdict beside it is the **
 is measured against the pooled seed sd and is the one that counts.
 
 The arms are ordered by how much structure they carry, and the cold-start column falls
-monotonically along that ordering. On the high-play bucket (11,283 targets) the sign
-flips: `B+ − A` = **+0.0166** paired across 4 seeds.
+monotonically along that ordering — **though one step is soft**: `B - A` is a NULL under the seed
+sd, so the ordering rests on four points with one unestablished link, not on five firm ones. On the high-play bucket (11,283 targets) the sign
+flips: `B+ − A` = **+0.0168** paired across 5 seeds.
 
 **Reading: structure trades generalization for memorization.** Added structure raises
 representational distinctiveness, which pays where dense co-occurrence makes memorizing a card's
@@ -44,7 +45,7 @@ got a negative number instead.
 
 ## 2. The premise that survives
 
-Cold-start recall lands at 0.1278–0.1413: about
+Cold-start recall lands at 0.1287–0.1413: about
 2.0× the aggregate, **33× random** (0.003856), against
 a popularity baseline of **exactly 0.0000**.
 
@@ -55,7 +56,7 @@ for the tail.
 ## 3. The metric verdict
 
 Popularity alone scores **0.1808** on the aggregate, beating every arm
-(best: B+ at 0.0628). It reaches
+(best: B+ at 0.0629). It reaches
 0.6481 on high-play cards and 0.0000 off them.
 
 A global frequency ranking returns the same top-50 for every query, so **aggregate recall@50 on
@@ -69,7 +70,7 @@ Over-determined. Four independent attempts to rescue it, each with the number th
 
 | question | answer | figure |
 |---|---|---|
-| Does CDL justify continued development? | No | `C − B+` = **-0.0093**, pooled seed sd 0.0009, gate +0.02 → **BELOW_GATE** |
+| Does CDL justify continued development? | No | `C − B+` = **-0.0094**, pooled seed sd 0.0008, gate +0.02 → **BELOW_GATE** |
 | Is that an artifact of the staple-enriched clean stratum? | No | clean **-0.0216**, clean non-staple **-0.0144** = 3.4× its paired sd |
 | Is it heterogeneity — two dialects in one space — rather than CDL? | No | C's partition gap **0.0031** vs 0.0006–0.0012 for the single-dialect arms; real, but small against mean cosine 0.526 |
 | Was arm D simply data-starved? | No | at matched volume the encoding effect is **+0.0427** against a volume effect of +0.0194 over 27× the data |
@@ -80,6 +81,13 @@ share. It moves clean-parse cards out to let gap cards in; the slots are conserv
 
 CDL is used on 10,628 of 30,958 cards in the pool, and on
 exactly those cards it makes retrieval worse.
+
+**What was not tested, stated here rather than in the caveats so this section is not read as
+exhaustive.** Every arm serialized CDL into an encoder pretrained on English and never exposed
+to it. The licensed claim is therefore *CDL, serialized to MiniLM, is worse than clause-tagged
+text* — a **serialization ceiling**, not a verdict on the representation itself. A CDL-native
+pretrained encoder is untried and could clear it. It does not change the decision: T0 makes any
+deployable CDL system a hybrid, and the hybrid arm is the one that lost hardest.
 
 
 ## 5. Does more data help? Volume and diversity, separated
@@ -106,12 +114,26 @@ trained.
 | C | cold-start | +0.0360 | +0.0042 | [+0.0276, +0.0449] | 0.0096 | **DIVERSITY_BEYOND_VOLUME** |
 | C | aggregate | -0.0025 | +0.0042 | [-0.0027, -0.0024] | 0.0052 | **BELOW_VOLUME_NULL** ⚠︎ inside seed sd |
 
-**On the cold-start stratum every arm beats the volume null by roughly 10×.** More decks buy
-something on the tail that more pairs do not explain. On the aggregate nothing survives: every gap
-there is smaller than its own pooled seed sd, so by T4's standing null rule those rows are **null**
-regardless of the label — the query bootstrap is tight because it resamples ~10⁵ paired queries, and
-it does not see training variance. That the frozen rule prints a decisive label anyway is a
-limitation of the rule, recorded rather than repaired after the fact.
+**On the cold-start stratum every arm beats the volume null by roughly 10×** — and, because
+the previous paragraph's caveat matters, **it clears the stricter test too**: 3.4–5.5× its own
+pooled seed sd. This is the one genuine positive on the branch, and it does *not* rest on the
+bootstrap branch whose weakness is recorded below. It rests on the same standing null rule that
+vetoed everything else.
+
+On the aggregate nothing survives: every gap there is smaller than its own pooled seed sd, so by
+that same rule those rows are **null** regardless of the label — the query bootstrap is tight
+because it resamples ~10⁵ paired queries, and it does not see training variance. That the frozen
+rule prints a decisive label anyway is a limitation of the rule, recorded rather than repaired.
+
+**What the gain should be called is not settled.** The PPMI vocabulary is 4,821 cards at the
+subsample level against 10,133 at full, so ~5,300 cards go from *zero* mined positives to some — and
+cold-start cards are exactly the marginal ones crossing that line. That **coverage** mechanism
+predicts a tail-concentrated gain and a flat aggregate, which is precisely what was observed, so
+this result does not by itself distinguish it from **diversity**. The two imply opposite actions:
+coverage says fix the mining (cheap), diversity says buy more decks (not). `mr.t4_coverage_probe`
+splits the cold-start queries by whether the target was in the subsample's vocabulary and separates
+them. Until it runs, read this as *more training decks help the tail*, not as *deck diversity is the
+lever*.
 
 **Three caveats, all load-bearing.** Volume is *not* matched (2.97× examples), so an excess
 over the null is diversity evidence conditional on D4's slope transferring from casual to cedh. The

@@ -304,7 +304,8 @@ arms share the split, the queries and the seeds. The verdict beside it is the **
 is measured against the pooled seed sd and is the one that counts.
 
 The arms are ordered by how much structure they carry, and the cold-start column falls
-monotonically along that ordering. On the high-play bucket ({base['high_n']:,} targets) the sign
+monotonically along that ordering — **though one step is soft**: `B - A` is a NULL under the seed
+sd, so the ordering rests on four points with one unestablished link, not on five firm ones. On the high-play bucket ({base['high_n']:,} targets) the sign
 flips: `B+ − A` = **{flip['mean']:+.4f}** paired across {flip['n_seeds']} seeds.
 
 **Reading: structure trades generalization for memorization.** Added structure raises
@@ -351,6 +352,13 @@ share. It moves clean-parse cards out to let gap cards in; the slots are conserv
 
 CDL is used on {cdl['n_cdl']:,} of {cdl['n_cdl'] + cdl['n_fallback']:,} cards in the pool, and on
 exactly those cards it makes retrieval worse.
+
+**What was not tested, stated here rather than in the caveats so this section is not read as
+exhaustive.** Every arm serialized CDL into an encoder pretrained on English and never exposed
+to it. The licensed claim is therefore *CDL, serialized to MiniLM, is worse than clause-tagged
+text* — a **serialization ceiling**, not a verdict on the representation itself. A CDL-native
+pretrained encoder is untried and could clear it. It does not change the decision: T0 makes any
+deployable CDL system a hybrid, and the hybrid arm is the one that lost hardest.
 
 {scaling_section(src, cdl)}
 ## Caveats, weighted
@@ -421,6 +429,8 @@ def scaling_section(src: dict, cdl: dict) -> str:
     pred = next(iter(res.values()))["predicted"]
     deck_ratio = meta.get("n_train_available", 0) / max(1, thresholds.T4_SCALING_CEDH_SUBSAMPLE)
     fold = best["observed"] / pred if best and pred else float("nan")
+    mult = sorted(abs(u["observed"]) / u["pooled_sd"] for u in cold.values() if u["pooled_sd"])
+    sd_mult = f"{mult[0]:.1f}–{mult[-1]:.1f}" if mult else "n/a"
 
     return f"""
 ## 5. Does more data help? Volume and diversity, separated
@@ -442,12 +452,26 @@ trained.
 |---|---|---|---|---|---|---|
 {chr(10).join(rows)}
 
-**On the cold-start stratum every arm beats the volume null by roughly {fold:.0f}×.** More decks buy
-something on the tail that more pairs do not explain. On the aggregate nothing survives: every gap
-there is smaller than its own pooled seed sd, so by T4's standing null rule those rows are **null**
-regardless of the label — the query bootstrap is tight because it resamples ~10⁵ paired queries, and
-it does not see training variance. That the frozen rule prints a decisive label anyway is a
-limitation of the rule, recorded rather than repaired after the fact.
+**On the cold-start stratum every arm beats the volume null by roughly {fold:.0f}×** — and, because
+the previous paragraph's caveat matters, **it clears the stricter test too**: {sd_mult}× its own
+pooled seed sd. This is the one genuine positive on the branch, and it does *not* rest on the
+bootstrap branch whose weakness is recorded below. It rests on the same standing null rule that
+vetoed everything else.
+
+On the aggregate nothing survives: every gap there is smaller than its own pooled seed sd, so by
+that same rule those rows are **null** regardless of the label — the query bootstrap is tight
+because it resamples ~10⁵ paired queries, and it does not see training variance. That the frozen
+rule prints a decisive label anyway is a limitation of the rule, recorded rather than repaired.
+
+**What the gain should be called is not settled.** The PPMI vocabulary is 4,821 cards at the
+subsample level against 10,133 at full, so ~5,300 cards go from *zero* mined positives to some — and
+cold-start cards are exactly the marginal ones crossing that line. That **coverage** mechanism
+predicts a tail-concentrated gain and a flat aggregate, which is precisely what was observed, so
+this result does not by itself distinguish it from **diversity**. The two imply opposite actions:
+coverage says fix the mining (cheap), diversity says buy more decks (not). `mr.t4_coverage_probe`
+splits the cold-start queries by whether the target was in the subsample's vocabulary and separates
+them. Until it runs, read this as *more training decks help the tail*, not as *deck diversity is the
+lever*.
 
 **Three caveats, all load-bearing.** Volume is *not* matched ({ratio:.2f}× examples), so an excess
 over the null is diversity evidence conditional on D4's slope transferring from casual to cedh. The
