@@ -155,7 +155,17 @@ def summarize(res: dict) -> dict:
     return agg
 
 
-def render(res: dict, agg: dict) -> str:
+def volume_null(findings_dir: Path) -> float:
+    """The frozen volume null from the scaling run, so `covered both` is judged against the number
+    that already accounts for the extra training examples rather than against zero."""
+    p = findings_dir / "t4_scaling.json"
+    if not p.exists():
+        return float("nan")
+    a = json.loads(p.read_text(encoding="utf-8"))["analysis"]
+    return float(next(iter(a.values()))["predicted"])
+
+
+def render(res: dict, agg: dict, null: float = float("nan")) -> str:
     rows = []
     for arm in sorted(agg):
         for label in ("newly_covered", "covered_both"):
@@ -165,20 +175,31 @@ def render(res: dict, agg: dict) -> str:
             rows.append(f"| {arm} | {label.replace('_', ' ')} | {v['n']:,} | {v['gain']:+.4f} "
                         f"| {v['sd']:.4f} | {v['share_of_total_gain']:+.4f} |")
 
+    # Judged against the frozen volume null, not against zero. `covered both` cards were already in
+    # the mining vocabulary at both levels, so the only thing the extra decks could buy them is more
+    # and better contexts — diversity in the intended sense. If that gain does not exceed what the
+    # extra training examples alone predict, there is no diversity effect to find.
     verdicts = []
     for arm in sorted(agg):
         nc, cb = agg[arm].get("newly_covered"), agg[arm].get("covered_both")
         if not (nc and cb):
             continue
-        if cb["gain"] <= 0 and nc["gain"] > 0:
-            v = "COVERAGE — the gain is entirely in cards the subsample could not mine at all"
-        elif nc["gain"] > 2 * cb["gain"] > 0:
-            v = "MOSTLY COVERAGE — both groups gain, newly-covered dominates"
-        elif cb["gain"] > 0 and abs(nc["gain"] - cb["gain"]) < 0.5 * max(nc["gain"], cb["gain"]):
-            v = "DIVERSITY — comparable gain whether or not the card was already covered"
+        share = nc["share_of_total_gain"] / (nc["share_of_total_gain"] + cb["share_of_total_gain"])
+        excess = cb["gain"] - null
+        inside = abs(excess) < cb["sd"] if cb["sd"] else False
+        if null == null and (excess <= 0 or inside):
+            v = (f"**COVERAGE.** {share:.0%} of the gain is in cards the subsample could not mine at "
+                 f"all. Among cards covered at both levels the gain is {cb['gain']:+.4f} against a "
+                 f"volume null of {null:+.4f}"
+                 + (f" — a difference of {excess:+.4f}, inside its own seed sd of {cb['sd']:.4f}."
+                    if inside else ".")
+                 + " No diversity effect is detectable.")
+        elif share > 0.8:
+            v = (f"**MOSTLY COVERAGE.** {share:.0%} of the gain is in newly-covered cards, but the "
+                 f"covered-both group still clears the null by {excess:+.4f}.")
         else:
-            v = "MIXED — read the numbers rather than this label"
-        verdicts.append(f"- **{arm}**: {v}")
+            v = f"**MIXED** — {share:.0%} from newly-covered. Read the numbers, not this label."
+        verdicts.append(f"- {arm}: {v}")
 
     return f"""# T4 — is the cedh cold-start gain coverage or diversity?
 
@@ -206,6 +227,10 @@ aligned by construction, not by assumption.
 |---|---|---|---|---|---|
 {chr(10).join(rows)}
 
+The frozen volume null from `t4_scaling.md` is **{null:+.4f}** — what the {res.get('example_ratio', 2.97):.2f}x extra
+training examples alone are predicted to buy. `covered both` is the group where a diversity effect
+could show up, because those cards were already in the mining vocabulary at both levels.
+
 `contribution to total` is the group's gain weighted by its share of cold-start queries; the two
 rows for an arm sum to that arm's overall cold-start gain.
 
@@ -227,9 +252,10 @@ def main(findings_dir: Path | None = None) -> dict:
     d = findings_dir or config.FINDINGS_DIR
     res = probe(d)
     agg = summarize(res)
+    null = volume_null(d)
     payload = report.envelope([config.CARDS_PARQUET], {"corpus": CORPUS, "mode": "coverage_probe"})
-    payload.update({"per_seed": res, "summary": agg})
-    report.write("t4_coverage_probe", payload, render(res, agg), findings_dir=d)
+    payload.update({"per_seed": res, "summary": agg, "volume_null": null})
+    report.write("t4_coverage_probe", payload, render(res, agg, null), findings_dir=d)
     return payload
 
 

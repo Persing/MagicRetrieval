@@ -163,13 +163,19 @@
     }
   ],
   "git_dirty": true,
-  "git_rev": "6310977",
+  "git_rev": "6440c81",
   "highplay_flip": {
     "mean": 0.01675086413187982,
     "n_seeds": 5,
     "sd": 0.004014312451526461
   },
   "inputs": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_coverage_probe.json": {
+      "bytes": 8304,
+      "exists": true,
+      "mtime": 1785469441,
+      "sha256": "c22534ef17679e0fe698b5c02eecc4736f0a39a5f4a64b404aa2a536bec38efb"
+    },
     "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\findings\\t4_diagnostics.json": {
       "bytes": 17467,
       "exists": true,

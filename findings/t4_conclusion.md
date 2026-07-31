@@ -125,23 +125,16 @@ that same rule those rows are **null** regardless of the label — the query boo
 because it resamples ~10⁵ paired queries, and it does not see training variance. That the frozen
 rule prints a decisive label anyway is a limitation of the rule, recorded rather than repaired.
 
-**What the gain should be called is not settled.** The PPMI vocabulary is 4,821 cards at the
-subsample level against 10,133 at full, so ~5,300 cards go from *zero* mined positives to some — and
-cold-start cards are exactly the marginal ones crossing that line. That **coverage** mechanism
-predicts a tail-concentrated gain and a flat aggregate, which is precisely what was observed, so
-this result does not by itself distinguish it from **diversity**. The two imply opposite actions:
-coverage says fix the mining (cheap), diversity says buy more decks (not). `mr.t4_coverage_probe`
-splits the cold-start queries by whether the target was in the subsample's vocabulary and separates
-them. Until it runs, read this as *more training decks help the tail*, not as *deck diversity is the
-lever*.
+**It is coverage, not diversity — and that reverses the action.** The PPMI vocabulary is 4,821 cards at the subsample level against 10,133 at full, so ~5,300 cards go from *zero* mined positives to some, and cold-start cards are exactly the ones crossing that line. Splitting the cold-start queries by whether the target was in the subsample's vocabulary (`t4_coverage_probe`) puts **96%–98% of the gain in cards the subsample could not mine at all**. Among cards covered at *both* levels — the only group where diversity could show up — the gain is +0.0070 (A), +0.0099 (B+), +0.0042 (C) against the volume null of +0.0042, every one inside its own seed sd. **No diversity effect is detectable.** The lever is not deck acquisition; it is that `mining.mine_positives` takes only the top decile of PPMI, which excludes those cards from training entirely. That is a tunable, not a fact about the corpus.
 
-**Three caveats, all load-bearing.** Volume is *not* matched (2.97× examples), so an excess
-over the null is diversity evidence conditional on D4's slope transferring from casual to cedh. The
-cold-start stratum is frozen at full-level counts, so cards with ≤5
-appearances in 39,733 decks expect ≤0.40
-in the subsample and are mostly **absent** rather than rare — part of the effect is "a few exposures
-versus none". And `max_sim` runs the *opposite* direction to `centroid` on the aggregate; both
-aggregators were frozen up front so that gets reported rather than chosen between.
+**What still qualifies it.** Volume is not matched (2.97× examples), so the null itself
+rests on D4's slope transferring from casual to cedh — though that matters less now the effect is
+attributed to coverage rather than to volume or diversity. The cold-start stratum is frozen at
+full-level counts, so cards with ≤5 appearances in
+39,733 decks expect ≤0.40 in the subsample — which is
+the same fact the coverage result rests on, seen from the query side rather than the mining side.
+And `max_sim` runs the *opposite* direction to `centroid` on the aggregate; both aggregators were
+frozen up front so that gets reported rather than chosen between.
 
 ## 6. What to do with all of it
 
@@ -149,8 +142,13 @@ Ranked by what the evidence actually supports:
 
 1. **Do not spend on richer representation.** Every gate failed, the dose-response is monotonically
    *against* structure on cold-start, and CDL specifically makes retrieval worse.
-2. **Do spend on more, more diverse decks** — that is the only intervention here that moved the
-   cold-start number, and it moved it by ~10× what extra training pairs alone would.
+2. **Fix the mining before buying data.** More training decks moved the cold-start number by
+   ~10× the volume null — but essentially all of that is *coverage*: cards the smaller corpus
+   could not mine a single positive for. Among cards already covered, the gain is indistinguishable
+   from the volume null. `mining.mine_positives` keeps only the top decile of PPMI, and that
+   threshold is what excludes ~5,300 cards from training. Lowering it, or mining rare cards on a
+   separate rule, is cheap and testable now. Acquiring decks is neither, and the evidence for it is
+   absent rather than merely weak.
 3. **Ship popularity for staples and arm A for the tail**, split on play count. Popularity wins the
    aggregate outright and scores exactly 0.0000 off it; arm A is the plainest arm and the best of
    them where popularity cannot reach.
@@ -169,7 +167,11 @@ Ranked by what the evidence actually supports:
 - **The matched-volume decomposition does not transfer to cold-start.** It is scored clean-only on
   both sides, and that universe is the memorization regime where structure helps and popularity
   alone reaches high recall. It settles arm D's confound and nothing about the tail.
-- **Everything above is one corpus.** cedh transfer is a separate run.
+- **The ladder is casual; the scaling result is cedh.** They are different corpora with very
+  different structure — cedh's PPMI vocabulary is half casual's and 97.6% of its queries are
+  high-play — so absolute numbers do not transfer between them. What transfers is the shape: a
+  staple-dominated aggregate that popularity wins, and a tail where the encoder is the only thing
+  that works.
 - **The diagnostics in §4 were specified after seeing the T4 result** and carry no pre-committed
   criteria. They constrain *which claim* the evidence supports; the decision rests on the gated
   ladder and the cold-start dose-response, which were frozen first.

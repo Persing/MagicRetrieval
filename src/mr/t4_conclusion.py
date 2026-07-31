@@ -41,7 +41,8 @@ SOURCES = {
 
 # Optional because the conclusion has to render before Phase 4 exists — a missing scaling result is
 # a section that says so, not a crash. Everything in SOURCES is required; this is not.
-OPTIONAL_SOURCES = {"t4_scaling": "uv run python -m mr.t4_scaling --merge --corpus cedh"}
+OPTIONAL_SOURCES = {"t4_scaling": "uv run python -m mr.t4_scaling --merge --corpus cedh",
+                    "t4_coverage_probe": "uv run python -m mr.t4_coverage_probe"}
 
 LADDER = tuple(a for a in encodings.ALL_ARMS if a != "D")  # D has no full-universe number
 
@@ -375,7 +376,11 @@ deployable CDL system a hybrid, and the hybrid arm is the one that lost hardest.
 - **The matched-volume decomposition does not transfer to cold-start.** It is scored clean-only on
   both sides, and that universe is the memorization regime where structure helps and popularity
   alone reaches high recall. It settles arm D's confound and nothing about the tail.
-- **Everything above is one corpus.** cedh transfer is a separate run.
+- **The ladder is casual; the scaling result is cedh.** They are different corpora with very
+  different structure — cedh's PPMI vocabulary is half casual's and 97.6% of its queries are
+  high-play — so absolute numbers do not transfer between them. What transfers is the shape: a
+  staple-dominated aggregate that popularity wins, and a tail where the encoder is the only thing
+  that works.
 - **The diagnostics in §4 were specified after seeing the T4 result** and carry no pre-committed
   criteria. They constrain *which claim* the evidence supports; the decision rests on the gated
   ladder and the cold-start dose-response, which were frozen first.
@@ -429,6 +434,37 @@ def scaling_section(src: dict, cdl: dict) -> str:
     pred = next(iter(res.values()))["predicted"]
     deck_ratio = meta.get("n_train_available", 0) / max(1, thresholds.T4_SCALING_CEDH_SUBSAMPLE)
     fold = best["observed"] / pred if best and pred else float("nan")
+    cov = src.get("t4_coverage_probe")
+    if cov:
+        cs = cov["summary"]; cnull = cov.get("volume_null", float("nan"))
+        shares, both = [], []
+        for arm, e in cs.items():
+            nc, cb = e["newly_covered"], e["covered_both"]
+            shares.append(nc["share_of_total_gain"]
+                          / (nc["share_of_total_gain"] + cb["share_of_total_gain"]))
+            both.append((arm, cb["gain"], cb["sd"]))
+        coverage_para = (
+            "**It is coverage, not diversity — and that reverses the action.** The PPMI vocabulary "
+            f"is 4,821 cards at the subsample level against 10,133 at full, so ~5,300 cards go from "
+            "*zero* mined positives to some, and cold-start cards are exactly the ones crossing that "
+            "line. Splitting the cold-start queries by whether the target was in the subsample's "
+            f"vocabulary (`t4_coverage_probe`) puts **{min(shares):.0%}–{max(shares):.0%} of the "
+            "gain in cards the subsample could not mine at all**. Among cards covered at *both* "
+            "levels — the only group where diversity could show up — the gain is "
+            + ", ".join(f"{g:+.4f} ({a})" for a, g, _ in both)
+            + f" against the volume null of {cnull:+.4f}, every one inside its own seed sd. "
+            "**No diversity effect is detectable.** The lever is not deck acquisition; it is that "
+            "`mining.mine_positives` takes only the top decile of PPMI, which excludes those cards "
+            "from training entirely. That is a tunable, not a fact about the corpus.")
+    else:
+        coverage_para = (
+            "**What the gain should be called is not settled.** The PPMI vocabulary roughly doubles "
+            "between levels, so ~5,300 cards go from zero mined positives to some — a **coverage** "
+            "mechanism that predicts this exact signature and implies a different, much cheaper "
+            "action than **diversity**. Run `mr.t4_coverage_probe` to separate them. Until then, "
+            "read this as *more training decks help the tail*, not *deck diversity is the lever*.")
+    cold_expect_c = (thresholds.T4_COLDSTART_MAX_COUNT * thresholds.T4_SCALING_CEDH_SUBSAMPLE
+                     / max(1, meta.get("n_train_available", 1)))
     mult = sorted(abs(u["observed"]) / u["pooled_sd"] for u in cold.values() if u["pooled_sd"])
     sd_mult = f"{mult[0]:.1f}–{mult[-1]:.1f}" if mult else "n/a"
 
@@ -463,23 +499,16 @@ that same rule those rows are **null** regardless of the label — the query boo
 because it resamples ~10⁵ paired queries, and it does not see training variance. That the frozen
 rule prints a decisive label anyway is a limitation of the rule, recorded rather than repaired.
 
-**What the gain should be called is not settled.** The PPMI vocabulary is 4,821 cards at the
-subsample level against 10,133 at full, so ~5,300 cards go from *zero* mined positives to some — and
-cold-start cards are exactly the marginal ones crossing that line. That **coverage** mechanism
-predicts a tail-concentrated gain and a flat aggregate, which is precisely what was observed, so
-this result does not by itself distinguish it from **diversity**. The two imply opposite actions:
-coverage says fix the mining (cheap), diversity says buy more decks (not). `mr.t4_coverage_probe`
-splits the cold-start queries by whether the target was in the subsample's vocabulary and separates
-them. Until it runs, read this as *more training decks help the tail*, not as *deck diversity is the
-lever*.
+{coverage_para}
 
-**Three caveats, all load-bearing.** Volume is *not* matched ({ratio:.2f}× examples), so an excess
-over the null is diversity evidence conditional on D4's slope transferring from casual to cedh. The
-cold-start stratum is frozen at full-level counts, so cards with ≤{thresholds.T4_COLDSTART_MAX_COUNT}
-appearances in {meta.get('n_train_available', 0):,} decks expect ≤{thresholds.T4_COLDSTART_MAX_COUNT * thresholds.T4_SCALING_CEDH_SUBSAMPLE / max(1, meta.get('n_train_available', 1)):.2f}
-in the subsample and are mostly **absent** rather than rare — part of the effect is "a few exposures
-versus none". And `max_sim` runs the *opposite* direction to `centroid` on the aggregate; both
-aggregators were frozen up front so that gets reported rather than chosen between.
+**What still qualifies it.** Volume is not matched ({ratio:.2f}× examples), so the null itself
+rests on D4's slope transferring from casual to cedh — though that matters less now the effect is
+attributed to coverage rather than to volume or diversity. The cold-start stratum is frozen at
+full-level counts, so cards with ≤{thresholds.T4_COLDSTART_MAX_COUNT} appearances in
+{meta.get('n_train_available', 0):,} decks expect ≤{cold_expect_c:.2f} in the subsample — which is
+the same fact the coverage result rests on, seen from the query side rather than the mining side.
+And `max_sim` runs the *opposite* direction to `centroid` on the aggregate; both aggregators were
+frozen up front so that gets reported rather than chosen between.
 
 ## 6. What to do with all of it
 
@@ -487,8 +516,13 @@ Ranked by what the evidence actually supports:
 
 1. **Do not spend on richer representation.** Every gate failed, the dose-response is monotonically
    *against* structure on cold-start, and CDL specifically makes retrieval worse.
-2. **Do spend on more, more diverse decks** — that is the only intervention here that moved the
-   cold-start number, and it moved it by ~{fold:.0f}× what extra training pairs alone would.
+2. **Fix the mining before buying data.** More training decks moved the cold-start number by
+   ~{fold:.0f}× the volume null — but essentially all of that is *coverage*: cards the smaller corpus
+   could not mine a single positive for. Among cards already covered, the gain is indistinguishable
+   from the volume null. `mining.mine_positives` keeps only the top decile of PPMI, and that
+   threshold is what excludes ~5,300 cards from training. Lowering it, or mining rare cards on a
+   separate rule, is cheap and testable now. Acquiring decks is neither, and the evidence for it is
+   absent rather than merely weak.
 3. **Ship popularity for staples and arm A for the tail**, split on play count. Popularity wins the
    aggregate outright and scores exactly 0.0000 off it; arm A is the plainest arm and the best of
    them where popularity cannot reach.

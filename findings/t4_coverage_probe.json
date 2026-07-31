@@ -1,0 +1,279 @@
+{
+  "git_dirty": true,
+  "git_rev": "6440c81",
+  "inputs": {
+    "C:\\Users\\nick\\PycharmProjects\\MagicRetrieval\\vendor\\magicspike_data\\cards.parquet": {
+      "bytes": 5093341,
+      "exists": true,
+      "mtime": 1785027795,
+      "sha256": "4c5ea4ff251e98eaee118644d6273f3c987a02b066128068a19ab5eb1bb138cf"
+    }
+  },
+  "per_seed": {
+    "arms": {
+      "A": [
+        {
+          "covered_both": {
+            "full": 0.09176470588235294,
+            "gain": 0.030588235294117645,
+            "n": 425,
+            "subsample": 0.0611764705882353
+          },
+          "n_covered_both": 425,
+          "n_newly_covered": 1797,
+          "newly_covered": {
+            "full": 0.07401224262659989,
+            "gain": 0.05230940456316083,
+            "n": 1797,
+            "subsample": 0.021702838063439065
+          },
+          "seed": 42
+        },
+        {
+          "covered_both": {
+            "full": 0.026578073089700997,
+            "gain": 0.006644518272425251,
+            "n": 301,
+            "subsample": 0.019933554817275746
+          },
+          "n_covered_both": 301,
+          "n_newly_covered": 1921,
+          "newly_covered": {
+            "full": 0.08797501301405518,
+            "gain": 0.052056220718375845,
+            "n": 1921,
+            "subsample": 0.03591879229567933
+          },
+          "seed": 43
+        },
+        {
+          "covered_both": {
+            "full": 0.13911290322580644,
+            "gain": -0.01612903225806453,
+            "n": 496,
+            "subsample": 0.15524193548387097
+          },
+          "n_covered_both": 496,
+          "n_newly_covered": 1726,
+          "newly_covered": {
+            "full": 0.06025492468134415,
+            "gain": 0.04171494785631518,
+            "n": 1726,
+            "subsample": 0.01853997682502897
+          },
+          "seed": 44
+        }
+      ],
+      "B+": [
+        {
+          "covered_both": {
+            "full": 0.11058823529411765,
+            "gain": 0.04235294117647059,
+            "n": 425,
+            "subsample": 0.06823529411764706
+          },
+          "n_covered_both": 425,
+          "n_newly_covered": 1797,
+          "newly_covered": {
+            "full": 0.07067334446299388,
+            "gain": 0.05230940456316083,
+            "n": 1797,
+            "subsample": 0.018363939899833055
+          },
+          "seed": 42
+        },
+        {
+          "covered_both": {
+            "full": 0.013289036544850499,
+            "gain": -0.006644518272425248,
+            "n": 301,
+            "subsample": 0.019933554817275746
+          },
+          "n_covered_both": 301,
+          "n_newly_covered": 1921,
+          "newly_covered": {
+            "full": 0.09213951067152525,
+            "gain": 0.06663196251952108,
+            "n": 1921,
+            "subsample": 0.025507548152004164
+          },
+          "seed": 43
+        },
+        {
+          "covered_both": {
+            "full": 0.16733870967741934,
+            "gain": -0.006048387096774216,
+            "n": 496,
+            "subsample": 0.17338709677419356
+          },
+          "n_covered_both": 496,
+          "n_newly_covered": 1726,
+          "newly_covered": {
+            "full": 0.058516801853997685,
+            "gain": 0.03360370799536501,
+            "n": 1726,
+            "subsample": 0.024913093858632676
+          },
+          "seed": 44
+        }
+      ],
+      "C": [
+        {
+          "covered_both": {
+            "full": 0.07529411764705882,
+            "gain": 0.009411764705882342,
+            "n": 425,
+            "subsample": 0.06588235294117648
+          },
+          "n_covered_both": 425,
+          "n_newly_covered": 1797,
+          "newly_covered": {
+            "full": 0.06455203116304953,
+            "gain": 0.045631608235948806,
+            "n": 1797,
+            "subsample": 0.018920422927100722
+          },
+          "seed": 42
+        },
+        {
+          "covered_both": {
+            "full": 0.023255813953488372,
+            "gain": 0.0033222591362126255,
+            "n": 301,
+            "subsample": 0.019933554817275746
+          },
+          "n_covered_both": 301,
+          "n_newly_covered": 1921,
+          "newly_covered": {
+            "full": 0.07964601769911504,
+            "gain": 0.05413846954711088,
+            "n": 1921,
+            "subsample": 0.025507548152004164
+          },
+          "seed": 43
+        },
+        {
+          "covered_both": {
+            "full": 0.13709677419354838,
+            "gain": 0.0,
+            "n": 496,
+            "subsample": 0.13709677419354838
+          },
+          "n_covered_both": 496,
+          "n_newly_covered": 1726,
+          "newly_covered": {
+            "full": 0.05214368482039398,
+            "gain": 0.02838933951332561,
+            "n": 1726,
+            "subsample": 0.023754345307068367
+          },
+          "seed": 44
+        }
+      ]
+    },
+    "n_coldstart": 2222,
+    "query_fingerprint": "3fe8406f6b91e0ede8987d87afef2b780d85673de9841bf727a928a5f929209a"
+  },
+  "run_args": {
+    "corpus": "cedh",
+    "mode": "coverage_probe"
+  },
+  "summary": {
+    "A": {
+      "covered_both": {
+        "gain": 0.007034573769492789,
+        "n": 407,
+        "sd": 0.023361076160006794,
+        "share_of_total_gain": 0.0012890911860349236
+      },
+      "newly_covered": {
+        "gain": 0.04869352437928395,
+        "n": 1814,
+        "sd": 0.006044950225602623,
+        "share_of_total_gain": 0.03977039766952773
+      }
+    },
+    "B+": {
+      "covered_both": {
+        "gain": 0.00988667860242371,
+        "n": 407,
+        "sd": 0.028118188014875065,
+        "share_of_total_gain": 0.0018117416439380682
+      },
+      "newly_covered": {
+        "gain": 0.05084835835934898,
+        "n": 1814,
+        "sd": 0.016562529735380516,
+        "share_of_total_gain": 0.041530356624880256
+      }
+    },
+    "C": {
+      "covered_both": {
+        "gain": 0.004244674614031656,
+        "n": 407,
+        "sd": 0.00477320295556487,
+        "share_of_total_gain": 0.0007778399675420458
+      },
+      "newly_covered": {
+        "gain": 0.04271980576546177,
+        "n": 1814,
+        "sd": 0.013119198511896467,
+        "share_of_total_gain": 0.034891367698580665
+      }
+    }
+  },
+  "thresholds": {
+    "confound_note": "Every co-occurrence-derived ground truth here inherits EDHREC circularity: the deck data is not independent of EDHREC's recommendations. The effect is strongest in the Archidekt casual corpus. All arms inherit it equally, so relative comparisons between arms survive; absolute numbers do not mean much. Recorded, not solved.",
+    "t0": {
+      "fail": 0.7,
+      "guard_max_drop": 0.1,
+      "pass": 0.85
+    },
+    "t1": {
+      "fail": 0.25,
+      "numeric_max": 0.05,
+      "pass": 0.1
+    },
+    "t2": {
+      "baseline_random": 0.748,
+      "baseline_substitute": 0.717,
+      "baseline_tol": 0.02,
+      "bootstrap_n": 10000,
+      "ci": 0.95,
+      "generalization_ratio": 0.5,
+      "min_lift": 0.05
+    },
+    "t4": {
+      "coldstart_max_count": 5,
+      "gate_b_minus_a": 0.01,
+      "gate_bplus_minus_b": 0.02,
+      "gate_c_minus_bplus": 0.02,
+      "gate_coldstart": 0.03,
+      "max_seq_length": 512,
+      "n_seeds": 5,
+      "null_rule": "gap smaller than the pooled seed sd is NULL, not a small win",
+      "primary_metric": "recall_at_50",
+      "recall_ks": [
+        10,
+        50
+      ],
+      "test_frac": 0.15
+    },
+    "t4_scaling": {
+      "arms": [
+        "A",
+        "B+",
+        "C"
+      ],
+      "bootstrap_n": 10000,
+      "cedh_subsample": 3142,
+      "ci": 0.95,
+      "decision_rule": "DIVERSITY_BEYOND_VOLUME requires all three: excess over the prediction >= min_lift, paired query-bootstrap CI excluding the prediction, and the gap exceeding the pooled seed sd",
+      "min_lift": 0.005,
+      "n_seeds": 3,
+      "prediction_rule": "predicted = slope_per_efold * ln(realized n_training_examples ratio); 0.0000 when the positive cap binds equally at both levels",
+      "slope_per_efold": 0.00389
+    }
+  },
+  "volume_null": 0.004234520810796274
+}
