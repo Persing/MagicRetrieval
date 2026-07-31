@@ -68,36 +68,122 @@ reason, not silently omitted.
   different regimes. If it is ever revived, regress on log(**realized examples**) and do not fit a
   single slope across the kink. The harness supports it: `--train-subsample` with a reference level.
 
-**Phase 4 — cedh transfer. This is now the whole scaling test, and a better one than planned.**
-A/B+/C × 3 seeds at full size (46,745 decks, ~39,733 train) *and* a 3,142-deck **train** subsample
-**resampled per seed** (a fixed subsample conflates subsample identity with corpus effect).
+**Phase 4 — cedh transfer. This is now the whole scaling test.** A/B+/C × 3 seeds at full size
+(46,745 decks, ~39,733 train) *and* a 3,142-deck **train** subsample **resampled per seed** (a fixed
+subsample conflates subsample identity with corpus effect). It **ran on 2026-07-30 and is 15–18/18
+complete but unmerged** — see "cedh run state" below before touching it.
 
-*Expected but **not yet measured**:* the cap binds at both levels, holding example volume constant
-while decks vary ~12.6×, which makes the pure-volume null **exactly 0.0000** and the comparison a
-clean diversity isolation. `mr.t4_scaling --preflight` is what settles it, and the frozen rule needs
-no amendment either way — the prediction is a function of the realized example ratio, so if the cap
-turns out not to bind the null simply stops being zero. Order: pre-flight, freeze the point
-predictions from its ratios, then run the grid. Frozen rule in `THRESHOLDS.md` under "T4 scaling".
-
-Non-negotiables, all now enforced in code rather than by discipline: the subsample is applied
-**after** `split_by_deck`; the test set is asserted byte-identical by fingerprint; strata and the
-popularity baseline are loaded from the full level so the cold-start bucket holds the same cards at
-both levels; the layer-0 cache key and the embedding path both carry the subsample.
+Non-negotiables, all enforced in code rather than by discipline: the subsample is applied **after**
+`split_by_deck`; the test set is asserted byte-identical by fingerprint (all four cedh levels hashed
+`3fe8406f6b91e0ed`); strata and the popularity baseline load from the full level so the cold-start
+bucket holds the same cards at both levels; the layer-0 cache key and the embedding path both carry
+the subsample.
 
 cedh needs no deck filter (p50 98, max 99) — a useful control on the filter itself. Its played
-vocabulary is far narrower than the 30,958-card retrieval pool.
+vocabulary is far narrower than the 30,958-card retrieval pool: **PPMI vocab 10,133 against casual's
+20,531**.
 
-**Phase 5 — seeds 45/46.** ~3.3h total, but chunkable: `main` skips runs whose partial exists, so
-`--seeds 45 --arms A B B_type D` (~40 min), then `--arms B+` (~29 min), then `--arms C` (~29 min).
-Removes the INTERIM banner. **Must run on the same GPU as seeds 42/43/44** — the pooled seed sd is
-the denominator of the null rule, and splitting seeds across hardware adds a term no seed controls.
-Must also finish before any cedh partial is written.
+**Phase 5 — seeds 45/46. THE NEXT THING TO DO, and it needs no pod.** See the dedicated section
+below.
 
 **Phase 6 — `findings/t4_conclusion.md`. Done, and it is a renderer** (`mr.t4_conclusion`), not a
 hand-written file: every number is read from the frozen findings JSONs, so Phase 5 and Phase 4
 refresh it by re-running rather than by anyone remembering to. Two guards, both on rendered text —
 an incomplete ladder must carry the INTERIM banner, and each closed question must appear with its
 figure.
+
+---
+
+## Phase 5 — start here. Self-contained, local, no pod.
+
+**What it is.** Casual seeds 45/46 across all six arms, completing the frozen n=5. This is the
+highest-value work outstanding: it removes the INTERIM banner from `t4_representation.md`, which is
+the ladder every other document cites. Nothing about it depends on cedh.
+
+**Where it runs: the local 4090, and nowhere else.** Seeds 45/46 join a pooled seed sd computed from
+42/43/44 on that card, and that sd is the denominator of the null rule for every verdict in the
+ladder. Splitting seeds across hardware injects a term no seed controls. This is not a preference.
+
+**Sustained local load is capped at ~1–2h** (breaker, shared with AC), so run it in chunks. No code
+change needed: `main` skips any (arm, seed) whose partial already exists and layer 0 is cached, so
+the grid resumes for free. Longest single unit is B+ at ~29 min.
+
+```bash
+uv run python -m mr.t4_representation --corpus casual --seeds 45 --arms A B B_type D   # ~40 min
+uv run python -m mr.t4_representation --corpus casual --seeds 45 --arms B+             # ~29 min
+uv run python -m mr.t4_representation --corpus casual --seeds 45 --arms C              # ~29 min
+#   ... then repeat all three for --seeds 46
+uv run python -m mr.t4_representation --merge          # casual-scoped; writes t4_representation.*
+uv run python -m mr.t4_conclusion                      # re-renders the conclusion from the findings
+```
+
+**How to know it worked.** `t4_representation.md` loses the INTERIM banner and the payload reports
+`is_final: true`. Until *every* arm reaches 5 seeds the banner stays and reports the **least**
+complete arm — that is deliberate (`completed_seeds` uses `min`, not `max`), so a half-finished seed
+cannot read as a finished ladder. Expect the banner to say "4 of 5" for a while mid-way through
+seed 46; that is correct, not a bug.
+
+**Do not** run anything else on the GPU during a chunk — early timings were inflated up to 3× by
+competing processes.
+
+---
+
+## cedh run state — 2026-07-30, incomplete and partially stranded
+
+**What happened.** The Phase 4 grid ran on a RunPod 3×RTX 5090 secure pod (`b45vlg6pu83rz7`). It got
+through the pre-flight, the pre-registration gate and **at least 15 of 18 partials** — all nine
+full-level, plus subsample A and B+ at all three seeds — with subsample C mid-run. RunPod then
+auto-stopped the pod on a low account balance. On restart it returned *"not enough free GPUs on the
+host machine"*: the pod's volume lives on that host's local disk, and the host had reallocated the
+GPUs. **The partials are intact on that volume but unreachable until the host frees capacity.**
+
+**Design lesson, for any re-run: use a RunPod _network_ volume, not a pod-local one.** A network
+volume detaches from the host, so a stop, a low balance or a full host cannot strand the results. A
+pod-local volume makes every stop a gamble on getting back onto the same machine.
+
+**Results already established** (means ± sd over 3 seeds, `centroid`, recall@50). Provisional: these
+came from reading partials directly, not from the merged report.
+
+| level | arm | aggregate | cold-start | max_sim |
+|---|---|---|---|---|
+| full | A | 0.0099 ± 0.0043 | **0.0783 ± 0.0012** | 0.1340 |
+| full | B+ | 0.0070 ± 0.0008 | **0.0809 ± 0.0023** | 0.1479 |
+| full | C | 0.0083 ± 0.0043 | 0.0699 ± 0.0029 | 0.1216 |
+| subsample | A | 0.0077 ± 0.0038 | **0.0374 ± 0.0104** | 0.1402 |
+| subsample | B+ | 0.0108 ± 0.0107 | **0.0369 ± 0.0184** | 0.1670 |
+
+Cold-start gaps: **A +0.0409, B+ +0.0440**, against the frozen volume null of **+0.0042** — roughly
+tenfold, far past the +0.005 magnitude gate and well outside the pooled seed sd. The aggregate is
+null and noisy (A +0.0022, B+ −0.0038). 675,233 queries; cold-start stratum only 2,222 of them
+(0.33%, against casual's 14.7%) because 39,733 train decks leave few cards rare. Popularity scores
+**0.6912** aggregate and **0.0000** cold-start — same structure as casual, more extreme.
+
+**What is missing and why it matters.** The paired query bootstrap needs the per-query `hits`
+vectors stored inside each partial. Without them `t4_scaling_verdict` returns **UNDERPOWERED** by
+design rather than passing a verdict on two of the three frozen conditions. So the headline above is
+a point estimate with no interval, and must be reported that way until the merge runs.
+
+**Two interpretation caveats that must reach the write-up.**
+
+1. *The cold-start stratum is frozen at full-level counts* — ≤5 appearances among 39,733 decks. In a
+   3,142-deck subsample those same cards have ~0.4 expected appearances, so most are not merely rare
+   at the low level, they are **absent**. Part of +0.041 is therefore "a few exposures versus none",
+   which is neither diversity nor something the pair-count null models. Get the per-level appearance
+   distribution before claiming diversity.
+2. *`max_sim` runs the opposite direction* — subsample beats full for both arms (A 0.1402 vs 0.1340;
+   B+ 0.1670 vs 0.1479). Both aggregators were frozen up front precisely so this is reported rather
+   than chosen between.
+
+**To finish it.** Either recover the pod (retry `start-pod`; reducing it to 1 GPU in the console
+makes the host far likelier to fit it — `02_grid.sh` now clamps `NGPU` to the visible device count,
+and the pod re-syncs the repo on start, so a resized pod works), or re-run. A re-run costs ~$4.65 on
+a **single** 5090 secure over ~4.7h and does not compromise anything: the frozen prediction is
+already committed, and the pre-flight is deterministic, so the same counts (194,312 / 65,425, ratio
+2.9700, prediction +0.0042) reproduce exactly. Skip the replicate floor — already measured at
+delta ~3e-06, three orders of magnitude below the +0.005 gate.
+
+Once partials are in hand, **the merge is free and local**: `uv run python -m mr.t4_scaling --merge
+--corpus cedh` reads `findings/` and the bootstrap is pure numpy. No GPU required.
 
 ---
 
@@ -144,6 +230,35 @@ code and unfrozen in the record. A meta-test enforces it.
 **Report guards assert on rendered text, not intermediate dicts.** Both shipped omission bugs had
 perfectly correct data; the defect was in the rendering, which is the only artifact anyone reads.
 Keep it that way.
+
+**More than one visible GPU silently changes the recipe.** `transformers.Trainer` wraps the model in
+DataParallel and multiplies `per_device_train_batch_size` by the device count, so a 3-GPU box trains
+at an effective batch of 96 against the frozen 32 — and under `MultipleNegativesRankingLoss` the
+batch *is* the negative sampling. It also breaks the schedule: `num_train_steps` is computed as
+`len(dataset) // 32`, so WarmupLinear decays against a horizon 3× too long and the LR never reaches
+zero (observed: 4,048 steps against an assumed 12,144, final LR 1.4e-05). `finetune` now **raises**
+rather than setting `CUDA_VISIBLE_DEVICES` internally, which would be a no-op after torch has
+initialized. Callers pin the device. DataParallel was also barely faster — 12.5 min on 3 GPUs vs
+16 min on 1 — because gather/scatter dominates for a 22M-param model.
+
+**The parser pin used to hash checkout bytes, not parser content.** Fixed 2026-07-30; see
+Provenance. If a pin mismatch ever appears again, check line endings before believing the parser
+changed.
+
+**`git pull ... || true` in an automation script runs stale code silently.** The pod ran an old
+`01_preflight.sh` for a full cycle because a pull failed on an untracked-file collision and the
+`|| true` swallowed it. Use `git fetch && git reset --hard`, and make a sync failure fatal.
+
+**Do not gate on file mtimes.** The first pre-registration gate required `THRESHOLDS.md` to be newer
+than the pre-flight output. A fresh `git clone` writes everything at the same instant, so a
+correctly pre-registered run would have been blocked — and the natural response is to reach for the
+override, after which the gate means nothing. It now checks *content*: recompute the ratio from the
+pre-flight JSON and require that ratio and its implied prediction to appear in `THRESHOLDS.md`.
+
+**A RunPod start command replaces the image entrypoint**, so `sshd` never starts and `$PUBLIC_KEY`
+is never written to `authorized_keys` — SSH refuses even with the key added in the console. If you
+override the start command, start sshd yourself and pass `PUBLIC_KEY` in the pod env. The TCP port
+also remaps on every restart; re-read it from `get-pod` rather than reusing the old one.
 
 **Windows:** `PYTHONIOENCODING=utf-8` on anything that prints findings text — 290 cards carry
 U+2212 and the console defaults to cp1252. The `index_reduce() is in beta` warning is expected.
